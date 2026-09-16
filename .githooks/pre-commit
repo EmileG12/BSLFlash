@@ -1,0 +1,19 @@
+#!/bin/sh
+# Non-blocking reminder: warns if src/ or supabase/ changes are staged
+# without any docs/ change staged alongside them.
+
+staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+
+code_changed=$(printf '%s\n' "$staged_files" | grep -E '^(src|supabase)/')
+docs_changed=$(printf '%s\n' "$staged_files" | grep -E '^docs/')
+
+if [ -n "$code_changed" ] && [ -z "$docs_changed" ]; then
+  echo ""
+  echo "Reminder: src/ or supabase/ changes are staged but no docs/ files are staged."
+  echo "If this adds/modifies/removes a component, hook, table, RLS policy, or RPC"
+  echo "function, update the matching file(s) in docs/ before committing."
+  echo "(Non-blocking -- commit will proceed.)"
+  echo ""
+fi
+
+exit 0
