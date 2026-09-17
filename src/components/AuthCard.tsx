@@ -11,7 +11,7 @@ interface AuthCardProps {
 export function AuthCard({ title, description, children }: AuthCardProps) {
   return (
     <div className="flex min-h-svh items-center justify-center p-4">
-      <Card className="w-[50vw]">
+      <Card className="w-[50vw] shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl">{title}</CardTitle>
           <CardDescription>{description}</CardDescription>

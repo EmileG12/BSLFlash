@@ -62,7 +62,7 @@ export function LoginPage() {
           </Button>
           <Link
             to="/signup"
-            className="text-muted-foreground text-center text-xs no-underline hover:underline"
+            className="text-muted-foreground cursor-pointer text-center text-xs no-underline hover:underline"
           >
             Sign Up
           </Link>
