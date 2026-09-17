@@ -58,7 +58,7 @@ values
     extensions.crypt('SuperAdmin123!', extensions.gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
-    '{}'::jsonb,
+    '{"username":"Super Admin"}'::jsonb,
     now(),
     now(),
     '',
@@ -77,7 +77,7 @@ values
     extensions.crypt('User123!', extensions.gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
-    '{}'::jsonb,
+    '{"username":"Test User"}'::jsonb,
     now(),
     now(),
     '',
@@ -137,24 +137,15 @@ values
   )
 on conflict (provider_id, provider) do nothing;
 
--- 4. Profiles -------------------------------------------------------------
-
-insert into public.profiles (user_id, user_name)
-values
-  ('11111111-1111-1111-1111-111111111111', 'Super Admin'),
-  ('22222222-2222-2222-2222-222222222222', 'Test User')
-on conflict (user_id) do nothing;
-
--- 5. Role assignments -------------------------------------------------------
+-- 4. Role assignments -------------------------------------------------------
+-- public.profiles rows and the base 'user' role are both created
+-- automatically by the handle_new_user trigger, fired by the auth.users
+-- insert above (now that raw_user_meta_data.username is populated). The
+-- superadmin account additionally needs the 'superadmin' role, which the
+-- trigger never grants (it only ever grants 'user').
 
 insert into public.user_roles (user_id, role_id)
 select '11111111-1111-1111-1111-111111111111', id
 from public.roles
 where role_name = 'superadmin'
-on conflict (user_id, role_id) do nothing;
-
-insert into public.user_roles (user_id, role_id)
-select '22222222-2222-2222-2222-222222222222', id
-from public.roles
-where role_name = 'user'
 on conflict (user_id, role_id) do nothing;

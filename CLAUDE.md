@@ -37,7 +37,7 @@ For Supabase elements (tables, RLS policies, RPC functions), each doc file embed
 
 **Library-first for new components/functions:** when asked to build a new component, icon, or utility function, first check whether a well-tested existing library or plugin already provides it (e.g. an icon request → recommend Lucide rather than a custom SVG). Recommend the library and get confirmation before building a custom implementation. Only build custom when no suitable library exists.
 
-**Extract shared code instead of copying:** when asked to copy a component or its styling to another page, don't duplicate the code. Extract it into its own reusable file (component/hook/module) that both the original and new usage import, rather than pasting a second copy.
+**Extract shared code instead of duplicating it:** don't duplicate a component or its styling across pages — whether explicitly asked to copy something, or discovered while building something new that turns out to share structure with existing code. When a new page/component would repeat markup, styling, or logic that already exists elsewhere (or when building two similar things in the same task, like a login and signup page), extract the shared part into its own reusable file that both import, rather than pasting a second copy. Recognize this during design, not only when told to.
 
 ## Testing
 

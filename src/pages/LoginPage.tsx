@@ -1,7 +1,10 @@
 import { useState, type FormEvent } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import { AuthCard } from '@/components/AuthCard'
+import { LabeledInput } from '@/components/LabeledInput'
+import { Button } from '@/components/ui/button'
+import { CardContent, CardFooter } from '@/components/ui/card'
 import { signInWithPassword } from '../lib/auth'
-import './LoginPage.css'
 
 export function LoginPage() {
   const [email, setEmail] = useState('')
@@ -26,42 +29,45 @@ export function LoginPage() {
   }
 
   return (
-    <div className="login-page">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1>Log in</h1>
-
-        <label>
-          Email
-          <input
+    <AuthCard title="Log in" description="Enter your email and password to continue.">
+      <form onSubmit={handleSubmit} className="flex flex-col gap-(--card-spacing)">
+        <CardContent className="flex flex-col gap-4">
+          <LabeledInput
+            label="Email"
+            id="email"
             type="email"
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             autoComplete="email"
             required
           />
-        </label>
-
-        <label>
-          Password
-          <input
+          <LabeledInput
+            label="Password"
+            id="password"
             type="password"
             value={password}
             onChange={(event) => setPassword(event.target.value)}
             autoComplete="current-password"
             required
           />
-        </label>
-
-        {error && (
-          <p className="login-error" role="alert">
-            {error}
-          </p>
-        )}
-
-        <button type="submit" disabled={submitting}>
-          {submitting ? 'Logging in…' : 'Log in'}
-        </button>
+          {error && (
+            <p role="alert" className="text-destructive text-sm">
+              {error}
+            </p>
+          )}
+        </CardContent>
+        <CardFooter className="flex flex-col gap-2">
+          <Button type="submit" disabled={submitting} className="w-full">
+            {submitting ? 'Logging in…' : 'Log in'}
+          </Button>
+          <Link
+            to="/signup"
+            className="text-muted-foreground text-center text-xs no-underline hover:underline"
+          >
+            Sign Up
+          </Link>
+        </CardFooter>
       </form>
-    </div>
+    </AuthCard>
   )
 }

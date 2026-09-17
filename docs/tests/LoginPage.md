@@ -7,6 +7,7 @@
 
 - Shows the generic error message (`Email or password are incorrect.`) when `signInWithPassword` rejects, and does not navigate away.
 - Navigates to `/` after a successful login.
+- Navigates to `/signup` when the "Sign Up" link is clicked.
 
 ## Notes
 

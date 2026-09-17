@@ -54,4 +54,21 @@ describe('LoginPage', () => {
 
     expect(await screen.findByText('Home page')).toBeInTheDocument()
   })
+
+  it('navigates to /signup when the Sign Up link is clicked', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/login']}>
+        <Routes>
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/signup" element={<div>Signup page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('link', { name: /sign up/i }))
+
+    expect(await screen.findByText('Signup page')).toBeInTheDocument()
+  })
 })

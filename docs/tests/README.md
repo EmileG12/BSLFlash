@@ -7,4 +7,5 @@ Run the suite: `npm run test`.
 | Test file | Tests | Covers |
 |---|---|---|
 | [LoginPage](./LoginPage.md) | `src/pages/LoginPage.test.tsx` | [LoginPage](../components/LoginPage.md) |
+| [SignupPage](./SignupPage.md) | `src/pages/SignupPage.test.tsx` | [SignupPage](../components/SignupPage.md) |
 | [NavBar](./NavBar.md) | `src/components/NavBar.test.tsx` | [NavBar](../components/NavBar.md) |
