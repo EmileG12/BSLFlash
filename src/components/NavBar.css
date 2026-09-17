@@ -1,0 +1,27 @@
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 24px;
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-brand {
+  color: var(--text-h);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.navbar-signout {
+  font: inherit;
+  color: var(--text-h);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+.navbar-signout:hover {
+  border-color: var(--accent-border);
+}

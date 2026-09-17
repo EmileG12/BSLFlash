@@ -16,7 +16,8 @@ This folder is a plain markdown tree, so it works two ways:
 - [db-schema/](./db-schema/README.md) — database tables.
 - [rls-policies/](./rls-policies/README.md) — Row Level Security policies, grouped by table.
 - [rpc-functions/](./rpc-functions/README.md) — Postgres functions exposed via Supabase RPC.
+- [tests/](./tests/README.md) — what the test suite covers, kept separate from the component/hook/utility docs so test docs don't flood the docs for the actual codebase; each entry links back to the doc of the thing it tests.
 
 ## How this is used
 
-Before searching `src/` or `supabase/` to understand how something works, check the matching file(s) here first. As part of finishing any change that adds, modifies, or removes a component, hook/utility, table, RLS policy, or RPC function, the matching doc file(s) are updated in the same change — see the `update-docs` skill. For Supabase elements (tables, policies, functions), each doc file embeds the current live SQL definition directly, so it's a self-contained source of truth — no need to trace migration history to know current behavior.
+Before searching `src/` or `supabase/` to understand how something works, check the matching file(s) here first. As part of finishing any change that adds, modifies, or removes a component, hook/utility, table, RLS policy, or RPC function, the matching doc file(s) are updated in the same change — see the `update-docs` skill. New or changed test files are documented separately under `tests/` — see the `suggest-tests` skill. For Supabase elements (tables, policies, functions), each doc file embeds the current live SQL definition directly, so it's a self-contained source of truth — no need to trace migration history to know current behavior.
