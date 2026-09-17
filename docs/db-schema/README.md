@@ -4,5 +4,8 @@ Tables, one doc file per table.
 
 | Table | Purpose |
 |---|---|
+| [profiles](./profiles.md) | One row per app user; app-facing profile data. |
+| [roles](./roles.md) | Lookup table of roles (`superadmin`, `user`). |
+| [user_roles](./user_roles.md) | Junction table assigning roles to auth users. |
 
-No tables exist yet — `supabase/migrations/` is empty. Entries are added here as real tables are created; see [migrations.md](../migrations.md) for the workflow.
+See [migrations.md](../migrations.md) for the workflow that keeps this in sync with `supabase/migrations/`.
