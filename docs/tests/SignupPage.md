@@ -11,6 +11,7 @@
 - Successful signup without a session (`hasSession: false`) navigates to `/login`.
 - `signUp` rejecting with `SIGNUP_ALREADY_IN_USE_MESSAGE` shows it via `role="alert"`.
 - Any other rejection shows the generic unexpected-error message.
+- Navigates to `/login` when the "Log In" link is clicked.
 
 ## Notes
 

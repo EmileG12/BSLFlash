@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { AuthCard } from '@/components/AuthCard'
+import { AuthSwitchLink } from '@/components/AuthSwitchLink'
 import { LabeledInput } from '@/components/LabeledInput'
 import { Button } from '@/components/ui/button'
 import { CardContent, CardFooter } from '@/components/ui/card'
@@ -87,10 +88,11 @@ export function SignupPage() {
             </p>
           )}
         </CardContent>
-        <CardFooter className="bg-muted">
+        <CardFooter className="flex flex-col gap-2 bg-muted">
           <Button type="submit" disabled={submitting} className="mx-auto w-11/12">
             {submitting ? 'Signing up…' : 'Sign up'}
           </Button>
+          <AuthSwitchLink to="/login">Log In</AuthSwitchLink>
         </CardFooter>
       </form>
     </AuthCard>

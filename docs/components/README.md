@@ -13,3 +13,4 @@ React components, one doc file per component.
 | [GuestRoute](./GuestRoute.md) | `src/components/GuestRoute.tsx` | Redirects to `/` when already signed in. |
 | [AuthCard](./AuthCard.md) | `src/components/AuthCard.tsx` | Shared Card scaffold for `LoginPage`/`SignupPage`. |
 | [LabeledInput](./LabeledInput.md) | `src/components/LabeledInput.tsx` | Shared label + input field, used by `LoginPage`/`SignupPage`. |
+| [AuthSwitchLink](./AuthSwitchLink.md) | `src/components/AuthSwitchLink.tsx` | Shared "switch to the other auth page" link, used by `LoginPage`/`SignupPage`. |

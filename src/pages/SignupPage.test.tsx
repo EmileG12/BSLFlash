@@ -144,4 +144,21 @@ describe('SignupPage', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent(/something went wrong/i)
   })
+
+  it('navigates to /login when the Log In link is clicked', async () => {
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter initialEntries={['/signup']}>
+        <Routes>
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/login" element={<div>Login page</div>} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    await user.click(screen.getByRole('link', { name: /log in/i }))
+
+    expect(await screen.findByText('Login page')).toBeInTheDocument()
+  })
 })
