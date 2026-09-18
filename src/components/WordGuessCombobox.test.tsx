@@ -16,6 +16,20 @@ describe('WordGuessCombobox', () => {
     expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled()
   })
 
+  it('shows only the word in the list, with the definition appearing as a tooltip on hover', async () => {
+    const user = userEvent.setup()
+
+    render(<WordGuessCombobox words={words} onSubmit={vi.fn()} />)
+
+    await user.click(screen.getByRole('combobox'))
+    const option = await screen.findByRole('option', { name: 'Hello' })
+
+    expect(screen.queryByText('A greeting.')).not.toBeInTheDocument()
+
+    await user.hover(option)
+    expect(await screen.findByText('A greeting.')).toBeVisible()
+  })
+
   it('enables Confirm once a word is selected and submits its id on click', async () => {
     const onSubmit = vi.fn()
     const user = userEvent.setup()
@@ -23,7 +37,7 @@ describe('WordGuessCombobox', () => {
     render(<WordGuessCombobox words={words} onSubmit={onSubmit} />)
 
     await user.click(screen.getByRole('combobox'))
-    await user.click(await screen.findByText(/hello — a greeting/i))
+    await user.click(await screen.findByRole('option', { name: 'Hello' }))
 
     const confirmButton = screen.getByRole('button', { name: /confirm/i })
     expect(confirmButton).toBeEnabled()
@@ -40,8 +54,8 @@ describe('WordGuessCombobox', () => {
     await user.click(screen.getByRole('combobox'))
     await user.type(screen.getByRole('combobox'), 'World')
 
-    expect(await screen.findByText(/world — the earth/i)).toBeInTheDocument()
-    expect(screen.queryByText(/hello — a greeting/i)).not.toBeInTheDocument()
+    expect(await screen.findByRole('option', { name: 'World' })).toBeInTheDocument()
+    expect(screen.queryByRole('option', { name: 'Hello' })).not.toBeInTheDocument()
   })
 
   it('submits via a second Enter press after selecting a word', async () => {
@@ -51,7 +65,7 @@ describe('WordGuessCombobox', () => {
     render(<WordGuessCombobox words={words} onSubmit={onSubmit} />)
 
     await user.click(screen.getByRole('combobox'))
-    await user.click(await screen.findByText(/world — the earth/i))
+    await user.click(await screen.findByRole('option', { name: 'World' }))
     expect(onSubmit).not.toHaveBeenCalled()
 
     await user.keyboard('{Enter}')

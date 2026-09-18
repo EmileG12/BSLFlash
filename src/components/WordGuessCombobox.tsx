@@ -8,16 +8,14 @@ import {
   ComboboxList,
 } from '@/components/ui/combobox'
 import { Button } from '@/components/ui/button'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import type { WordOption } from '../hooks/useWords'
+import './WordGuessCombobox.css'
 
 interface WordGuessComboboxProps {
   words: WordOption[]
   onSubmit: (wordId: string) => void
   disabled?: boolean
-}
-
-function wordLabel(word: WordOption) {
-  return `${word.word} — ${word.definition}`
 }
 
 /** Searchable combobox over every word, gated behind a Confirm button (or a second Enter) so guessing never submits accidentally while narrowing the search. */
@@ -43,18 +41,25 @@ export function WordGuessCombobox({ words, onSubmit, disabled = false }: WordGue
         items={words}
         value={selectedWord}
         onValueChange={setSelectedWord}
-        itemToStringLabel={wordLabel}
+        itemToStringLabel={(word) => word.word}
         isItemEqualToValue={(a, b) => a.id === b.id}
         disabled={disabled}
       >
-        <ComboboxInput placeholder="Search words..." className="w-full" />
+        <ComboboxInput placeholder="Search words..." className="w-full word-guess-input" />
         <ComboboxContent>
           <ComboboxEmpty>No matching words.</ComboboxEmpty>
           <ComboboxList>
             {(word: WordOption) => (
-              <ComboboxItem key={word.id} value={word}>
-                {wordLabel(word)}
-              </ComboboxItem>
+              <TooltipProvider key={word.id}>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <ComboboxItem value={word} className="word-guess-item">
+                      {word.word}
+                    </ComboboxItem>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">{word.definition}</TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
             )}
           </ComboboxList>
         </ComboboxContent>

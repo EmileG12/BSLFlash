@@ -1,0 +1,13 @@
+@reference "../index.css";
+
+.word-guess-input:focus-within {
+  box-shadow: 0 8px 12px var(--shadow-color);
+}
+
+.word-guess-item {
+  @apply w-full;
+}
+
+.word-guess-item[data-highlighted] {
+  @apply bg-muted;
+}

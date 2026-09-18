@@ -75,7 +75,7 @@ describe('FlashcardPage', () => {
     renderPage()
 
     await user.click(await screen.findByRole('combobox'))
-    await user.click(await screen.findByText(/hello — a greeting/i))
+    await user.click(await screen.findByRole('option', { name: 'Hello' }))
     await user.click(screen.getByRole('button', { name: /confirm/i }))
 
     expect(await screen.findByText(/correct!/i)).toBeInTheDocument()
@@ -89,7 +89,7 @@ describe('FlashcardPage', () => {
     renderPage()
 
     await user.click(await screen.findByRole('combobox'))
-    await user.click(await screen.findByText(/world — the earth/i))
+    await user.click(await screen.findByRole('option', { name: 'World' }))
     await user.click(screen.getByRole('button', { name: /confirm/i }))
 
     expect(await screen.findByText(/incorrect\./i)).toBeInTheDocument()
@@ -103,7 +103,7 @@ describe('FlashcardPage', () => {
     renderPage()
 
     await user.click(await screen.findByRole('combobox'))
-    await user.click(await screen.findByText(/hello — a greeting/i))
+    await user.click(await screen.findByRole('option', { name: 'Hello' }))
     await user.click(screen.getByRole('button', { name: /confirm/i }))
     await screen.findByText(/correct!/i)
 
