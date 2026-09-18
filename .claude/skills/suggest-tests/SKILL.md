@@ -15,6 +15,7 @@ Conventions already established (follow them, don't reinvent per file):
 
 ## Checklist
 
+0. **Check whether `src/` changed at all first.** If the change is backend-only (`supabase/migrations/`, `supabase/seed.sql`, `supabase/config.toml`, `scripts/`, etc. — no files under `src/`), this skill doesn't apply: there's no React component/hook/utility for Vitest/RTL to test, and running `npm run build`/`npm run lint`/`npm run test` against unchanged frontend code proves nothing about the change just made. Skip straight to backend-appropriate verification instead (SQL queries, curl against the local API, RLS checks) and don't run any of steps 1-5.
 1. List what changed in this task: components, hooks, utility functions added/modified/removed.
 2. For each one with user-visible or branching behavior (conditionals, error handling, state transitions, async calls) — not pure styling/markup-only changes — check whether a matching test file exists.
    - Missing and the change introduces real behavior worth protecting: propose specific test cases (not just "renders without crashing") and write them as part of finishing the change, same as `update-docs` does for documentation.
