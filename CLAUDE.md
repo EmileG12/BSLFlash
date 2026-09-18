@@ -10,7 +10,9 @@ BSL (British Sign Language) flashcard web app.
 
 ## Learning goal
 
-This project also doubles as how the user is learning React, Postgres, and testing. When introducing a new pattern, library, or non-obvious technique, explain it like a tutorial, not a one-line mention: what it does, why it was chosen over the alternatives, how it actually works (not just "call this function"), and the steps to reproduce or extend it yourself. Don't compress this for brevity — skipping the reasoning or the mechanism to keep things short defeats the point; the goal is the user could rebuild the pattern from scratch next time, not just recognize it.
+This project also doubles as how the user is learning React, Postgres, CSS, and testing. When introducing a new pattern, library, or non-obvious technique, explain it like a tutorial, not a one-line mention: what it does, why it was chosen over the alternatives, how it actually works (not just "call this function"), and the steps to reproduce or extend it yourself. Don't compress this for brevity — skipping the reasoning or the mechanism to keep things short defeats the point; the goal is the user could rebuild the pattern from scratch next time, not just recognize it.
+
+When a concept recurs that was already given the full tutorial treatment earlier (in this session or a prior one), don't repeat the full explanation or skip it silently — give a **refresher**: a short reminder (a sentence or two) of what it is and why it works, right at the point of use. This is shorter than the original explanation but still present every time, to build muscle memory through repetition rather than a one-off lesson.
 
 ## Running locally
 

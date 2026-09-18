@@ -6,7 +6,10 @@ React components, one doc file per component.
 |---|---|---|
 | [LoginPage](./LoginPage.md) | `src/pages/LoginPage.tsx` | Email/password login form. |
 | [SignupPage](./SignupPage.md) | `src/pages/SignupPage.tsx` | Account creation form (email, username, password, confirm password). |
-| [HomePage](./HomePage.md) | `src/pages/HomePage.tsx` | Placeholder landing page for logged-in users. |
+| [HomePage](./HomePage.md) | `src/pages/HomePage.tsx` | Landing page for logged-in users; greeting + deck picker. |
+| [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.tsx` | Card listing flashcard categories as buttons to pick a deck. |
+| [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | The flashcard guessing game: video + guess combobox + reveal. |
+| [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
 | [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link + Sign Out) shown on all authenticated pages. |
 | [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar`. |
 | [ProtectedRoute](./ProtectedRoute.md) | `src/components/ProtectedRoute.tsx` | Redirects to `/login` when signed out. |

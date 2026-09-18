@@ -7,6 +7,7 @@
 
 :root {
   --code-bg: #f4f3ec;
+  --shadow-color: rgba(0, 0, 0, 0.12);
 
   --sans: system-ui, 'Segoe UI', Roboto, sans-serif;
   --heading: system-ui, 'Segoe UI', Roboto, sans-serif;
@@ -53,6 +54,8 @@
   --accent-foreground: oklch(0.205 0 0);
 
   --destructive: oklch(0.577 0.245 27.325);
+
+  --success: oklch(0.6 0.16 145);
 
   --input: oklch(0.922 0 0);
 
@@ -159,6 +162,7 @@ code {
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-success: var(--success);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -183,6 +187,8 @@ code {
 }
 
 .dark {
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --success: oklch(0.65 0.17 145);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);
   --card: oklch(0.205 0 0);

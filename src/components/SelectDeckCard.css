@@ -1,0 +1,18 @@
+@reference "../index.css";
+
+.select-deck-card {
+  @apply w-full max-w-4xl shadow-lg;
+}
+
+.select-deck-grid {
+  @apply grid gap-3;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+}
+
+.select-deck-button {
+  @apply hover:bg-transparent;
+}
+
+.select-deck-button:hover {
+  box-shadow: 0 8px 12px var(--shadow-color);
+}

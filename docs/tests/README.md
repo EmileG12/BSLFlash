@@ -9,3 +9,8 @@ Run the suite: `npm run test`.
 | [LoginPage](./LoginPage.md) | `src/pages/LoginPage.test.tsx` | [LoginPage](../components/LoginPage.md) |
 | [SignupPage](./SignupPage.md) | `src/pages/SignupPage.test.tsx` | [SignupPage](../components/SignupPage.md) |
 | [NavBar](./NavBar.md) | `src/components/NavBar.test.tsx` | [NavBar](../components/NavBar.md) |
+| [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.test.tsx` | [SelectDeckCard](../components/SelectDeckCard.md) |
+| [useWords](./useWords.md) | `src/hooks/useWords.test.ts` | [useWords](../hooks/useWords.md) |
+| [useRandomFlashcard](./useRandomFlashcard.md) | `src/hooks/useRandomFlashcard.test.ts` | [useRandomFlashcard](../hooks/useRandomFlashcard.md) |
+| [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.test.tsx` | [WordGuessCombobox](../components/WordGuessCombobox.md) |
+| [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.test.tsx` | [FlashcardPage](../components/FlashcardPage.md) |

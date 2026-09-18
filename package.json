@@ -12,6 +12,7 @@
     "db:reset:seeded": "npx supabase db reset && node scripts/seed-sign-videos.mjs"
   },
   "dependencies": {
+    "@base-ui/react": "^1.8.0",
     "@fontsource-variable/geist": "^5.3.0",
     "@supabase/supabase-js": "^2.116.0",
     "@tailwindcss/vite": "^4.3.3",
