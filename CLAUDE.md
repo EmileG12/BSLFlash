@@ -39,6 +39,12 @@ For Supabase elements (tables, RLS policies, RPC functions), each doc file embed
 
 **Extract shared code instead of duplicating it:** don't duplicate a component or its styling across pages — whether explicitly asked to copy something, or discovered while building something new that turns out to share structure with existing code. When a new page/component would repeat markup, styling, or logic that already exists elsewhere (or when building two similar things in the same task, like a login and signup page), extract the shared part into its own reusable file that both import, rather than pasting a second copy. Recognize this during design, not only when told to.
 
+## Color tokens
+
+Every color value lives in `src/index.css`'s `:root` (light) and `.dark` blocks as a named CSS variable (e.g. `--foreground`, `--ring`) — never hardcode a raw color value (hex/oklch/rgb) inside a component. Name tokens by role ("what it's for" — `--muted-foreground`, `--destructive`) not by appearance ("what it looks like" — `--gray-500`), so the name stays meaningful if the actual value changes later.
+
+**When asked to use or add a color:** first check whether an existing variable already matches or is close, and propose using that instead of introducing a near-duplicate (this is what prevents drift like one component using `0.985` and another using `0.976` for what's supposed to be the same shade). If nothing fits, propose adding a new variable with a properly semantic name — defined in both `:root` and `.dark`, and mapped in the `@theme inline` block if it needs its own Tailwind utility (e.g. `bg-*`/`text-*`/`ring-*`) — rather than inlining a literal value in the component.
+
 ## Testing
 
 This project uses [Vitest](https://vitest.dev) + [React Testing Library](https://testing-library.com/react) for component/hook tests — fast, in-memory, no browser or running Supabase instance required. Run the suite: `npm run test`.
