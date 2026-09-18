@@ -6,6 +6,7 @@
 ## Coverage
 
 - Renders a "Home" link.
+- Renders the SignStack logo image (accessible name "SignStack").
 - Clicking "Sign Out" calls `signOut` and navigates to `/login`.
 - Still navigates to `/login` even if `signOut` rejects (this test caught a real bug: the original `try { await signOut() } finally { navigate(...) }` let the error propagate as an unhandled promise rejection after the `finally` ran — fixed by adding an explicit empty `catch`).
 

@@ -6,6 +6,18 @@
   border-bottom: 1px solid #000;
 }
 
+.navbar-left {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.navbar-logo {
+  height: 64px;
+  width: auto;
+  display: block;
+}
+
 .navbar-brand {
   color: var(--foreground);
   font-weight: 500;

@@ -2,7 +2,7 @@
 
 **Path:** `src/components/NavBar.tsx`
 
-**Purpose:** Top navigation bar rendered on every authenticated page via [AppLayout](./AppLayout.md). Currently just a "Home" link and a "Sign Out" button.
+**Purpose:** Top navigation bar rendered on every authenticated page via [AppLayout](./AppLayout.md). Shows the SignStack long-form logo (`/bsl-long-logo.svg`) and a "Home" link on the left, and a "Sign Out" button on the right.
 
 **Props:** None.
 

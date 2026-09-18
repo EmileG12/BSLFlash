@@ -18,9 +18,12 @@ export function NavBar() {
 
   return (
     <nav className="navbar">
-      <Link to="/" className="navbar-brand">
-        Home
-      </Link>
+      <div className="navbar-left">
+        <img src="/bsl-long-logo.svg" alt="SignStack" className="navbar-logo" />
+        <Link to="/" className="navbar-brand">
+          Home
+        </Link>
+      </div>
       <button type="button" onClick={handleSignOut} className="navbar-signout">
         Sign Out
       </button>

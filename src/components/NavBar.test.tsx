@@ -20,6 +20,16 @@ describe('NavBar', () => {
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument()
   })
 
+  it('renders the SignStack logo', () => {
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('img', { name: /signstack/i })).toBeInTheDocument()
+  })
+
   it('signs the user out and navigates to /login when Sign Out is clicked', async () => {
     vi.mocked(signOut).mockResolvedValueOnce(undefined)
     const user = userEvent.setup()
