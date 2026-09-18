@@ -87,8 +87,8 @@ export function SignupPage() {
             </p>
           )}
         </CardContent>
-        <CardFooter>
-          <Button type="submit" disabled={submitting} className="w-full">
+        <CardFooter className="bg-muted">
+          <Button type="submit" disabled={submitting} className="mx-auto w-11/12">
             {submitting ? 'Signing up…' : 'Sign up'}
           </Button>
         </CardFooter>

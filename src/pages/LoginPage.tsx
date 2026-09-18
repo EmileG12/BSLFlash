@@ -56,8 +56,8 @@ export function LoginPage() {
             </p>
           )}
         </CardContent>
-        <CardFooter className="flex flex-col gap-2">
-          <Button type="submit" disabled={submitting} className="w-full">
+        <CardFooter className="flex flex-col gap-2 bg-muted">
+          <Button type="submit" disabled={submitting} className="mx-auto w-11/12">
             {submitting ? 'Logging in…' : 'Log in'}
           </Button>
           <Link
