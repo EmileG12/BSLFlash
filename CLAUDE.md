@@ -25,11 +25,11 @@ This project also doubles as how the user is learning React, Postgres, and testi
 
 ## Documentation system (read before editing code)
 
-[`/docs`](./docs/README.md) is a hand-maintained wiki describing the CURRENT state of the codebase: components, hooks/utilities, DB schema, RLS policies, RPC functions, and (as its own category) what the test suite covers. It is not a changelog — every file is edited in place to describe what exists now, never appended to with historical entries.
+[`/docs`](./docs/README.md) is a hand-maintained wiki describing the CURRENT state of the codebase: components, hooks/utilities, DB schema, RLS policies, RPC functions, Storage buckets, and (as its own category) what the test suite covers. It is not a changelog — every file is edited in place to describe what exists now, never appended to with historical entries.
 
 **Before grepping `src/` or `supabase/` to understand how something works, check the matching file(s) in `/docs` first.** Fall back to reading raw source only when the docs don't cover it, or to verify a doc is still accurate before changing the code it describes.
 
-**As part of finishing any change** that adds, modifies, or removes a React component, hook/utility, database table, RLS policy, or RPC function, update the matching file(s) under `/docs` in the same change. Use the `update-docs` skill as a checklist.
+**As part of finishing any change** that adds, modifies, or removes a React component, hook/utility, database table, RLS policy, RPC function, or Storage bucket, update the matching file(s) under `/docs` in the same change. Use the `update-docs` skill as a checklist.
 
 For Supabase elements (tables, RLS policies, RPC functions), each doc file embeds the current live SQL definition directly — that embedded SQL is the thing to check, not migration history. A table/policy/function's current shape is the cumulative result of every migration applied to it, so reading an individual migration file (or the original one) does not tell you its current state.
 

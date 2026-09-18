@@ -149,3 +149,33 @@ select '11111111-1111-1111-1111-111111111111', id
 from public.roles
 where role_name = 'superadmin'
 on conflict (user_id, role_id) do nothing;
+
+-- 5. Flashcard sample content -------------------------------------------
+-- Fixed literal UUIDs, same rationale as the auth users above: lets the
+-- sign_videos rows inserted by scripts/seed-sign-videos.mjs reference these
+-- signs deterministically after this script has run.
+--   aaaaaaaa-... = "Greetings" category
+--   bbbbbbbb-... = "Hello" word / sign
+--   cccccccc-... = "World" word / sign
+
+insert into public.categories (id, category_name)
+values ('aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa', 'Greetings')
+on conflict (id) do nothing;
+
+insert into public.words (id, word, definition)
+values
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Hello', 'A greeting used when meeting someone or answering the phone.'),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'World', 'The earth, together with all of its countries and peoples.')
+on conflict (id) do nothing;
+
+insert into public.word_categories (word_id, category_id)
+values
+  ('bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa'),
+  ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
+on conflict (word_id, category_id) do nothing;
+
+insert into public.signs (id, word_id, variant_name, region)
+values
+  ('bbbbbbbb-1111-1111-1111-111111111111', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Standard', null),
+  ('cccccccc-1111-1111-1111-111111111111', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Standard', null)
+on conflict (id) do nothing;

@@ -36,10 +36,15 @@ After applying a migration that touches a table, RLS policy, or RPC function:
    ```
    npx supabase db dump --local --schema public -f <scratch-file>.sql
    ```
-2. Find the exact current `CREATE TABLE` / `CREATE POLICY` / `CREATE FUNCTION` block for whatever changed, and copy it verbatim into the matching file under [docs/db-schema/](./db-schema/README.md), [docs/rls-policies/](./rls-policies/README.md), or [docs/rpc-functions/](./rpc-functions/README.md).
+   Storage bucket RLS policies live on `storage.objects`, not `public` — dump `--schema storage` instead to see those (e.g. the `sign-videos` bucket's policies, documented under [docs/storage/](./storage/README.md)).
+2. Find the exact current `CREATE TABLE` / `CREATE POLICY` / `CREATE FUNCTION` block for whatever changed, and copy it verbatim into the matching file under [docs/db-schema/](./db-schema/README.md), [docs/rls-policies/](./rls-policies/README.md), [docs/rpc-functions/](./rpc-functions/README.md), or [docs/storage/](./storage/README.md).
 3. Delete the scratch dump file — don't commit a redundant full schema dump; each entity's doc file holds its own current-state excerpt.
 4. Link the doc entry's "Last touched by migration" line to the new migration file.
 
 This dump-and-extract step matters because a table/policy/function's current shape is the *cumulative* result of every migration applied to it — a later migration can `ALTER`, `DROP`+`CREATE`, or `CREATE OR REPLACE` something an earlier migration defined. Reading only the original migration file (or hand-tracing the full history) can give a stale picture. Introspecting the live database is the only reliable way to get the current definition, which is why doc files embed that live-dumped SQL directly rather than linking to migration history as the source of truth.
+
+## Storage buckets
+
+Bucket declarations themselves (`public`, `file_size_limit`, `allowed_mime_types`) live in [`supabase/config.toml`](../supabase/config.toml) `[storage.buckets.*]`, not in a migration — they're applied by `npx supabase stop && npx supabase start`, not `db reset`. RLS policies on `storage.objects` scoped to a bucket are still ordinary SQL and belong in a migration, same as any table policy. See [docs/storage/](./storage/README.md).
 
 See the [update-docs skill](../.claude/skills/update-docs/SKILL.md) for the full checklist this fits into.

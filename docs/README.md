@@ -16,6 +16,7 @@ This folder is a plain markdown tree, so it works two ways:
 - [db-schema/](./db-schema/README.md) — database tables.
 - [rls-policies/](./rls-policies/README.md) — Row Level Security policies, grouped by table.
 - [rpc-functions/](./rpc-functions/README.md) — Postgres functions exposed via Supabase RPC.
+- [storage/](./storage/README.md) — Supabase Storage buckets.
 - [tests/](./tests/README.md) — what the test suite covers, kept separate from the component/hook/utility docs so test docs don't flood the docs for the actual codebase; each entry links back to the doc of the thing it tests.
 
 ## How this is used
