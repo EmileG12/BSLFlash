@@ -24,6 +24,27 @@
   text-decoration: none;
 }
 
+.navbar-menu-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--foreground);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+}
+
+.navbar-menu-trigger[data-state='open'] {
+  color: var(--muted-foreground);
+}
+
+.navbar-menu-icon {
+  pointer-events: none;
+}
+
 .navbar-signout {
   font: inherit;
   color: var(--foreground);

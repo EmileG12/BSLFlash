@@ -13,7 +13,7 @@ React components, one doc file per component.
 | [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.tsx` | "10 Cards" mode: a bounded, no-repeat round of up to 10 words, ending on a score. |
 | [FlashcardRound](./FlashcardRound.md) | `src/components/FlashcardRound.tsx` | Shared per-card gameplay (video + guess combobox + reveal), used by both game modes. |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
-| [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link + Sign Out) shown on all authenticated pages. |
+| [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Sign Out) shown on all authenticated pages. |
 | [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar`. |
 | [ProtectedRoute](./ProtectedRoute.md) | `src/components/ProtectedRoute.tsx` | Redirects to `/login` when signed out. |
 | [GuestRoute](./GuestRoute.md) | `src/components/GuestRoute.tsx` | Redirects to `/` when already signed in. |

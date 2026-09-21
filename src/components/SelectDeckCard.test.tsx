@@ -2,7 +2,7 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
-import { supabase } from '../lib/supabase'
+import { mockCategories, mockCategoriesPending } from '../test/mockCategories'
 import { SelectDeckCard } from './SelectDeckCard'
 
 vi.mock('../lib/supabase', () => ({
@@ -11,22 +11,9 @@ vi.mock('../lib/supabase', () => ({
   },
 }))
 
-function mockCategories(result: { data?: unknown; error?: unknown }) {
-  const order = vi.fn().mockResolvedValue(result)
-  const eq = vi.fn().mockReturnValue({ order })
-  vi.mocked(supabase.from).mockReturnValue({
-    select: vi.fn().mockReturnValue({ eq }),
-  } as never)
-  return { eq }
-}
-
 describe('SelectDeckCard', () => {
   it('shows a loading state before the categories resolve', () => {
-    vi.mocked(supabase.from).mockReturnValue({
-      select: vi.fn().mockReturnValue({
-        eq: vi.fn().mockReturnValue({ order: vi.fn().mockReturnValue(new Promise(() => {})) }),
-      }),
-    } as never)
+    mockCategoriesPending()
 
     render(
       <MemoryRouter>

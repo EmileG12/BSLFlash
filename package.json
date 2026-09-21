@@ -8,7 +8,7 @@
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview",
-    "test": "vitest run",
+    "test": "vitest run --project=unit",
     "db:reset:seeded": "npx supabase db reset && node scripts/seed-sign-videos.mjs"
   },
   "dependencies": {
@@ -36,12 +36,14 @@
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",
     "@vitejs/plugin-react": "^6.1.1",
+    "@vitest/browser-playwright": "^5.0.1",
     "eslint": "^10.10.0",
     "eslint-plugin-react-hooks": "^7.1.1",
     "eslint-plugin-react-refresh": "^0.5.6",
     "ffprobe-static": "^3.1.0",
     "globals": "^17.12.0",
     "jsdom": "^30.1.0",
+    "playwright": "^1.63.0",
     "supabase": "^2.117.0",
     "typescript": "~6.0.2",
     "typescript-eslint": "^8.69.0",

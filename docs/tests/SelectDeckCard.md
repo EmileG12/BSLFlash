@@ -15,4 +15,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase` (`supabase.from`) via an explicit factory, chaining mocked `select`/`eq`/`order` calls to control what [`useCategories`](../hooks/useCategories.md) resolves with, rather than hitting a real Supabase instance. Since `SelectDeckCard` now navigates via `useNavigate`, every test renders it inside a `MemoryRouter`; the navigation test wraps it in `Routes` with a stub `/flashcards/:categoryId` route to assert on. Every render passes a `vocabulary` prop, since it's now required.
+Mocks `../lib/supabase` (`supabase.from`) via an explicit factory, then uses the shared [`mockCategories`](./mockCategories.md) helper to chain mocked `select`/`eq`/`order` calls and control what [`useCategories`](../hooks/useCategories.md) resolves with, rather than hitting a real Supabase instance. Since `SelectDeckCard` now navigates via `useNavigate`, every test renders it inside a `MemoryRouter`; the navigation test wraps it in `Routes` with a stub `/flashcards/:categoryId` route to assert on. Every render passes a `vocabulary` prop, since it's now required.

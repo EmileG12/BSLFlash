@@ -25,5 +25,10 @@
     "erasableSyntaxOnly": true,
     "noFallthroughCasesInSwitch": true
   },
-  "include": ["src"]
+  // Browser-mode tests are checked by tsconfig.browser-test.json instead: they pull in
+  // Vitest's browser matcher types, which conflict with jest-dom's (e.g. toHaveTextContent
+  // accepts a RegExp in jest-dom but not in the browser matchers) and would break the
+  // jsdom tests' type checking if merged into this program.
+  "include": ["src"],
+  "exclude": ["src/**/*.browser.test.tsx"]
 }
