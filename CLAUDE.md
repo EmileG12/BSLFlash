@@ -49,9 +49,14 @@ Every color value lives in `src/index.css`'s `:root` (light) and `.dark` blocks 
 
 ## Testing
 
-This project uses [Vitest](https://vitest.dev) + [React Testing Library](https://testing-library.com/react) for component/hook tests — fast, in-memory, no browser or running Supabase instance required. Run the suite: `npm run test`.
+This project uses [Vitest](https://vitest.dev) + [React Testing Library](https://testing-library.com/react), split into two suites routed by filename:
 
-**After finishing any change to a component, hook, or utility function**, use the `suggest-tests` skill to check whether new tests are warranted and which existing tests are relevant to re-run. Test files live next to the code they test (`Foo.tsx` -> `Foo.test.tsx`) and are documented separately under [`docs/tests/`](./docs/tests/README.md) (kept apart from the component/hook/utility docs so test docs don't flood the docs for the actual codebase) — each test doc links back to the doc of the thing it tests.
+- **`unit`** (`Foo.test.tsx`) — jsdom, in-memory, no browser or running Supabase instance required. Run it: `npm run test`.
+- **`browser`** (`Foo.browser.test.tsx`) — real Chromium via Playwright. Run it: `npx vitest run --project=browser` (needs `npx playwright install chromium` once).
+
+`npm run test` runs **only** the `unit` suite, so everyday changes never pay the browser cost — it is not a full-suite run. Default new tests to `unit`; reach for `browser` only when jsdom genuinely cannot cover the behavior (layout, hit-testing, real pointer input). See [`docs/tests/README.md`](./docs/tests/README.md) for the split and its rationale.
+
+**After finishing any change to a component, hook, or utility function**, use the `suggest-tests` skill to check whether new tests are warranted and which existing tests are relevant to re-run. Test files live next to the code they test (`Foo.tsx` -> `Foo.test.tsx`, or `Foo.browser.test.tsx`) and are documented separately under [`docs/tests/`](./docs/tests/README.md) (kept apart from the component/hook/utility docs so test docs don't flood the docs for the actual codebase) — each test doc links back to the doc of the thing it tests.
 
 ## Database migrations
 
