@@ -8,7 +8,10 @@ React components, one doc file per component.
 | [SignupPage](./SignupPage.md) | `src/pages/SignupPage.tsx` | Account creation form (email, username, password, confirm password). |
 | [HomePage](./HomePage.md) | `src/pages/HomePage.tsx` | Landing page for logged-in users; greeting + deck picker. |
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.tsx` | Card listing flashcard categories as buttons to pick a deck. |
-| [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | The flashcard guessing game: video + guess combobox + reveal. |
+| [ModeSelectPage](./ModeSelectPage.md) | `src/pages/ModeSelectPage.tsx` | Choose "Practice" or "10 Cards" for a category. |
+| [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | "Practice" mode: an endless loop of random words, no score. |
+| [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.tsx` | "10 Cards" mode: a bounded, no-repeat round of up to 10 words, ending on a score. |
+| [FlashcardRound](./FlashcardRound.md) | `src/components/FlashcardRound.tsx` | Shared per-card gameplay (video + guess combobox + reveal), used by both game modes. |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
 | [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link + Sign Out) shown on all authenticated pages. |
 | [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar`. |

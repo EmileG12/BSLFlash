@@ -4,6 +4,7 @@ import { supabase } from '../lib/supabase'
 export interface Category {
   id: string
   category_name: string
+  is_vocabulary: boolean
 }
 
 interface CategoriesState {
@@ -12,7 +13,7 @@ interface CategoriesState {
   error: string | null
 }
 
-export function useCategories(): CategoriesState {
+export function useCategories(vocabulary: boolean): CategoriesState {
   const [categories, setCategories] = useState<Category[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,7 +23,8 @@ export function useCategories(): CategoriesState {
 
     supabase
       .from('categories')
-      .select('id, category_name')
+      .select('id, category_name, is_vocabulary')
+      .eq('is_vocabulary', vocabulary)
       .order('category_name')
       .then(({ data, error }) => {
         if (cancelled) return
@@ -37,7 +39,7 @@ export function useCategories(): CategoriesState {
     return () => {
       cancelled = true
     }
-  }, [])
+  }, [vocabulary])
 
   return { categories, loading, error }
 }

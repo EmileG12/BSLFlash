@@ -12,24 +12,25 @@ vi.mock('../lib/supabase', () => ({
 }))
 
 function mockCategories(result: { data?: unknown; error?: unknown }) {
+  const order = vi.fn().mockResolvedValue(result)
+  const eq = vi.fn().mockReturnValue({ order })
   vi.mocked(supabase.from).mockReturnValue({
-    select: vi.fn().mockReturnValue({
-      order: vi.fn().mockResolvedValue(result),
-    }),
+    select: vi.fn().mockReturnValue({ eq }),
   } as never)
+  return { eq }
 }
 
 describe('SelectDeckCard', () => {
   it('shows a loading state before the categories resolve', () => {
     vi.mocked(supabase.from).mockReturnValue({
       select: vi.fn().mockReturnValue({
-        order: vi.fn().mockReturnValue(new Promise(() => {})),
+        eq: vi.fn().mockReturnValue({ order: vi.fn().mockReturnValue(new Promise(() => {})) }),
       }),
     } as never)
 
     render(
       <MemoryRouter>
-        <SelectDeckCard />
+        <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
     )
 
@@ -39,15 +40,15 @@ describe('SelectDeckCard', () => {
   it('renders a button per category once loaded', async () => {
     mockCategories({
       data: [
-        { id: '1', category_name: 'Animals' },
-        { id: '2', category_name: 'Greetings' },
+        { id: '1', category_name: 'Animals', is_vocabulary: false },
+        { id: '2', category_name: 'Greetings', is_vocabulary: false },
       ],
       error: null,
     })
 
     render(
       <MemoryRouter>
-        <SelectDeckCard />
+        <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
     )
 
@@ -55,12 +56,25 @@ describe('SelectDeckCard', () => {
     expect(screen.getByRole('button', { name: 'Greetings' })).toBeInTheDocument()
   })
 
+  it('filters by the vocabulary prop', async () => {
+    const { eq } = mockCategories({ data: [], error: null })
+
+    render(
+      <MemoryRouter>
+        <SelectDeckCard vocabulary={true} />
+      </MemoryRouter>,
+    )
+
+    await screen.findByText(/no categories yet/i)
+    expect(eq).toHaveBeenCalledWith('is_vocabulary', true)
+  })
+
   it('shows an error message when the fetch fails', async () => {
     mockCategories({ data: null, error: { message: 'network error' } })
 
     render(
       <MemoryRouter>
-        <SelectDeckCard />
+        <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
     )
 
@@ -72,16 +86,28 @@ describe('SelectDeckCard', () => {
 
     render(
       <MemoryRouter>
-        <SelectDeckCard />
+        <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
     )
 
     expect(await screen.findByText(/no categories yet/i)).toBeInTheDocument()
   })
 
+  it('renders a custom title when given one', async () => {
+    mockCategories({ data: [], error: null })
+
+    render(
+      <MemoryRouter>
+        <SelectDeckCard vocabulary={true} title="Select a vocabulary list" />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText('Select a vocabulary list')).toBeInTheDocument()
+  })
+
   it('navigates to the flashcard page for the clicked category', async () => {
     mockCategories({
-      data: [{ id: 'cat-1', category_name: 'Animals' }],
+      data: [{ id: 'cat-1', category_name: 'Animals', is_vocabulary: false }],
       error: null,
     })
     const user = userEvent.setup()
@@ -89,7 +115,7 @@ describe('SelectDeckCard', () => {
     render(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
-          <Route path="/" element={<SelectDeckCard />} />
+          <Route path="/" element={<SelectDeckCard vocabulary={false} />} />
           <Route path="/flashcards/:categoryId" element={<div>Flashcard page</div>} />
         </Routes>
       </MemoryRouter>,

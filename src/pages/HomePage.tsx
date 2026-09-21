@@ -9,7 +9,8 @@ export function HomePage() {
       <h1 className="text-2xl font-medium">
         Welcome{session?.user.email ? `, ${session.user.email}` : ''}
       </h1>
-      <SelectDeckCard />
+      <SelectDeckCard vocabulary={false} />
+      <SelectDeckCard vocabulary={true} title="Select a vocabulary list" />
     </div>
   )
 }
