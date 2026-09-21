@@ -15,7 +15,8 @@ description: Use after making any code change that adds, modifies, or removes a 
    - table `foo` -> `docs/db-schema/foo.md`
    - each policy on `foo` -> `docs/rls-policies/foo/<policy_name>.md`
    - RPC function `foo()` -> `docs/rpc-functions/foo.md`
-3. For any Supabase element (table/policy/function), get the current DDL via `npx supabase db dump --local --schema public -f <scratch-file>.sql`, copy the exact current block into the doc's "Current DDL"/"Current definition" section, then delete the scratch file. Never hand-paraphrase or copy from the migration file directly.
+3. For any Supabase element (table/policy/function), get the current DDL per the `migrations` skill's "Keeping /docs in sync" section, and copy it into the doc's "Current DDL"/"Current definition" section. Never hand-paraphrase or copy from the migration file directly.
 4. If something was removed, delete its doc file and its row in the domain `README.md` index — don't leave stale entries.
 5. Update the relevant domain `README.md` index table for any addition/removal.
 6. Keep entries concise: purpose, shape/signature, current behavior, related-doc links. No "changed in this task" language.
+7. Update `docs/architecture.md` only when the change is a real architectural shift (a new route group, a new data-flow pattern, a new top-level feature) — not for every component/hook addition, which belongs in its own `/docs` category per steps 1-2 instead. `architecture.md` is a map of the territory, not a duplicate of the detailed docs it links to.

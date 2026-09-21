@@ -5,7 +5,9 @@ import { ProtectedRoute } from './components/ProtectedRoute'
 import { FlashcardPage } from './pages/FlashcardPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
+import { ModeSelectPage } from './pages/ModeSelectPage'
 import { SignupPage } from './pages/SignupPage'
+import { TenCardsPage } from './pages/TenCardsPage'
 
 function App() {
   return (
@@ -18,7 +20,9 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/flashcards/:categoryId" element={<FlashcardPage />} />
+          <Route path="/flashcards/:categoryId" element={<ModeSelectPage />} />
+          <Route path="/flashcards/:categoryId/practice" element={<FlashcardPage />} />
+          <Route path="/flashcards/:categoryId/ten-cards" element={<TenCardsPage />} />
         </Route>
       </Route>
     </Routes>

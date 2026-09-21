@@ -40,9 +40,9 @@ function mockBackend({ rpcData = [FLASHCARD_ROW] }: { rpcData?: unknown[] } = {}
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={['/flashcards/cat-1']}>
+    <MemoryRouter initialEntries={['/flashcards/cat-1/practice']}>
       <Routes>
-        <Route path="/flashcards/:categoryId" element={<FlashcardPage />} />
+        <Route path="/flashcards/:categoryId/practice" element={<FlashcardPage />} />
       </Routes>
     </MemoryRouter>,
   )
@@ -60,59 +60,13 @@ describe('FlashcardPage', () => {
     expect(screen.getByText(/loading flashcard/i)).toBeInTheDocument()
   })
 
-  it('renders the video and combobox once loaded', async () => {
+  it('shows an error message when the flashcard fails to load', async () => {
     mockBackend()
+    vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: { message: 'boom' } } as never)
 
     renderPage()
 
-    expect(await screen.findByRole('combobox')).toBeInTheDocument()
-  })
-
-  it('shows a correct message and the answer when the guess matches', async () => {
-    mockBackend()
-    const user = userEvent.setup()
-
-    renderPage()
-
-    await user.click(await screen.findByRole('combobox'))
-    await user.click(await screen.findByRole('option', { name: 'Hello' }))
-    await user.click(screen.getByRole('button', { name: /confirm/i }))
-
-    expect(await screen.findByText(/correct!/i)).toBeInTheDocument()
-    expect(screen.getByText(/hello — a greeting/i)).toBeInTheDocument()
-  })
-
-  it('shows an incorrect message and the answer when the guess is wrong', async () => {
-    mockBackend()
-    const user = userEvent.setup()
-
-    renderPage()
-
-    await user.click(await screen.findByRole('combobox'))
-    await user.click(await screen.findByRole('option', { name: 'World' }))
-    await user.click(screen.getByRole('button', { name: /confirm/i }))
-
-    expect(await screen.findByText(/incorrect\./i)).toBeInTheDocument()
-    expect(screen.getByText(/hello — a greeting/i)).toBeInTheDocument()
-  })
-
-  it('"Next sign" returns to guessing and draws a new word', async () => {
-    mockBackend()
-    const user = userEvent.setup()
-
-    renderPage()
-
-    await user.click(await screen.findByRole('combobox'))
-    await user.click(await screen.findByRole('option', { name: 'Hello' }))
-    await user.click(screen.getByRole('button', { name: /confirm/i }))
-    await screen.findByText(/correct!/i)
-
-    expect(supabase.rpc).toHaveBeenCalledTimes(1)
-
-    await user.click(screen.getByRole('button', { name: /next sign/i }))
-
-    expect(await screen.findByRole('combobox')).toBeInTheDocument()
-    expect(supabase.rpc).toHaveBeenCalledTimes(2)
+    expect(await screen.findByText(/failed to load flashcard/i)).toBeInTheDocument()
   })
 
   it('shows an empty-state message when the category has no eligible words', async () => {
@@ -121,5 +75,24 @@ describe('FlashcardPage', () => {
     renderPage()
 
     expect(await screen.findByText(/no flashcards yet/i)).toBeInTheDocument()
+  })
+
+  it('renders FlashcardRound once loaded, and draws a new word on advance regardless of the guess', async () => {
+    mockBackend()
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await user.click(await screen.findByRole('combobox'))
+    await user.click(await screen.findByRole('option', { name: 'World' }))
+    await user.click(screen.getByRole('button', { name: /confirm/i }))
+    await screen.findByText(/incorrect\./i)
+
+    expect(supabase.rpc).toHaveBeenCalledTimes(1)
+
+    await user.click(screen.getByRole('button', { name: /next sign/i }))
+
+    expect(await screen.findByRole('combobox')).toBeInTheDocument()
+    expect(supabase.rpc).toHaveBeenCalledTimes(2)
   })
 })

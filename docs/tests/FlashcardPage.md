@@ -6,12 +6,10 @@
 ## Coverage
 
 - Shows a loading message before the flashcard and word list resolve.
-- Renders the combobox once both resolve.
-- Correct guess: shows "Correct!" and the actual word/definition.
-- Incorrect guess: shows "Incorrect." and still shows the actual word/definition.
-- "Next sign" returns to the guessing phase and re-triggers the RPC call.
+- Shows an error message when the flashcard fails to load.
 - Shows an empty-state message when the category has no eligible words.
+- Renders [FlashcardRound](../components/FlashcardRound.md) once loaded, and advancing draws a new word (re-triggers the RPC call) regardless of whether the guess was correct — the correctness/reveal mechanics themselves are covered by [FlashcardRound.test.tsx](./FlashcardRound.md), not duplicated here.
 
 ## Notes
 
-Mocks `../lib/supabase`'s `from`, `rpc`, and `storage.from(...).getPublicUrl`. Renders inside a `MemoryRouter`/`Routes` with an initial entry matching `/flashcards/:categoryId`, since the page reads `categoryId` via `useParams`.
+Mocks `../lib/supabase`'s `from`, `rpc`, and `storage.from(...).getPublicUrl`. Renders inside a `MemoryRouter`/`Routes` with an initial entry matching `/flashcards/:categoryId/practice` (its real route), since the page reads `categoryId` via `useParams`.
