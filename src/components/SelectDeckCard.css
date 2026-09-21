@@ -10,9 +10,13 @@
 }
 
 .select-deck-button {
-  @apply hover:bg-transparent;
+  transition: none;
+  font-weight: 600;
 }
 
 .select-deck-button:hover {
+  outline: 1px solid var(--brand);
+  color: var(--brand);
+  background-color: var(--brand-muted);
   box-shadow: 0 8px 12px var(--shadow-color);
 }

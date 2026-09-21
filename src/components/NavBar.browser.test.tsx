@@ -18,20 +18,20 @@ vi.mock('../lib/supabase', () => ({
 /**
  * Runs in real Chromium (`npx vitest run --project=browser`) rather than jsdom.
  *
- * Opening a Radix menu with the mouse can't be covered in jsdom: Radix relies on
- * the open menu setting `pointer-events: none` on <body>, which makes the trigger
- * un-hit-testable so the browser never delivers the trailing `click` to it. jsdom
- * has no hit-testing, so that click lands on the trigger anyway and toggles the
- * menu straight back shut. `userEvent` from `vitest/browser` is Playwright's real
- * input driver (note: NOT @testing-library/user-event, which dispatches synthetic
- * events at a named element and would reproduce the same behavior in Chromium).
+ * The Categories/Vocabulary menus open on hover, not click (the trigger's own
+ * pointerdown-to-toggle is deliberately suppressed in NavBar.tsx so mouse clicks
+ * can't fight with the hover-driven open state). Hover relies on real mouse
+ * movement and hit-testing, which jsdom doesn't do, so it can't be covered there.
+ * `userEvent` from `vitest/browser` is Playwright's real input driver (note: NOT
+ * @testing-library/user-event, which dispatches synthetic events at a named
+ * element and wouldn't move a real pointer).
  *
  * Keep this file to behavior that genuinely needs a browser. Menu contents,
  * category filtering, navigation and loading/empty states are cheaper to cover in
  * jsdom and live in NavBar.test.tsx.
  */
 describe('NavBar in a real browser', () => {
-  it('opens the Categories menu when the trigger is clicked', async () => {
+  it('opens the Categories menu when the trigger is hovered', async () => {
     mockCategories({
       data: [
         { id: 'cat-1', category_name: 'Animals', is_vocabulary: false },
@@ -46,7 +46,7 @@ describe('NavBar in a real browser', () => {
       </MemoryRouter>,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /categories/i }))
+    await userEvent.hover(screen.getByRole('button', { name: /categories/i }))
 
     expect(await screen.findByRole('menuitem', { name: 'Animals' })).toBeInTheDocument()
     expect(screen.getByRole('menuitem', { name: 'Greetings' })).toBeInTheDocument()
@@ -67,7 +67,7 @@ describe('NavBar in a real browser', () => {
       </MemoryRouter>,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /categories/i }))
+    await userEvent.hover(screen.getByRole('button', { name: /categories/i }))
     await userEvent.click(await screen.findByRole('menuitem', { name: 'Animals' }))
 
     expect(await screen.findByText('Mode select page')).toBeInTheDocument()
@@ -85,8 +85,30 @@ describe('NavBar in a real browser', () => {
       </MemoryRouter>,
     )
 
-    await userEvent.click(screen.getByRole('button', { name: /vocabulary/i }))
+    await userEvent.hover(screen.getByRole('button', { name: /vocabulary/i }))
 
     expect(await screen.findByRole('menuitem', { name: 'GCSE' })).toBeInTheDocument()
+  })
+
+  it('closes the menu when the pointer moves away without entering it', async () => {
+    mockCategories({
+      data: [{ id: 'cat-1', category_name: 'Animals', is_vocabulary: false }],
+      error: null,
+    })
+
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    )
+
+    await userEvent.hover(screen.getByRole('button', { name: /categories/i }))
+    await screen.findByRole('menuitem', { name: 'Animals' })
+
+    await userEvent.hover(screen.getByRole('button', { name: /sign out/i }))
+
+    await expect
+      .poll(() => screen.queryByRole('menuitem', { name: 'Animals' }), { timeout: 1000 })
+      .not.toBeInTheDocument()
   })
 })

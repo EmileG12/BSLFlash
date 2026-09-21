@@ -1,18 +1,19 @@
 # NavBar.browser.test.tsx
 
 **Path:** `src/components/NavBar.browser.test.tsx`
-**Tests:** [NavBar](../components/NavBar.md)
+**Tests:** [NavBar](../components/NavBar.md) and, through it, [CategoryMenu](../components/CategoryMenu.md)
 **Suite:** `browser` (real Chromium via Playwright) — runs on `npx vitest run --project=browser`, *not* on `npm run test`
 
 ## Coverage
 
-- Clicking the "Categories" trigger opens the menu and lists its categories.
+- Hovering the "Categories" trigger opens the menu and lists its categories.
 - Clicking a category in the open menu navigates to `/flashcards/:categoryId`.
-- Clicking the "Vocabulary" trigger opens its own menu, independently of the Categories menu.
+- Hovering the "Vocabulary" trigger opens its own menu, independently of the Categories menu.
+- Moving the pointer away from the trigger (without entering the menu) closes it.
 
 ## Notes
 
-This file exists for one reason: **opening a Radix dropdown with a real mouse cannot be covered in jsdom.** Radix relies on the open menu setting `pointer-events: none` on `<body>`, which makes the trigger un-hit-testable so the browser never delivers the trailing `click` to it. jsdom has no layout or hit-testing, so that click lands on the trigger anyway and closes the menu again. See [NavBar.md](./NavBar.md) for the full mechanism and why the jsdom tests open menus by keyboard instead.
+This file exists for one reason: **opening a Radix dropdown by hover cannot be covered in jsdom.** The Categories/Vocabulary menus, [CategoryMenu](../components/CategoryMenu.md), open on real mouse hover rather than click (the trigger's own pointerdown-to-toggle is deliberately suppressed so clicks can't fight with the hover-driven open state), and hover depends on real pointer movement and hit-testing, which jsdom doesn't do. See [CategoryMenu.md](../components/CategoryMenu.md) for the full mechanism and why the jsdom tests open menus by keyboard instead.
 
 `userEvent` is imported from **`vitest/browser`**, which is Playwright's real input driver — it moves an actual cursor and does real hit-testing. This is the load-bearing detail: `@testing-library/user-event` dispatches synthetic events at an element you name, so using it here would reproduce the jsdom behavior inside Chromium and the file would prove nothing. (In Vitest 5 the import path is the virtual module `vitest/browser`; `@vitest/browser/context` is a legacy shim that throws.)
 

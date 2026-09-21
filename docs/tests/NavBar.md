@@ -1,7 +1,7 @@
 # NavBar.test.tsx
 
 **Path:** `src/components/NavBar.test.tsx`
-**Tests:** [NavBar](../components/NavBar.md)
+**Tests:** [NavBar](../components/NavBar.md) and, through it, [CategoryMenu](../components/CategoryMenu.md)
 **Suite:** `unit` (jsdom) — runs on `npm run test`
 
 ## Coverage
@@ -19,6 +19,6 @@
 
 Mocks `../lib/auth` (`signOut`) via an explicit factory — see [auth](../utils/auth.md). Category data comes from the shared [`mockCategories`](./mockCategories.md) helper. Navigation is verified by rendering real routes and asserting on the resulting screen content, not by mocking `useNavigate`.
 
-**Menus are opened by keyboard here, via the file's `openMenu` helper** (focus the trigger, press Enter) rather than by clicking. Opening a Radix menu with a simulated mouse click is not reliable in jsdom: Radix depends on the open menu setting `pointer-events: none` on `<body>`, which in a real browser makes the trigger un-hit-testable so the trailing `click` is never delivered to it. jsdom has no hit-testing, so that click reaches the trigger and toggles the menu straight back shut. Whether it does depends on a `setTimeout(…, 0)` inside Radix's `DismissableLayer` that arms its outside-dismiss listener — which lands after the click in the first test of a file but mid-click in every later one, so the same test passes alone and fails in suite order.
+**Menus are opened by keyboard here, via the file's `openMenu` helper** (focus the trigger, press Enter) rather than by hovering or clicking. The Categories/Vocabulary menus, [CategoryMenu](../components/CategoryMenu.md), open on real mouse hover, and hovering can't be simulated meaningfully in jsdom — there's no real layout or hit-testing, so a synthetic `mouseenter` doesn't reproduce what a real cursor crossing the trigger's bounds does. The trigger also has its own click-to-toggle suppressed (`onPointerDown` calling `preventDefault`) precisely so clicks don't fight with the hover-driven open state, which rules out simulating a click here too.
 
-Enter on a focused trigger is a first-class way to open a Radix menu and avoids that machinery entirely. Mouse opening is covered for real in [NavBar.browser.md](./NavBar.browser.md). Clicking a menu *item* still uses a normal `user.click` — only the interaction that opens the layer is affected.
+Enter on a focused trigger is a separate code path (Radix's `onKeyDown` handler, untouched by the pointerdown suppression) and is a first-class way to open a Radix menu for keyboard users, so it works the same in jsdom as in a real browser. Real hover opening is covered in [NavBar.browser.md](./NavBar.browser.md). Clicking a menu *item* still uses a normal `user.click` — only the interaction that opens the menu is affected.
