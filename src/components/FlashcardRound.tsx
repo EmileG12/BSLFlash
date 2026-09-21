@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { WordGuessCombobox } from './WordGuessCombobox'
 import type { Flashcard } from '../hooks/useRandomFlashcard'
@@ -32,6 +32,24 @@ export function FlashcardRound({ flashcard, words, advanceLabel, onAdvance }: Fl
   }
 
   const isCorrect = guessedWordId === flashcard.wordId
+
+  useEffect(() => {
+    if (phase !== 'revealed') {
+      return
+    }
+
+    // Ignore browser auto-repeat: holding down the Enter that just confirmed the guess (in
+    // WordGuessCombobox) can otherwise fire repeat 'keydown' events here too, advancing past
+    // the reveal before the user has had a chance to read it.
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.key === 'Enter' && !event.repeat) {
+        handleAdvance()
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyDown)
+    return () => window.removeEventListener('keydown', handleKeyDown)
+  })
 
   return (
     <>

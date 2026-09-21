@@ -92,4 +92,23 @@ describe('FlashcardRound', () => {
 
     expect(await screen.findByRole('combobox')).toBeInTheDocument()
   })
+
+  it('advances on Enter once revealed, same as clicking the advance button', async () => {
+    const onAdvance = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <FlashcardRound flashcard={FLASHCARD} words={WORDS} advanceLabel="Next sign" onAdvance={onAdvance} />,
+    )
+
+    await user.click(screen.getByRole('combobox'))
+    await user.click(await screen.findByRole('option', { name: 'Hello' }))
+    await user.click(screen.getByRole('button', { name: /confirm/i }))
+    await screen.findByText(/correct!/i)
+
+    await user.keyboard('{Enter}')
+
+    expect(onAdvance).toHaveBeenCalledWith({ wordId: 'word-1', correct: true })
+    expect(await screen.findByRole('combobox')).toBeInTheDocument()
+  })
 })

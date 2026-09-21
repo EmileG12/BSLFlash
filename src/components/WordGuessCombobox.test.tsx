@@ -71,4 +71,36 @@ describe('WordGuessCombobox', () => {
     await user.keyboard('{Enter}')
     expect(onSubmit).toHaveBeenCalledWith('2')
   })
+
+  it('stages the top filtered match on Enter, same as clicking it', async () => {
+    const onSubmit = vi.fn()
+    const user = userEvent.setup()
+
+    render(<WordGuessCombobox words={words} onSubmit={onSubmit} />)
+
+    await user.click(screen.getByRole('combobox'))
+    await user.type(screen.getByRole('combobox'), 'World')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByRole('combobox')).toHaveValue('World')
+    expect(onSubmit).not.toHaveBeenCalled()
+
+    const confirmButton = screen.getByRole('button', { name: /confirm/i })
+    expect(confirmButton).toBeEnabled()
+    await user.click(confirmButton)
+    expect(onSubmit).toHaveBeenCalledWith('2')
+  })
+
+  it('clears the box on Enter when no options match', async () => {
+    const user = userEvent.setup()
+
+    render(<WordGuessCombobox words={words} onSubmit={vi.fn()} />)
+
+    await user.click(screen.getByRole('combobox'))
+    await user.type(screen.getByRole('combobox'), 'nonexistent')
+    await user.keyboard('{Enter}')
+
+    expect(screen.getByRole('combobox')).toHaveValue('')
+    expect(screen.getByRole('button', { name: /confirm/i })).toBeDisabled()
+  })
 })
