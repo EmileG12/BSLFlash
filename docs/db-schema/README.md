@@ -13,4 +13,4 @@ Tables, one doc file per table.
 | [signs](./signs.md) | BSL sign variants for a word. |
 | [sign_videos](./sign_videos.md) | Video files demonstrating a sign. |
 
-See [migrations.md](../migrations.md) for the workflow that keeps this in sync with `supabase/migrations/`.
+See the `migrations` skill for the workflow that keeps this in sync with `supabase/migrations/`.

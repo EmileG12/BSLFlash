@@ -55,4 +55,4 @@ This project uses [Vitest](https://vitest.dev) + [React Testing Library](https:/
 
 ## Database migrations
 
-`supabase/migrations/` is the source of truth for schema, RLS policies, and RPC functions. See [`docs/migrations.md`](./docs/migrations.md) for the full workflow, including how doc updates stay in sync with it.
+`supabase/migrations/` is the source of truth for schema, RLS policies, and RPC functions. Use the `migrations` skill for the full workflow: creating a migration, applying it, regenerating TypeScript types, and keeping `/docs` in sync.

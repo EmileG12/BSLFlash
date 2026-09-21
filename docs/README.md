@@ -9,7 +9,6 @@ This folder is a plain markdown tree, so it works two ways:
 ## Contents
 
 - [architecture.md](./architecture.md) — how the pieces fit together, current state of the app.
-- [migrations.md](./migrations.md) — the `supabase/migrations/` workflow and how these docs stay in sync with it.
 - [components/](./components/README.md) — React components.
 - [hooks/](./hooks/README.md) — custom React hooks.
 - [utils/](./utils/README.md) — non-hook utility modules (e.g. the Supabase client).
@@ -21,4 +20,4 @@ This folder is a plain markdown tree, so it works two ways:
 
 ## How this is used
 
-Before searching `src/` or `supabase/` to understand how something works, check the matching file(s) here first. As part of finishing any change that adds, modifies, or removes a component, hook/utility, table, RLS policy, or RPC function, the matching doc file(s) are updated in the same change — see the `update-docs` skill. New or changed test files are documented separately under `tests/` — see the `suggest-tests` skill. For Supabase elements (tables, policies, functions), each doc file embeds the current live SQL definition directly, so it's a self-contained source of truth — no need to trace migration history to know current behavior.
+Before searching `src/` or `supabase/` to understand how something works, check the matching file(s) here first. As part of finishing any change that adds, modifies, or removes a component, hook/utility, table, RLS policy, or RPC function, the matching doc file(s) are updated in the same change — see the `update-docs` skill. New or changed test files are documented separately under `tests/` — see the `suggest-tests` skill. Creating or applying a `supabase/migrations/` change (schema, RLS, or RPC) goes through the `migrations` skill instead of being documented here — see that skill for the full workflow, including how it keeps this wiki in sync. For Supabase elements (tables, policies, functions), each doc file embeds the current live SQL definition directly, so it's a self-contained source of truth — no need to trace migration history to know current behavior.

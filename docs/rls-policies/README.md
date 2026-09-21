@@ -13,4 +13,4 @@ Row Level Security policies, grouped by table into subfolders (one file per indi
 | [signs](./signs/README.md) | Any authenticated user can read; superadmin-only writes. |
 | [sign_videos](./sign_videos/README.md) | Any authenticated user can read; superadmin-only writes. |
 
-Superadmin checks are implemented via the [`is_superadmin()`](../rpc-functions/is_superadmin.md) `SECURITY DEFINER` helper, to avoid RLS recursion. See [migrations.md](../migrations.md) for the workflow.
+Superadmin checks are implemented via the [`is_superadmin()`](../rpc-functions/is_superadmin.md) `SECURITY DEFINER` helper, to avoid RLS recursion. See the `migrations` skill for the workflow.
