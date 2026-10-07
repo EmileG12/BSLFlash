@@ -3,13 +3,15 @@
   align-items: center;
   justify-content: space-between;
   padding: 12px 24px;
-  border-bottom: 1px solid #000;
+  background:var(--background);
+  box-shadow: 0 8px 12px var(--shadow-color);
+  border-bottom: 1px solid var(--brand);
 }
 
 .navbar-left {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 28px;
 }
 
 .navbar-logo {
@@ -19,18 +21,33 @@
 }
 
 .navbar-brand {
+  position: relative;
   color: var(--foreground);
   font-weight: 500;
   text-decoration: none;
   outline: none;
 }
 
+.navbar-brand::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: transparent;
+}
+
+.navbar-brand[aria-current='page']::after {
+  background: var(--brand);
+}
+
 .navbar-brand:hover {
   color: var(--brand);
-  text-decoration: underline;
-  text-decoration-color: var(--brand);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 6px;
+}
+
+.navbar-brand:hover::after {
+  background: var(--brand);
 }
 
 .navbar-brand:focus-visible {
@@ -42,14 +59,18 @@
   font: inherit;
   color: var(--foreground);
   background: none;
-  border: 1px solid #000;
+  outline: 1px solid #000;
   border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
-  outline: none;
+  transition: none;
+  font-weight: 600;
 }
 
 .navbar-signout:hover {
+  outline: 1px solid var(--brand);
+  color: var(--brand);
+  background-color: var(--brand-muted);
   box-shadow: 0 8px 12px var(--shadow-color);
 }
 

@@ -1,5 +1,9 @@
 @reference "../index.css";
 
+.word-guess-input {
+  border: 1px solid var(--foreground);
+}
+
 .word-guess-input:focus-within {
   box-shadow: 0 8px 12px var(--shadow-color);
 }

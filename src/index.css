@@ -17,7 +17,6 @@
   letter-spacing: 0.18px;
   color-scheme: light;
   color: var(--foreground);
-  background: var(--background);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -238,6 +237,8 @@ code {
   * {
     @apply border-border outline-ring/50;}
   body {
-    @apply bg-background text-foreground;}
+    @apply text-foreground;
+    background: linear-gradient(150deg, var(--background) 0%, var(--brand) 180%);
+    min-height: 100svh;}
   html {
     @apply font-sans;}}

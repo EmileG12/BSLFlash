@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { useCategories } from '../hooks/useCategories'
 import {
@@ -19,6 +19,8 @@ interface CategoryMenuProps {
 export function CategoryMenu({ vocabulary, label }: CategoryMenuProps) {
   const { categories, loading } = useCategories(vocabulary)
   const navigate = useNavigate()
+  const { categoryId } = useParams<{ categoryId?: string }>()
+  const isActive = categories.some((category) => category.id === categoryId)
   const [open, setOpen] = useState(false)
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
   const closedByHoverRef = useRef(false)
@@ -53,6 +55,7 @@ export function CategoryMenu({ vocabulary, label }: CategoryMenuProps) {
         <DropdownMenuTrigger
           className="category-menu-trigger"
           onPointerDown={(event) => event.preventDefault()}
+          aria-current={isActive ? 'page' : undefined}
         >
           {label}
           <ChevronRight className="category-menu-icon" size={16} />

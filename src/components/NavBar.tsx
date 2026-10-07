@@ -1,4 +1,4 @@
-import { Link, useNavigate } from 'react-router-dom'
+import { NavLink, useNavigate } from 'react-router-dom'
 import { signOut } from '../lib/auth'
 import { CategoryMenu } from './CategoryMenu'
 import './NavBar.css'
@@ -21,9 +21,9 @@ export function NavBar() {
     <nav className="navbar">
       <div className="navbar-left">
         <img src="/bsl-long-logo.svg" alt="SignStack" className="navbar-logo" />
-        <Link to="/" className="navbar-brand">
+        <NavLink to="/" end className="navbar-brand">
           Home
-        </Link>
+        </NavLink>
         <CategoryMenu vocabulary={false} label="Categories" />
         <CategoryMenu vocabulary={true} label="Vocabulary" />
       </div>
