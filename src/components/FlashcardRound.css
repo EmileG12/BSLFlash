@@ -1,6 +1,14 @@
 @reference "../index.css";
 
+.flashcard-round-card {
+  @apply w-full max-w-3xl shadow-lg;
+}
+
 .flashcard-video {
   @apply w-full rounded-xl bg-muted;
   max-height: 60vh;
+}
+
+.flashcard-pill {
+  @apply rounded-full px-3 py-1 text-sm font-medium;
 }

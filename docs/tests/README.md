@@ -35,6 +35,9 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [useTenCardsRound](./useTenCardsRound.md) | `src/hooks/useTenCardsRound.test.ts` | [useTenCardsRound](../hooks/useTenCardsRound.md) |
 | [ModeSelectPage](./ModeSelectPage.md) | `src/pages/ModeSelectPage.test.tsx` | [ModeSelectPage](../components/ModeSelectPage.md) |
 | [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.test.tsx` | [TenCardsPage](../components/TenCardsPage.md) |
+| [useStreakScore](./useStreakScore.md) | `src/hooks/useStreakScore.test.ts` | [useStreakScore](../hooks/useStreakScore.md) |
+| [useRoundProgress](./useRoundProgress.md) | `src/hooks/useRoundProgress.test.ts` | [useRoundProgress](../hooks/useRoundProgress.md) |
+| [ScorePill](./ScorePill.md) | `src/components/ScorePill.test.tsx` | [ScorePill](../components/ScorePill.md) |
 
 ## Shared helpers
 

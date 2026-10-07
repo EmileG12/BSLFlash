@@ -9,9 +9,10 @@ React components, one doc file per component.
 | [HomePage](./HomePage.md) | `src/pages/HomePage.tsx` | Landing page for logged-in users; greeting + deck picker. |
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.tsx` | Card listing flashcard categories as buttons to pick a deck. |
 | [ModeSelectPage](./ModeSelectPage.md) | `src/pages/ModeSelectPage.tsx` | Choose "Practice" or "10 Cards" for a category. |
-| [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | "Practice" mode: an endless loop of random words, no score. |
+| [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | "Practice" mode: an endless loop of random words, tracking a consecutive-correct streak. |
 | [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.tsx` | "10 Cards" mode: a bounded, no-repeat round of up to 10 words, ending on a score. |
 | [FlashcardRound](./FlashcardRound.md) | `src/components/FlashcardRound.tsx` | Shared per-card gameplay (video + guess combobox + reveal), used by both game modes. |
+| [ScorePill](./ScorePill.md) | `src/components/ScorePill.tsx` | Shared score badge ("Score: x" or "Round: x/N \| Score: y/N"), used by both game modes. |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
 | [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Sign Out) shown on all authenticated pages. |
 | [CategoryMenu](./CategoryMenu.md) | `src/components/CategoryMenu.tsx` | Hover-triggered nav dropdown listing flashcard categories; used twice by `NavBar` for Categories and Vocabulary. |

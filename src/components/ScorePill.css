@@ -1,0 +1,18 @@
+@reference "../index.css";
+
+.flashcard-score-badge {
+  @apply mt-1 inline-flex shrink-0 items-center gap-2 whitespace-nowrap bg-brand text-base text-brand-foreground;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.flashcard-score-divider {
+  @apply h-4 w-px shrink-0 bg-brand-foreground/40;
+}
+
+.flashcard-score-label {
+  @apply text-sm leading-none;
+}
+
+.flashcard-score-value {
+  @apply text-brand-muted text-lg leading-none font-semibold;
+}

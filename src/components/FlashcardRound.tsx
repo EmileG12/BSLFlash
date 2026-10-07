@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Button } from '@/components/ui/button'
+import { Card, CardContent } from '@/components/ui/card'
 import { WordGuessCombobox } from './WordGuessCombobox'
 import type { Flashcard } from '../hooks/useRandomFlashcard'
 import type { WordOption } from '../hooks/useWords'
@@ -52,37 +53,45 @@ export function FlashcardRound({ flashcard, words, advanceLabel, onAdvance }: Fl
   })
 
   return (
-    <>
-      {videoError ? (
-        <p className="text-sm text-destructive">Video failed to load.</p>
-      ) : (
-        <video
-          key={flashcard.videoUrl}
-          src={flashcard.videoUrl}
-          className="flashcard-video"
-          controls
-          autoPlay
-          muted
-          playsInline
-          onError={() => setVideoError(true)}
-        />
-      )}
+    <Card className="flashcard-round-card">
+      <CardContent className="flex flex-col items-center gap-4">
+        {videoError ? (
+          <p className="text-sm text-destructive">Video failed to load.</p>
+        ) : (
+          <video
+            key={flashcard.videoUrl}
+            src={flashcard.videoUrl}
+            className="flashcard-video"
+            controls
+            autoPlay
+            muted
+            playsInline
+            onError={() => setVideoError(true)}
+          />
+        )}
 
-      {phase === 'guessing' ? (
-        <WordGuessCombobox words={words} onSubmit={handleSubmit} />
-      ) : (
-        <div className="flex flex-col items-center gap-2">
-          <p className={isCorrect ? 'text-success font-medium' : 'text-destructive font-medium'}>
-            {isCorrect ? 'Correct!' : 'Incorrect.'}
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {flashcard.word} — {flashcard.definition}
-          </p>
-          <Button type="button" onClick={handleAdvance}>
-            {advanceLabel}
-          </Button>
-        </div>
-      )}
-    </>
+        {phase === 'guessing' ? (
+          <WordGuessCombobox words={words} onSubmit={handleSubmit} />
+        ) : (
+          <div className="flex flex-col items-center gap-2">
+            <span
+              className={
+                isCorrect
+                  ? 'flashcard-pill bg-success text-primary-foreground'
+                  : 'flashcard-pill bg-destructive text-primary-foreground'
+              }
+            >
+              {isCorrect ? 'Correct!' : 'Incorrect.'}
+            </span>
+            <p className="text-sm text-muted-foreground">
+              {flashcard.word} — {flashcard.definition}
+            </p>
+            <Button type="button" onClick={handleAdvance}>
+              {advanceLabel}
+            </Button>
+          </div>
+        )}
+      </CardContent>
+    </Card>
   )
 }

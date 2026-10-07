@@ -1,13 +1,26 @@
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useRandomFlashcard } from '../hooks/useRandomFlashcard'
 import { useWords } from '../hooks/useWords'
+import { useStreakScore } from '../hooks/useStreakScore'
 import { FlashcardRound } from '../components/FlashcardRound'
+import { ScorePill } from '../components/ScorePill'
 import './FlashcardPage.css'
 
 export function FlashcardPage() {
   const { categoryId } = useParams<{ categoryId: string }>()
   const { flashcard, loading, error, empty, next } = useRandomFlashcard(categoryId ?? '')
   const { words, loading: wordsLoading, error: wordsError } = useWords()
+  const { streak, recordResult, reset } = useStreakScore()
+
+  useEffect(() => {
+    reset()
+  }, [categoryId, reset])
+
+  function handleAdvance(result: { wordId: string; correct: boolean }) {
+    recordResult(result.correct)
+    next()
+  }
 
   if (!categoryId) {
     return <p className="text-sm text-destructive">No category selected.</p>
@@ -28,13 +41,16 @@ export function FlashcardPage() {
   }
 
   return (
-    <div className="flashcard-page">
-      <FlashcardRound
-        flashcard={flashcard}
-        words={words}
-        advanceLabel="Next sign"
-        onAdvance={() => next()}
-      />
+    <div className="flashcard-round-page">
+      <div className="flashcard-round-wrap">
+        <FlashcardRound
+          flashcard={flashcard}
+          words={words}
+          advanceLabel="Next sign"
+          onAdvance={handleAdvance}
+        />
+        <ScorePill score={streak} />
+      </div>
     </div>
   )
 }

@@ -12,6 +12,7 @@
 - Steps through a two-card round (one correct, one incorrect answer) and ends on a summary showing the right score.
 - "Back to modes" navigates to `/flashcards/:categoryId` (mode select) for the same category.
 - A category with fewer eligible words than requested (a one-card round) still reaches a summary instead of hanging or erroring.
+- The [ScorePill](../components/ScorePill.md) showing round/score progress reads `Round 1/2, Score 0/2` at the start, updates to `Round 2/2, Score 1/2` after the first (correct) card is advanced past, and is gone once the round reaches the summary screen.
 
 ## Notes
 

@@ -48,6 +48,12 @@ function renderPage() {
   )
 }
 
+// The score badge's numeric portion is a nested <span> (styled separately from the "Score:"
+// label), so its full text isn't a single text node getByText can match directly.
+function scoreBadgeText(container: HTMLElement) {
+  return container.querySelector('.flashcard-score-badge')?.textContent?.replace(/\s+/g, ' ').trim()
+}
+
 describe('FlashcardPage', () => {
   it('shows a loading state before the flashcard and words resolve', () => {
     vi.mocked(supabase.from).mockReturnValue({
@@ -94,5 +100,37 @@ describe('FlashcardPage', () => {
 
     expect(await screen.findByRole('combobox')).toBeInTheDocument()
     expect(supabase.rpc).toHaveBeenCalledTimes(2)
+  })
+
+  it('tracks a consecutive-correct streak in the score pill, resetting on a wrong guess', async () => {
+    mockBackend()
+    const user = userEvent.setup()
+
+    const { container } = renderPage()
+
+    // The label/number are separate flex items with visual (not text) spacing between them —
+    // see ScorePill — so there's no literal space in the rendered text.
+    await screen.findByRole('combobox')
+    expect(scoreBadgeText(container)).toBe('Score:0')
+
+    // Correct guess (the flashcard's word is 'Hello', matching FLASHCARD_ROW's word_id).
+    await user.click(screen.getByRole('combobox'))
+    await user.click(await screen.findByRole('option', { name: 'Hello' }))
+    await user.click(screen.getByRole('button', { name: /confirm/i }))
+    await screen.findByText(/correct!/i)
+    await user.click(screen.getByRole('button', { name: /next sign/i }))
+    await screen.findByRole('combobox')
+
+    expect(scoreBadgeText(container)).toBe('Score:1')
+
+    // Wrong guess resets the streak back to 0.
+    await user.click(screen.getByRole('combobox'))
+    await user.click(await screen.findByRole('option', { name: 'World' }))
+    await user.click(screen.getByRole('button', { name: /confirm/i }))
+    await screen.findByText(/incorrect\./i)
+    await user.click(screen.getByRole('button', { name: /next sign/i }))
+    await screen.findByRole('combobox')
+
+    expect(scoreBadgeText(container)).toBe('Score:0')
   })
 })

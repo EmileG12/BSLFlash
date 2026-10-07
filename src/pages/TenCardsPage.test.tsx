@@ -64,6 +64,12 @@ async function answer(user: ReturnType<typeof userEvent.setup>, wordName: string
   await user.click(screen.getByRole('button', { name: /confirm/i }))
 }
 
+// The score badge's numeric portions are nested <span>s (styled separately from the "Round:"/
+// "Score:" labels), so its full text isn't a single text node getByText can match directly.
+function scoreBadgeText(container: HTMLElement) {
+  return container.querySelector('.flashcard-score-badge')?.textContent?.replace(/\s+/g, ' ').trim()
+}
+
 describe('TenCardsPage', () => {
   it('shows a loading state before the round and words resolve', () => {
     vi.mocked(supabase.from).mockReturnValue({
@@ -148,5 +154,29 @@ describe('TenCardsPage', () => {
     await user.click(await screen.findByRole('button', { name: 'See results' }))
 
     expect(await screen.findByText('You scored 1/1')).toBeInTheDocument()
+  })
+
+  it('shows a Round/Score pill during play that updates as the round advances, and hides it on the summary', async () => {
+    mockBackend()
+    const user = userEvent.setup()
+
+    const { container } = renderPage()
+
+    // The divider between the Round and Score groups is a visual flex-gap/bar, not a text
+    // character, so there's no literal space or "|" in the rendered text.
+    await screen.findByRole('combobox')
+    expect(scoreBadgeText(container)).toBe('Round:1/2Score:0/2')
+
+    await answer(user, 'Hello')
+    await user.click(screen.getByRole('button', { name: 'Next card' }))
+    await screen.findByRole('combobox')
+
+    expect(scoreBadgeText(container)).toBe('Round:2/2Score:1/2')
+
+    await answer(user, 'World')
+    await user.click(screen.getByRole('button', { name: 'See results' }))
+
+    await screen.findByText('You scored 2/2')
+    expect(container.querySelector('.flashcard-score-badge')).not.toBeInTheDocument()
   })
 })
