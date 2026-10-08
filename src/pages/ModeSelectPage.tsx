@@ -5,9 +5,10 @@ import '../components/SelectDeckCard.css'
 
 export function ModeSelectPage() {
   const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
+  const isValidDeckType = deckType === 'standard' || deckType === 'custom'
   const navigate = useNavigate()
 
-  if (!categoryId || !deckType) {
+  if (!categoryId || !isValidDeckType) {
     return <p className="text-sm text-destructive">No category selected.</p>
   }
 

@@ -71,4 +71,40 @@ describe('DeckGrid', () => {
 
     expect(onSelect).toHaveBeenCalledWith('1')
   })
+
+  it('omits the delete button when onDelete is not given', () => {
+    render(
+      <DeckGrid
+        title="My Decks"
+        items={[{ id: '1', name: 'Animals' }]}
+        loading={false}
+        error={null}
+        emptyMessage="No decks yet."
+        onSelect={() => {}}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: /delete/i })).not.toBeInTheDocument()
+  })
+
+  it('renders a delete button per item and calls onDelete with the item when given', async () => {
+    const onDelete = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <DeckGrid
+        title="My Decks"
+        items={[{ id: '1', name: 'Animals' }]}
+        loading={false}
+        error={null}
+        emptyMessage="No decks yet."
+        onSelect={() => {}}
+        onDelete={onDelete}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /delete animals/i }))
+
+    expect(onDelete).toHaveBeenCalledWith({ id: '1', name: 'Animals' })
+  })
 })

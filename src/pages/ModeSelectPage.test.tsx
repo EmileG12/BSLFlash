@@ -41,4 +41,17 @@ describe('ModeSelectPage', () => {
 
     expect(await screen.findByText('Ten Cards page')).toBeInTheDocument()
   })
+
+  it('shows an error instead of mode buttons for an unrecognized deckType', () => {
+    render(
+      <MemoryRouter initialEntries={['/flashcards/bogus/cat-1']}>
+        <Routes>
+          <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />
+        </Routes>
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByText(/no category selected/i)).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Practice' })).not.toBeInTheDocument()
+  })
 })

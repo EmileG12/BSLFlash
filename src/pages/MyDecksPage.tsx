@@ -9,15 +9,14 @@ import {
   DialogHeader,
   DialogTitle,
 } from '@/components/ui/dialog'
-import { Trash2 } from 'lucide-react'
-import { useCustomCategories, type CustomCategory } from '../hooks/useCustomCategories'
+import { useCustomCategories } from '../hooks/useCustomCategories'
 import { supabase } from '../lib/supabase'
-import { DeckGrid } from '../components/DeckGrid'
+import { DeckGrid, type DeckGridItem } from '../components/DeckGrid'
 
 export function MyDecksPage() {
   const { customCategories, loading, error } = useCustomCategories()
   const [deleted, setDeleted] = useState<Set<string>>(new Set())
-  const [pendingDelete, setPendingDelete] = useState<CustomCategory | null>(null)
+  const [pendingDelete, setPendingDelete] = useState<DeckGridItem | null>(null)
   const [deleting, setDeleting] = useState(false)
   const navigate = useNavigate()
 
@@ -49,33 +48,13 @@ export function MyDecksPage() {
         error={error}
         emptyMessage="You haven't created any decks yet."
         onSelect={(id) => navigate(`/flashcards/custom/${id}`)}
+        onDelete={(item) => setPendingDelete(item)}
       />
-
-      {visibleCategories.length > 0 && (
-        <ul className="flex flex-col gap-1">
-          {visibleCategories.map((category) => (
-            <li
-              key={category.id}
-              className="flex items-center justify-between rounded-md px-2 py-1 text-sm text-muted-foreground"
-            >
-              {category.category_name}
-              <Button
-                variant="ghost"
-                size="icon-sm"
-                aria-label={`Delete ${category.category_name}`}
-                onClick={() => setPendingDelete(category)}
-              >
-                <Trash2 />
-              </Button>
-            </li>
-          ))}
-        </ul>
-      )}
 
       <Dialog open={pendingDelete !== null} onOpenChange={(open) => !open && setPendingDelete(null)}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete "{pendingDelete?.category_name}"?</DialogTitle>
+            <DialogTitle>Delete "{pendingDelete?.name}"?</DialogTitle>
             <DialogDescription>This can't be undone.</DialogDescription>
           </DialogHeader>
           <DialogFooter>
