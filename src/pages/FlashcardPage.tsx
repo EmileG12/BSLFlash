@@ -8,8 +8,12 @@ import { ScorePill } from '../components/ScorePill'
 import './FlashcardPage.css'
 
 export function FlashcardPage() {
-  const { categoryId } = useParams<{ categoryId: string }>()
-  const { flashcard, loading, error, empty, next } = useRandomFlashcard(categoryId ?? '')
+  const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
+  const isValidDeckType = deckType === 'standard' || deckType === 'custom'
+  const { flashcard, loading, error, empty, next } = useRandomFlashcard(
+    categoryId ?? '',
+    isValidDeckType ? deckType : 'standard',
+  )
   const { words, loading: wordsLoading, error: wordsError } = useWords()
   const { streak, recordResult, reset } = useStreakScore()
 
@@ -22,7 +26,7 @@ export function FlashcardPage() {
     next()
   }
 
-  if (!categoryId) {
+  if (!categoryId || !isValidDeckType) {
     return <p className="text-sm text-destructive">No category selected.</p>
   }
 

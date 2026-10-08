@@ -121,7 +121,7 @@ describe('NavBar', () => {
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<NavBar />} />
-          <Route path="/flashcards/:categoryId" element={<div>Mode select page</div>} />
+          <Route path="/flashcards/:deckType/:categoryId" element={<div>Mode select page</div>} />
         </Routes>
       </MemoryRouter>,
     )

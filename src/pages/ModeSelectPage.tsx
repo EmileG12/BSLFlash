@@ -4,10 +4,10 @@ import { Button } from '@/components/ui/button'
 import '../components/SelectDeckCard.css'
 
 export function ModeSelectPage() {
-  const { categoryId } = useParams<{ categoryId: string }>()
+  const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
   const navigate = useNavigate()
 
-  if (!categoryId) {
+  if (!categoryId || !deckType) {
     return <p className="text-sm text-destructive">No category selected.</p>
   }
 
@@ -22,14 +22,14 @@ export function ModeSelectPage() {
             <Button
               variant="outline"
               className="select-deck-button"
-              onClick={() => navigate(`/flashcards/${categoryId}/practice`)}
+              onClick={() => navigate(`/flashcards/${deckType}/${categoryId}/practice`)}
             >
               Practice
             </Button>
             <Button
               variant="outline"
               className="select-deck-button"
-              onClick={() => navigate(`/flashcards/${categoryId}/ten-cards`)}
+              onClick={() => navigate(`/flashcards/${deckType}/${categoryId}/ten-cards`)}
             >
               10 Cards
             </Button>

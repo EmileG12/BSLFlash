@@ -10,6 +10,7 @@
 - Sets `empty` when the RPC returns zero rows.
 - Sets an error message when the RPC call fails.
 - `next()` re-triggers the RPC call to draw a new word, going back through a loading state.
+- Passes `is_custom: true` to the RPC when called with `deckType: 'custom'` (every other test calls it with `'standard'`).
 
 ## Notes
 

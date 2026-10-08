@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import type { Flashcard } from './useRandomFlashcard'
+import type { DeckType, Flashcard } from './useRandomFlashcard'
 
 interface TenCardsRoundState {
   cards: Flashcard[]
@@ -9,7 +9,7 @@ interface TenCardsRoundState {
   empty: boolean
 }
 
-export function useTenCardsRound(categoryId: string): TenCardsRoundState {
+export function useTenCardsRound(categoryId: string, deckType: DeckType): TenCardsRoundState {
   const [cards, setCards] = useState<Flashcard[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -19,7 +19,10 @@ export function useTenCardsRound(categoryId: string): TenCardsRoundState {
     let cancelled = false
 
     supabase
-      .rpc('get_random_words_for_category', { category_id: categoryId })
+      .rpc('get_random_words_for_category', {
+        category_id: categoryId,
+        is_custom: deckType === 'custom',
+      })
       .then(({ data, error }) => {
         if (cancelled) return
 
@@ -50,7 +53,7 @@ export function useTenCardsRound(categoryId: string): TenCardsRoundState {
     return () => {
       cancelled = true
     }
-  }, [categoryId])
+  }, [categoryId, deckType])
 
   return { cards, loading, error, empty }
 }

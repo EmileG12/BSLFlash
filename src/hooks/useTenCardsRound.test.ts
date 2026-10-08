@@ -24,7 +24,7 @@ describe('useTenCardsRound', () => {
   it('starts in a loading state', () => {
     vi.mocked(supabase.rpc).mockReturnValue(new Promise(() => {}) as never)
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1'))
+    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
 
     expect(result.current.loading).toBe(true)
     expect(result.current.cards).toEqual([])
@@ -52,7 +52,7 @@ describe('useTenCardsRound', () => {
     })
     mockPublicUrl('https://example.test/video.mp4')
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1'))
+    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.cards).toEqual([
@@ -64,7 +64,7 @@ describe('useTenCardsRound', () => {
   it('sets empty when the category has no eligible words', async () => {
     mockRpc({ data: [], error: null })
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1'))
+    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.empty).toBe(true)
@@ -74,7 +74,7 @@ describe('useTenCardsRound', () => {
   it('sets an error message when the RPC call fails', async () => {
     mockRpc({ data: null, error: { message: 'boom' } })
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1'))
+    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('boom')
@@ -95,10 +95,22 @@ describe('useTenCardsRound', () => {
     })
     mockPublicUrl('https://example.test/hello.mp4')
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1'))
+    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.cards).toHaveLength(1)
     expect(result.current.empty).toBe(false)
+  })
+
+  it('passes is_custom: true for a custom deck', async () => {
+    mockRpc({ data: [], error: null })
+
+    const { result } = renderHook(() => useTenCardsRound('deck-1', 'custom'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(supabase.rpc).toHaveBeenCalledWith('get_random_words_for_category', {
+      category_id: 'deck-1',
+      is_custom: true,
+    })
   })
 })

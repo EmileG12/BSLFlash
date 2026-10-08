@@ -52,6 +52,57 @@ export type Database = {
         }
         Relationships: []
       }
+      custom_categories: {
+        Row: {
+          category_name: string
+          created_at: string
+          id: string
+          user_id: string
+        }
+        Insert: {
+          category_name: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Update: {
+          category_name?: string
+          created_at?: string
+          id?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      custom_category_words: {
+        Row: {
+          custom_category_id: string
+          word_id: string
+        }
+        Insert: {
+          custom_category_id: string
+          word_id: string
+        }
+        Update: {
+          custom_category_id?: string
+          word_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "custom_category_words_custom_category_id_fkey"
+            columns: ["custom_category_id"]
+            isOneToOne: false
+            referencedRelation: "custom_categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_category_words_word_id_fkey"
+            columns: ["word_id"]
+            isOneToOne: false
+            referencedRelation: "words"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           id: string
@@ -240,8 +291,12 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      create_custom_category: {
+        Args: { p_name: string; p_word_ids: string[] }
+        Returns: string
+      }
       get_random_word_for_category: {
-        Args: { category_id: string }
+        Args: { category_id: string; is_custom?: boolean }
         Returns: {
           definition: string
           format: string
@@ -251,7 +306,7 @@ export type Database = {
         }[]
       }
       get_random_words_for_category: {
-        Args: { card_count?: number; category_id: string }
+        Args: { card_count?: number; category_id: string; is_custom?: boolean }
         Returns: {
           definition: string
           format: string

@@ -2,10 +2,12 @@ import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 import { GuestRoute } from './components/GuestRoute'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { CreateDeckPage } from './pages/CreateDeckPage'
 import { FlashcardPage } from './pages/FlashcardPage'
 import { HomePage } from './pages/HomePage'
 import { LoginPage } from './pages/LoginPage'
 import { ModeSelectPage } from './pages/ModeSelectPage'
+import { MyDecksPage } from './pages/MyDecksPage'
 import { SignupPage } from './pages/SignupPage'
 import { TenCardsPage } from './pages/TenCardsPage'
 
@@ -20,9 +22,11 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
-          <Route path="/flashcards/:categoryId" element={<ModeSelectPage />} />
-          <Route path="/flashcards/:categoryId/practice" element={<FlashcardPage />} />
-          <Route path="/flashcards/:categoryId/ten-cards" element={<TenCardsPage />} />
+          <Route path="/create-decks" element={<CreateDeckPage />} />
+          <Route path="/my-decks" element={<MyDecksPage />} />
+          <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />
+          <Route path="/flashcards/:deckType/:categoryId/practice" element={<FlashcardPage />} />
+          <Route path="/flashcards/:deckType/:categoryId/ten-cards" element={<TenCardsPage />} />
         </Route>
       </Route>
     </Routes>

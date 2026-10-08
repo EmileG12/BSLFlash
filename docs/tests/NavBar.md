@@ -11,7 +11,7 @@
 - Clicking "Sign Out" calls `signOut` and navigates to `/login`.
 - Still navigates to `/login` even if `signOut` rejects (this test caught a real bug: the original `try { await signOut() } finally { navigate(...) }` let the error propagate as an unhandled promise rejection after the `finally` ran — fixed by adding an explicit empty `catch`).
 - Renders both the "Categories" and "Vocabulary" menu triggers.
-- The Categories menu lists topic categories, and selecting one navigates to `/flashcards/:categoryId`.
+- The Categories menu lists topic categories, and selecting one navigates to `/flashcards/:deckType/:categoryId`.
 - The Vocabulary menu lists vocabulary categories, fetched separately from the Categories menu.
 - A menu with zero categories shows a "No categories yet" item.
 

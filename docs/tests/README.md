@@ -17,6 +17,10 @@ Browser tests are type-checked as their own TypeScript project (`tsconfig.browse
 
 Running the browser suite requires Chromium: `npx playwright install chromium`.
 
+## Reading the output
+
+[reading-test-output.md](./reading-test-output.md) — anatomy of a Vitest failure block, how to slice a log cheaply, and how to tell a real regression from an assertion that needs updating.
+
 ## Test files
 
 | Test file | Tests | Covers |
@@ -26,8 +30,12 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [NavBar](./NavBar.md) | `src/components/NavBar.test.tsx` | [NavBar](../components/NavBar.md) |
 | [NavBar.browser](./NavBar.browser.md) | `src/components/NavBar.browser.test.tsx` | [NavBar](../components/NavBar.md) — real-browser click behavior |
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.test.tsx` | [SelectDeckCard](../components/SelectDeckCard.md) |
+| [DeckGrid](./DeckGrid.md) | `src/components/DeckGrid.test.tsx` | [DeckGrid](../components/DeckGrid.md) |
+| [MyDecksPage](./MyDecksPage.md) | `src/pages/MyDecksPage.test.tsx` | [MyDecksPage](../components/MyDecksPage.md) |
+| [CreateDeckPage](./CreateDeckPage.md) | `src/pages/CreateDeckPage.test.tsx` | [CreateDeckPage](../components/CreateDeckPage.md) |
 | [HomePage](./HomePage.md) | `src/pages/HomePage.test.tsx` | [HomePage](../components/HomePage.md) |
 | [useWords](./useWords.md) | `src/hooks/useWords.test.ts` | [useWords](../hooks/useWords.md) |
+| [useCustomCategories](./useCustomCategories.md) | `src/hooks/useCustomCategories.test.ts` | [useCustomCategories](../hooks/useCustomCategories.md) |
 | [useRandomFlashcard](./useRandomFlashcard.md) | `src/hooks/useRandomFlashcard.test.ts` | [useRandomFlashcard](../hooks/useRandomFlashcard.md) |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.test.tsx` | [WordGuessCombobox](../components/WordGuessCombobox.md) |
 | [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.test.tsx` | [FlashcardPage](../components/FlashcardPage.md) |

@@ -103,7 +103,7 @@ describe('SelectDeckCard', () => {
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<SelectDeckCard vocabulary={false} />} />
-          <Route path="/flashcards/:categoryId" element={<div>Flashcard page</div>} />
+          <Route path="/flashcards/:deckType/:categoryId" element={<div>Flashcard page</div>} />
         </Routes>
       </MemoryRouter>,
     )

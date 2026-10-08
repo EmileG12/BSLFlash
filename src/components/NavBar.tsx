@@ -26,6 +26,12 @@ export function NavBar() {
         </NavLink>
         <CategoryMenu vocabulary={false} label="Categories" />
         <CategoryMenu vocabulary={true} label="Vocabulary" />
+        <NavLink to="/create-decks" className="navbar-brand">
+          Create Decks
+        </NavLink>
+        <NavLink to="/my-decks" className="navbar-brand">
+          My Decks
+        </NavLink>
       </div>
       <button type="button" onClick={handleSignOut} className="navbar-signout">
         Sign Out

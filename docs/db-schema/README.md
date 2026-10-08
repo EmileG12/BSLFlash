@@ -12,5 +12,7 @@ Tables, one doc file per table.
 | [word_categories](./word_categories.md) | Junction table assigning words to categories (many-to-many). |
 | [signs](./signs.md) | BSL sign variants for a word. |
 | [sign_videos](./sign_videos.md) | Video files demonstrating a sign. |
+| [custom_categories](./custom_categories.md) | User-created decks assembled from `words`. |
+| [custom_category_words](./custom_category_words.md) | Junction table assigning words to custom decks (many-to-many). |
 
 See the `migrations` skill for the workflow that keeps this in sync with `supabase/migrations/`.

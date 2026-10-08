@@ -19,7 +19,7 @@ interface CategoryMenuProps {
 export function CategoryMenu({ vocabulary, label }: CategoryMenuProps) {
   const { categories, loading } = useCategories(vocabulary)
   const navigate = useNavigate()
-  const { categoryId } = useParams<{ categoryId?: string }>()
+  const { categoryId } = useParams<{ deckType?: string; categoryId?: string }>()
   const isActive = categories.some((category) => category.id === categoryId)
   const [open, setOpen] = useState(false)
   const closeTimeoutRef = useRef<ReturnType<typeof setTimeout>>(undefined)
@@ -89,7 +89,7 @@ export function CategoryMenu({ vocabulary, label }: CategoryMenuProps) {
               <DropdownMenuItem
                 key={category.id}
                 className="category-menu-item"
-                onSelect={() => navigate(`/flashcards/${category.id}`)}
+                onSelect={() => navigate(`/flashcards/standard/${category.id}`)}
               >
                 {category.category_name}
               </DropdownMenuItem>

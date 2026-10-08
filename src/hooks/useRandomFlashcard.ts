@@ -8,6 +8,9 @@ export interface Flashcard {
   videoUrl: string
 }
 
+/** 'standard' plays a public.categories deck; 'custom' plays a user-owned custom_categories deck (same id space otherwise). */
+export type DeckType = 'standard' | 'custom'
+
 interface RandomFlashcardState {
   flashcard: Flashcard | null
   loading: boolean
@@ -23,11 +26,11 @@ interface Result {
   empty: boolean
 }
 
-export function useRandomFlashcard(categoryId: string): RandomFlashcardState {
+export function useRandomFlashcard(categoryId: string, deckType: DeckType): RandomFlashcardState {
   const [refreshKey, setRefreshKey] = useState(0)
   const [result, setResult] = useState<Result | null>(null)
 
-  const requestKey = `${categoryId}:${refreshKey}`
+  const requestKey = `${deckType}:${categoryId}:${refreshKey}`
   // Loading is derived, not stored: it's simply "the last completed fetch
   // doesn't match what we're currently asking for" -- so there's no separate
   // reset-to-loading setState call needed when categoryId/refreshKey change.
@@ -37,7 +40,10 @@ export function useRandomFlashcard(categoryId: string): RandomFlashcardState {
     let cancelled = false
 
     supabase
-      .rpc('get_random_word_for_category', { category_id: categoryId })
+      .rpc('get_random_word_for_category', {
+        category_id: categoryId,
+        is_custom: deckType === 'custom',
+      })
       .then(({ data, error }) => {
         if (cancelled) return
 
@@ -68,7 +74,7 @@ export function useRandomFlashcard(categoryId: string): RandomFlashcardState {
     return () => {
       cancelled = true
     }
-  }, [categoryId, requestKey])
+  }, [categoryId, deckType, requestKey])
 
   function next() {
     setRefreshKey((key) => key + 1)

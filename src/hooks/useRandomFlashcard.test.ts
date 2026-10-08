@@ -24,7 +24,7 @@ describe('useRandomFlashcard', () => {
   it('starts in a loading state', () => {
     vi.mocked(supabase.rpc).mockReturnValue(new Promise(() => {}) as never)
 
-    const { result } = renderHook(() => useRandomFlashcard('cat-1'))
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard'))
 
     expect(result.current.loading).toBe(true)
     expect(result.current.flashcard).toBeNull()
@@ -45,7 +45,7 @@ describe('useRandomFlashcard', () => {
     })
     mockPublicUrl('https://example.test/storage/v1/object/public/sign-videos/hello/standard.mp4')
 
-    const { result } = renderHook(() => useRandomFlashcard('cat-1'))
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.flashcard).toEqual({
@@ -59,7 +59,7 @@ describe('useRandomFlashcard', () => {
   it('sets empty when the category has no eligible words', async () => {
     mockRpc({ data: [], error: null })
 
-    const { result } = renderHook(() => useRandomFlashcard('cat-1'))
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.empty).toBe(true)
@@ -69,7 +69,7 @@ describe('useRandomFlashcard', () => {
   it('sets an error message when the RPC call fails', async () => {
     mockRpc({ data: null, error: { message: 'boom' } })
 
-    const { result } = renderHook(() => useRandomFlashcard('cat-1'))
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('boom')
@@ -90,7 +90,7 @@ describe('useRandomFlashcard', () => {
     })
     mockPublicUrl('https://example.test/hello.mp4')
 
-    const { result } = renderHook(() => useRandomFlashcard('cat-1'))
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard'))
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(supabase.rpc).toHaveBeenCalledTimes(1)
@@ -102,5 +102,17 @@ describe('useRandomFlashcard', () => {
     expect(result.current.loading).toBe(true)
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(supabase.rpc).toHaveBeenCalledTimes(2)
+  })
+
+  it('passes is_custom: true for a custom deck', async () => {
+    mockRpc({ data: [], error: null })
+
+    const { result } = renderHook(() => useRandomFlashcard('deck-1', 'custom'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(supabase.rpc).toHaveBeenCalledWith('get_random_word_for_category', {
+      category_id: 'deck-1',
+      is_custom: true,
+    })
   })
 })

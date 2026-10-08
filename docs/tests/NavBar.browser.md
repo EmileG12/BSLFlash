@@ -7,7 +7,7 @@
 ## Coverage
 
 - Hovering the "Categories" trigger opens the menu and lists its categories.
-- Clicking a category in the open menu navigates to `/flashcards/:categoryId`.
+- Clicking a category in the open menu navigates to `/flashcards/:deckType/:categoryId`.
 - Hovering the "Vocabulary" trigger opens its own menu, independently of the Categories menu.
 - Moving the pointer away from the trigger (without entering the menu) closes it.
 

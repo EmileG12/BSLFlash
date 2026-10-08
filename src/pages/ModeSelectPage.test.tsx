@@ -6,11 +6,11 @@ import { ModeSelectPage } from './ModeSelectPage'
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={['/flashcards/cat-1']}>
+    <MemoryRouter initialEntries={['/flashcards/standard/cat-1']}>
       <Routes>
-        <Route path="/flashcards/:categoryId" element={<ModeSelectPage />} />
-        <Route path="/flashcards/:categoryId/practice" element={<div>Practice page</div>} />
-        <Route path="/flashcards/:categoryId/ten-cards" element={<div>Ten Cards page</div>} />
+        <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />
+        <Route path="/flashcards/:deckType/:categoryId/practice" element={<div>Practice page</div>} />
+        <Route path="/flashcards/:deckType/:categoryId/ten-cards" element={<div>Ten Cards page</div>} />
       </Routes>
     </MemoryRouter>,
   )

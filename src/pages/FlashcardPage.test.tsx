@@ -40,9 +40,9 @@ function mockBackend({ rpcData = [FLASHCARD_ROW] }: { rpcData?: unknown[] } = {}
 
 function renderPage() {
   return render(
-    <MemoryRouter initialEntries={['/flashcards/cat-1/practice']}>
+    <MemoryRouter initialEntries={['/flashcards/standard/cat-1/practice']}>
       <Routes>
-        <Route path="/flashcards/:categoryId/practice" element={<FlashcardPage />} />
+        <Route path="/flashcards/:deckType/:categoryId/practice" element={<FlashcardPage />} />
       </Routes>
     </MemoryRouter>,
   )

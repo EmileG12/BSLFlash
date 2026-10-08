@@ -6,8 +6,8 @@
 ## Coverage
 
 - Renders "Practice" and "10 Cards" buttons.
-- Clicking "Practice" navigates to `/flashcards/:categoryId/practice`.
-- Clicking "10 Cards" navigates to `/flashcards/:categoryId/ten-cards`.
+- Clicking "Practice" navigates to `/flashcards/:deckType/:categoryId/practice`.
+- Clicking "10 Cards" navigates to `/flashcards/:deckType/:categoryId/ten-cards`.
 
 ## Notes
 

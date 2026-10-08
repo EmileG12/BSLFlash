@@ -7,8 +7,12 @@ import { FlashcardRound } from '../components/FlashcardRound'
 import { ScorePill } from '../components/ScorePill'
 
 export function TenCardsPage() {
-  const { categoryId } = useParams<{ categoryId: string }>()
-  const { cards, loading, error, empty } = useTenCardsRound(categoryId ?? '')
+  const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
+  const isValidDeckType = deckType === 'standard' || deckType === 'custom'
+  const { cards, loading, error, empty } = useTenCardsRound(
+    categoryId ?? '',
+    isValidDeckType ? deckType : 'standard',
+  )
   const { words, loading: wordsLoading, error: wordsError } = useWords()
   const navigate = useNavigate()
 
@@ -16,7 +20,7 @@ export function TenCardsPage() {
     cards.length,
   )
 
-  if (!categoryId) {
+  if (!categoryId || !isValidDeckType) {
     return <p className="text-sm text-destructive">No category selected.</p>
   }
 
@@ -40,7 +44,9 @@ export function TenCardsPage() {
         <p className="text-lg font-medium">
           You scored {correctCount}/{cards.length}
         </p>
-        <Button onClick={() => navigate(`/flashcards/${categoryId}`)}>Back to modes</Button>
+        <Button onClick={() => navigate(`/flashcards/${deckType}/${categoryId}`)}>
+          Back to modes
+        </Button>
       </div>
     )
   }
