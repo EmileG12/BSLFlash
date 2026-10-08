@@ -9,6 +9,9 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run --project=unit",
+    "setup-hooks": "git config core.hooksPath .githooks",
+    "test-hooks": "node scripts/test-hooks.mjs",
+    "postinstall": "git config core.hooksPath .githooks",
     "db:reset:seeded": "npx supabase db reset && node scripts/seed-sign-videos.mjs"
   },
   "dependencies": {

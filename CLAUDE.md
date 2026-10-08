@@ -8,17 +8,15 @@ BSL (British Sign Language) flashcard web app.
 - Backend: Supabase (Postgres, Auth, RLS, RPC/Postgres functions, Storage) — run locally via Docker during development
 - Package manager: npm
 
-## Learning goal
+## Skill usage
 
-This project also doubles as how the user is learning React, Postgres, CSS, and testing. When introducing a new pattern, library, or non-obvious technique, explain it like a tutorial, not a one-line mention: what it does, why it was chosen over the alternatives, how it actually works (not just "call this function"), and the steps to reproduce or extend it yourself. Don't compress this for brevity — skipping the reasoning or the mechanism to keep things short defeats the point; the goal is the user could rebuild the pattern from scratch next time, not just recognize it.
-
-When a concept recurs that was already given the full tutorial treatment earlier (in this session or a prior one), don't repeat the full explanation or skip it silently — give a **refresher**: a short reminder (a sentence or two) of what it is and why it works, right at the point of use. This is shorter than the original explanation but still present every time, to build muscle memory through repetition rather than a one-off lesson.
+Every section below that names a skill is a mandatory pointer, not something to paraphrase from memory. **Invoke that skill with the `Skill` tool once per logical task, before the action it covers** — then follow that one load through the short sequence of steps it prescribes. Don't re-invoke it before every individual command inside that same task, but also don't let one invocation from an earlier, different task stand in for this one: reproducing a skill's commands from memory because a similar task invoked it earlier in the session is bypassing it. A hook denial is a fallback for when this was skipped — treat a denial as evidence a skill should have been invoked first, not as a substitute for invoking it.
 
 ## Running locally
 
 - Install deps: `npm install`
 - Start the local Supabase stack (Docker must be running): `npx supabase start`
-- Apply `supabase/migrations/` to the local database: `npx supabase db reset`
+- Apply `supabase/migrations/` and seed sample data, including sign videos: `npm run db:reset:seeded` (runs `supabase db reset` then `scripts/seed-sign-videos.mjs`, which uploads the local video files and isn't part of `db reset` itself)
 - Start the dev server: `npm run dev`
 - Build: `npm run build`
 - Lint: `npm run lint`
@@ -27,13 +25,9 @@ When a concept recurs that was already given the full tutorial treatment earlier
 
 ## Documentation system (read before editing code)
 
-[`/docs`](./docs/README.md) is a hand-maintained wiki describing the CURRENT state of the codebase: components, hooks/utilities, DB schema, RLS policies, RPC functions, Storage buckets, and (as its own category) what the test suite covers. It is not a changelog — every file is edited in place to describe what exists now, never appended to with historical entries.
+[`/docs`](./docs/README.md) is a hand-maintained wiki describing the CURRENT state of the codebase. **Before grepping `src/` or `supabase/` to understand how something works, check the matching file(s) in `/docs` first.**
 
-**Before grepping `src/` or `supabase/` to understand how something works, check the matching file(s) in `/docs` first.** Fall back to reading raw source only when the docs don't cover it, or to verify a doc is still accurate before changing the code it describes.
-
-**As part of finishing any change** that adds, modifies, or removes a React component, hook/utility, database table, RLS policy, RPC function, or Storage bucket, update the matching file(s) under `/docs` in the same change. Use the `update-docs` skill as a checklist.
-
-For Supabase elements (tables, RLS policies, RPC functions), each doc file embeds the current live SQL definition directly — that embedded SQL is the thing to check, not migration history. A table/policy/function's current shape is the cumulative result of every migration applied to it, so reading an individual migration file (or the original one) does not tell you its current state.
+**ALWAYS use the [`update-docs`](./.claude/skills/update-docs/SKILL.md) skill** after any change that adds, modifies, or removes a component, hook/utility, table, RLS policy, or RPC function — it is the sole source of truth for what and how to document.
 
 ## Build workflow
 
@@ -49,15 +43,16 @@ Every color value lives in `src/index.css`'s `:root` (light) and `.dark` blocks 
 
 ## Testing
 
-This project uses [Vitest](https://vitest.dev) + [React Testing Library](https://testing-library.com/react), split into two suites routed by filename:
+**ALWAYS use the [`run-tests`](./.claude/skills/run-tests/SKILL.md) skill to run tests.** **ALWAYS use the [`suggest-tests`](./.claude/skills/suggest-tests/SKILL.md) skill after development ends** for instructions on how to build tests. These two skills are the sole source of truth for testing behavior in this repo.
 
-- **`unit`** (`Foo.test.tsx`) — jsdom, in-memory, no browser or running Supabase instance required. Run it: `npm run test`.
-- **`browser`** (`Foo.browser.test.tsx`) — real Chromium via Playwright. Run it: `npx vitest run --project=browser` (needs `npx playwright install chromium` once).
-
-`npm run test` runs **only** the `unit` suite, so everyday changes never pay the browser cost — it is not a full-suite run. Default new tests to `unit`; reach for `browser` only when jsdom genuinely cannot cover the behavior (layout, hit-testing, real pointer input). See [`docs/tests/README.md`](./docs/tests/README.md) for the split and its rationale.
-
-**After finishing any change to a component, hook, or utility function**, use the `suggest-tests` skill to check whether new tests are warranted and which existing tests are relevant to re-run. Test files live next to the code they test (`Foo.tsx` -> `Foo.test.tsx`, or `Foo.browser.test.tsx`) and are documented separately under [`docs/tests/`](./docs/tests/README.md) (kept apart from the component/hook/utility docs so test docs don't flood the docs for the actual codebase) — each test doc links back to the doc of the thing it tests.
+**Skipping a test run entirely is ONLY acceptable when a change does nothing but swap Tailwind utility classes (color/spacing/shadow/border) on already-tested elements** — no text content change, no renamed custom CSS class, no structural or prop change. This suite queries by role/text, never by Tailwind class name, so that specific case is provably safe to skip. Everything else — including anything that merely "feels cosmetic" — still goes through `run-tests`; a prior incident where a renamed *custom* CSS class broke two unrelated tests is why this exception stays this narrow.
 
 ## Database migrations
 
-`supabase/migrations/` is the source of truth for schema, RLS policies, and RPC functions. Use the `migrations` skill for the full workflow: creating a migration, applying it, regenerating TypeScript types, and keeping `/docs` in sync.
+`supabase/migrations/` is the source of truth for schema, RLS policies, and RPC functions. Use the [`migrations`](./.claude/skills/migrations/SKILL.md) skill for the full workflow.
+
+## Workflow enforcement
+
+**Check this file for a matching skill before starting any task, and follow it — that is the primary mechanism, not a suggestion to fall back on after the fact.** Hooks (`.githooks/pre-commit`, `.claude/hooks/*`) exist only as a fallback safety net for when a skill wasn't followed; a hook denial means a skill should have been consulted earlier, not that the hook is the thing to satisfy. A `diff-reviewer` subagent also exists for read-only, independent review of a diff. Rationale and rejected alternatives: [`docs/workflow-automation.md`](./docs/workflow-automation.md).
+
+`npm run test-hooks` verifies the enforcement is actually wired up — the failure modes are all silent. If it reports `core.hooksPath` unset (a fresh clone, or `npm install --ignore-scripts`), run `npm run setup-hooks`.

@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Hook-written verification logs (read with grep/sed, never committed)
+.test-logs/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

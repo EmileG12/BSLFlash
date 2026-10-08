@@ -1,19 +1,55 @@
 #!/bin/sh
-# Non-blocking reminder: warns if src/ or supabase/ changes are staged
-# without any docs/ change staged alongside them.
+# The load-bearing verification gate. Committing is the unambiguous "work is finished"
+# signal, so this is where checks execute and block.
+#
+# Active via `core.hooksPath=.githooks`, so this file is tracked in the repo rather than
+# living un-versioned in .git/hooks/. That config lives in .git/config (not tracked), so
+# `npm run setup-hooks` / `postinstall` re-sets it — otherwise a fresh clone is ungated
+# with nothing announcing it.
 
-staged_files=$(git diff --cached --name-only --diff-filter=ACMR)
+staged_src=$(git diff --cached --name-only --diff-filter=ACMRD | grep -E '^(src|supabase)/' || true)
 
-code_changed=$(printf '%s\n' "$staged_files" | grep -E '^(src|supabase)/')
-docs_changed=$(printf '%s\n' "$staged_files" | grep -E '^docs/')
+if [ -z "$staged_src" ]; then
+  exit 0
+fi
 
-if [ -n "$code_changed" ] && [ -z "$docs_changed" ]; then
+LOG_DIR=".test-logs"
+mkdir -p "$LOG_DIR"
+
+fail() {
   echo ""
-  echo "Reminder: src/ or supabase/ changes are staged but no docs/ files are staged."
-  echo "If this adds/modifies/removes a component, hook, table, RLS policy, or RPC"
-  echo "function, update the matching file(s) in docs/ before committing."
-  echo "(Non-blocking -- commit will proceed.)"
+  echo "pre-commit: $1"
+  echo "To bypass deliberately (e.g. a known-broken WIP commit): git commit --no-verify"
+  exit 1
+}
+
+# 1. Docs mapping. Checks the *specific* expected doc per staged file rather than
+#    just "was any docs/ file staged".
+if ! node .claude/hooks/check-docs.mjs; then
+  fail "docs missing for staged src changes (see above)."
+fi
+
+# 2. Lint.
+if ! npm run lint > "$LOG_DIR/lint.txt" 2>&1; then
+  tail -20 "$LOG_DIR/lint.txt"
+  fail "lint failed. Full output: $LOG_DIR/lint.txt"
+fi
+
+# 3. Tests. Output is redirected and only the summary plus failing test names surface, so a
+#    large failure cascade never dumps hundreds of lines into context. Drill into the log
+#    with grep/sed -- see docs/tests/reading-test-output.md.
+if ! npx vitest run --project=unit --changed > "$LOG_DIR/test-run.txt" 2>&1; then
+  tail -6 "$LOG_DIR/test-run.txt"
   echo ""
+  echo "Failing tests:"
+  grep "FAIL" "$LOG_DIR/test-run.txt" || true
+  fail "tests failed. Full output: $LOG_DIR/test-run.txt"
+fi
+
+# 4. Advisory only, never blocks: suggest an independent review pass on a large diff.
+changed_lines=$(git diff --cached --numstat | awk '{ added += $1; removed += $2 } END { print added + removed + 0 }')
+if [ "$changed_lines" -gt 300 ]; then
+  echo "pre-commit: diff is $changed_lines lines -- consider a diff-reviewer pass before committing." >&2
 fi
 
 exit 0

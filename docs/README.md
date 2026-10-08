@@ -9,6 +9,8 @@ This folder is a plain markdown tree, so it works two ways:
 ## Contents
 
 - [architecture.md](./architecture.md) — how the pieces fit together, current state of the app.
+- [documentation-standards.md](./documentation-standards.md) — how anything in this wiki is written: voice, structure, the current-state rule. Read before writing a doc.
+- [workflow-automation.md](./workflow-automation.md) — why the workflow is enforced by hooks, the two subagents, and which designs were rejected.
 - [components/](./components/README.md) — React components.
 - [hooks/](./hooks/README.md) — custom React hooks.
 - [utils/](./utils/README.md) — non-hook utility modules (e.g. the Supabase client).
