@@ -31,15 +31,11 @@ Every section below that names a skill is a mandatory pointer, not something to 
 
 ## Build workflow
 
-**Library-first for new components/functions:** when asked to build a new component, icon, or utility function, first check whether a well-tested existing library or plugin already provides it (e.g. an icon request → recommend Lucide rather than a custom SVG). Recommend the library and get confirmation before building a custom implementation. Only build custom when no suitable library exists.
+**Library-first for new components/functions:** when asked to build a new component, icon, or utility function, first check whether a well-tested existing library or plugin already provides it. Recommend the library and get confirmation before building a custom implementation. Only build custom when no suitable library exists.
 
 **Extract shared code instead of duplicating it:** don't duplicate a component or its styling across pages — whether explicitly asked to copy something, or discovered while building something new that turns out to share structure with existing code. When a new page/component would repeat markup, styling, or logic that already exists elsewhere (or when building two similar things in the same task, like a login and signup page), extract the shared part into its own reusable file that both import, rather than pasting a second copy. Recognize this during design, not only when told to.
 
-## Color tokens
-
-Every color value lives in `src/index.css`'s `:root` (light) and `.dark` blocks as a named CSS variable (e.g. `--foreground`, `--ring`) — never hardcode a raw color value (hex/oklch/rgb) inside a component. Name tokens by role ("what it's for" — `--muted-foreground`, `--destructive`) not by appearance ("what it looks like" — `--gray-500`), so the name stays meaningful if the actual value changes later.
-
-**When asked to use or add a color:** first check whether an existing variable already matches or is close, and propose using that instead of introducing a near-duplicate (this is what prevents drift like one component using `0.985` and another using `0.976` for what's supposed to be the same shade). If nothing fits, propose adding a new variable with a properly semantic name — defined in both `:root` and `.dark`, and mapped in the `@theme inline` block if it needs its own Tailwind utility (e.g. `bg-*`/`text-*`/`ring-*`) — rather than inlining a literal value in the component.
+**Any visual-design decision — new page/component, redesign, or a change to existing UI — ALWAYS use the [`build-ui`](./.claude/skills/build-ui/SKILL.md) skill**, after backend/logic work is done. This covers color, spacing, layout, and icon choice (including the Lucide-vs-custom-SVG call the library-first rule above would otherwise leave to judgment). The only exception: an explicit, direct instruction from the user naming exactly what to change (e.g. "change the header's background from `brand-muted` to `brand`") — apply that directly instead, consulting [`ui-repo-conventions`](./.claude/skills/ui-repo-conventions/SKILL.md) for correct token/icon names. Anything looser — including my own judgment calls about color/spacing/icons — is not an exception.
 
 ## Testing
 

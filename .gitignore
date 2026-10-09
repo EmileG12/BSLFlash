@@ -15,6 +15,11 @@ dist-ssr
 # Hook-written verification logs (read with grep/sed, never committed)
 .test-logs/
 
+# Python artifacts from vendored skill scripts (.claude/skills/*/scripts/)
+__pycache__/
+*.pyc
+.coverage
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
