@@ -36,25 +36,27 @@ function renderPage() {
   )
 }
 
-// "Total: " and the count are separate <span>s (styled in different colors), so their
-// combined text isn't a single text node getByText can match directly.
-function totalText(container: HTMLElement) {
-  return Array.from(container.querySelectorAll('p'))
-    .find((p) => p.textContent?.startsWith('Total'))
-    ?.textContent
-}
-
 describe('CreateDeckPage', () => {
   it('moves a word from the available list to the selected list on click', async () => {
     mockWords()
     const user = userEvent.setup()
 
-    const { container } = renderPage()
+    renderPage()
 
     await user.click(await screen.findByRole('button', { name: 'Hello' }))
 
-    expect(totalText(container)).toBe('Total: 1')
+    expect(screen.getByRole('status')).toHaveTextContent('1 word selected')
     expect(screen.queryByRole('button', { name: 'Hello' })).not.toBeInTheDocument()
+  })
+
+  it('exposes the word catalog and selected-words lists as labelled groups', async () => {
+    mockWords()
+
+    renderPage()
+    await screen.findByRole('button', { name: 'Hello' })
+
+    expect(screen.getByRole('group', { name: 'Word catalog' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Selected words' })).toBeInTheDocument()
   })
 
   it('filters the available list by search', async () => {
@@ -74,11 +76,11 @@ describe('CreateDeckPage', () => {
     mockWords()
     const user = userEvent.setup()
 
-    const { container } = renderPage()
+    renderPage()
     await user.click(await screen.findByRole('button', { name: 'Hello' }))
     await user.click(screen.getByRole('button', { name: /remove hello/i }))
 
-    expect(totalText(container)).toBe('Total: 0')
+    expect(screen.getByRole('status')).toHaveTextContent('0 words selected')
     expect(screen.getByRole('button', { name: 'Hello' })).toBeInTheDocument()
   })
 
