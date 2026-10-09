@@ -30,11 +30,18 @@ hairline-broadsheet, the "SaaS-card kit," template chrome). Follow its plan →
 review-against-brief → build → critique shape for how you structure your own spec-writing.
 
 **Pass 3 — binding remap**: invoke the `ui-repo-conventions` skill via the `Skill` tool — these
-rules are binding, not optional: map any palette/spacing suggestion from pass 1 or 2 onto existing
-tokens (propose a new one only if nothing fits, named by role), and translate any icon suggestion
-to its `lucide-react` equivalent. A suggestion that conflicts with this skill always loses — remap
-it, don't apply it raw. Aesthetic distinctiveness and the token system aren't in tension: a
-"deliberate, brief-specific" palette still gets expressed through named tokens, not raw hex.
+rules are binding, not optional, but "binding" means *expressed through the token system*, not
+*existing tokens only*. Default to mapping any palette/spacing suggestion from pass 1 or 2 onto an
+existing token when one genuinely fits. When it doesn't — the pass-1/2 direction calls for a
+semantic role the current palette has no token for, or the "one bold signature element" from pass 2
+needs a color existing tokens can't express without diluting it — recommend a new token instead of
+stretching an existing one to cover it. Say plainly why the existing tokens didn't fit; still name
+it by role and express it the same way any token is expressed (defined in both `:root` and `.dark`,
+mapped in `@theme inline`), never as a raw hex value in your spec. Icons are firmer, no equivalent
+exception: always translate any icon suggestion to its `lucide-react` equivalent. Aesthetic
+distinctiveness and the token system aren't in tension: a "deliberate, brief-specific" palette still
+gets expressed through named tokens — new ones when the design genuinely calls for one, not only
+recycled ones.
 
 You may also invoke the `ui-styling` skill (its `references/` — shadcn/Tailwind theming +
 accessibility notes) for stack-specific detail at any point. Ignore the other vendored skills
