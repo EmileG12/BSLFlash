@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { ChevronDown, LogOut, Menu } from 'lucide-react'
 import { useCategories } from '../hooks/useCategories'
-import { Sheet, SheetContent, SheetTitle, SheetTrigger } from './ui/sheet'
+import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from './ui/sheet'
 import { Button } from './ui/button'
 import './MobileNavSheet.css'
 
@@ -99,6 +99,9 @@ export function MobileNavSheet({ onSignOut }: MobileNavSheetProps) {
       </SheetTrigger>
       <SheetContent side="right" className="w-[85vw] max-w-sm">
         <SheetTitle className="sr-only">Navigation menu</SheetTitle>
+        <SheetDescription className="sr-only">
+          Links to pages and categories, plus sign out.
+        </SheetDescription>
         <nav className="mobile-nav-list">
           <NavLink to="/" end className="mobile-nav-row" onClick={close}>
             Home
