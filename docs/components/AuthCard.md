@@ -14,4 +14,6 @@
 
 **Key behavior:** Purely presentational — no state, no logic. `children` renders after `CardHeader` rather than being wrapped by it, since each page's `<form>` needs to contain `CardContent`/`CardFooter`, not `CardHeader` (which has no form controls).
 
+The card is sized `w-full max-w-sm` rather than a viewport-relative width like `w-[30vw]` — a `vw` unit scales with viewport width, so on a narrow phone screen it shrinks the card well below a usable size instead of just capping it on wide screens.
+
 **Used by:** [LoginPage](./LoginPage.md), [SignupPage](./SignupPage.md).

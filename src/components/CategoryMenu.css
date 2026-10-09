@@ -50,11 +50,10 @@
 
 .category-menu-icon {
   pointer-events: none;
-  transition: transform 150ms ease;
 }
 
-.category-menu-trigger[data-state='open'] .category-menu-icon {
-  transform: rotate(90deg);
+.category-menu-content {
+  border-bottom: 2px solid var(--brand);
 }
 
 .category-menu-item {

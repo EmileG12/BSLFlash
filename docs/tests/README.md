@@ -29,6 +29,7 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [SignupPage](./SignupPage.md) | `src/pages/SignupPage.test.tsx` | [SignupPage](../components/SignupPage.md) |
 | [NavBar](./NavBar.md) | `src/components/NavBar.test.tsx` | [NavBar](../components/NavBar.md) |
 | [NavBar.browser](./NavBar.browser.md) | `src/components/NavBar.browser.test.tsx` | [NavBar](../components/NavBar.md) — real-browser click behavior |
+| [MobileNavSheet](./MobileNavSheet.md) | `src/components/MobileNavSheet.test.tsx` | [MobileNavSheet](../components/MobileNavSheet.md) |
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.test.tsx` | [SelectDeckCard](../components/SelectDeckCard.md) |
 | [DeckGrid](./DeckGrid.md) | `src/components/DeckGrid.test.tsx` | [DeckGrid](../components/DeckGrid.md) |
 | [MyDecksPage](./MyDecksPage.md) | `src/pages/MyDecksPage.test.tsx` | [MyDecksPage](../components/MyDecksPage.md) |

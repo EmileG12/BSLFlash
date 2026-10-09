@@ -79,36 +79,38 @@ export function WordGuessCombobox({ words, onSubmit, disabled = false }: WordGue
         }
       }}
     >
-      <Combobox
-        items={words}
-        value={selectedWord}
-        onValueChange={setSelectedWord}
-        inputValue={inputValue}
-        onInputValueChange={setInputValue}
-        itemToStringLabel={(word) => word.word}
-        isItemEqualToValue={(a, b) => a.id === b.id}
-        disabled={disabled}
-      >
-        <FilteredItemsWatcher onChange={setFilteredItems} />
-        <ComboboxInput placeholder="Search words..." className="w-full word-guess-input" />
-        <ComboboxContent>
-          <ComboboxEmpty>No matching words.</ComboboxEmpty>
-          <ComboboxList>
-            {(word: WordOption) => (
-              <TooltipProvider key={word.id}>
-                <Tooltip>
-                  <TooltipTrigger asChild>
-                    <ComboboxItem value={word} className="word-guess-item">
-                      {word.word}
-                    </ComboboxItem>
-                  </TooltipTrigger>
-                  <TooltipContent side="right">{word.definition}</TooltipContent>
-                </Tooltip>
-              </TooltipProvider>
-            )}
-          </ComboboxList>
-        </ComboboxContent>
-      </Combobox>
+      <div className="min-w-0 flex-1">
+        <Combobox
+          items={words}
+          value={selectedWord}
+          onValueChange={setSelectedWord}
+          inputValue={inputValue}
+          onInputValueChange={setInputValue}
+          itemToStringLabel={(word) => word.word}
+          isItemEqualToValue={(a, b) => a.id === b.id}
+          disabled={disabled}
+        >
+          <FilteredItemsWatcher onChange={setFilteredItems} />
+          <ComboboxInput placeholder="Search words..." className="w-full word-guess-input" />
+          <ComboboxContent>
+            <ComboboxEmpty>No matching words.</ComboboxEmpty>
+            <ComboboxList>
+              {(word: WordOption) => (
+                <TooltipProvider key={word.id}>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <ComboboxItem value={word} className="word-guess-item">
+                        {word.word}
+                      </ComboboxItem>
+                    </TooltipTrigger>
+                    <TooltipContent side="right">{word.definition}</TooltipContent>
+                  </Tooltip>
+                </TooltipProvider>
+              )}
+            </ComboboxList>
+          </ComboboxContent>
+        </Combobox>
+      </div>
       <Button type="button" onClick={submit} disabled={!selectedWord}>
         Confirm
       </Button>

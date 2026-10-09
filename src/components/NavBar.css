@@ -57,18 +57,19 @@
 
 .navbar-signout {
   font: inherit;
+  font-weight: 600;
   color: var(--foreground);
   background: none;
-  outline: 1px solid #000;
+  border: 1px solid var(--foreground);
   border-radius: 6px;
   padding: 6px 12px;
   cursor: pointer;
-  transition: none;
-  font-weight: 600;
+  transition: color 150ms ease, background-color 150ms ease, border-color 150ms ease,
+    box-shadow 150ms ease;
 }
 
 .navbar-signout:hover {
-  outline: 1px solid var(--brand);
+  border-color: var(--brand);
   color: var(--brand);
   background-color: var(--brand-muted);
   box-shadow: 0 8px 12px var(--shadow-color);

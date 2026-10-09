@@ -19,6 +19,7 @@ React components, one doc file per component.
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
 | [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Create Decks/My Decks links, Sign Out) shown on all authenticated pages. |
 | [CategoryMenu](./CategoryMenu.md) | `src/components/CategoryMenu.tsx` | Hover-triggered nav dropdown listing flashcard categories; used twice by `NavBar` for Categories and Vocabulary. |
+| [MobileNavSheet](./MobileNavSheet.md) | `src/components/MobileNavSheet.tsx` | Hamburger-triggered slide-in nav menu for narrow screens, rendered by `NavBar` alongside the desktop bar. |
 | [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar`. |
 | [ProtectedRoute](./ProtectedRoute.md) | `src/components/ProtectedRoute.tsx` | Redirects to `/login` when signed out. |
 | [GuestRoute](./GuestRoute.md) | `src/components/GuestRoute.tsx` | Redirects to `/` when already signed in. |

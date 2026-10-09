@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { ChevronRight } from 'lucide-react'
+import { ChevronDown } from 'lucide-react'
 import { useCategories } from '../hooks/useCategories'
 import {
   DropdownMenu,
@@ -58,10 +58,10 @@ export function CategoryMenu({ vocabulary, label }: CategoryMenuProps) {
           aria-current={isActive ? 'page' : undefined}
         >
           {label}
-          <ChevronRight className="category-menu-icon" size={16} />
+          <ChevronDown className="category-menu-icon" size={16} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
-          className="min-w-48 p-0"
+          className="category-menu-content min-w-48 p-0"
           sideOffset={10}
           onCloseAutoFocus={(event) => {
             // Radix returns keyboard focus to the trigger whenever the menu

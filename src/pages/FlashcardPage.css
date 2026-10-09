@@ -10,5 +10,5 @@
 }
 
 .flashcard-round-wrap {
-  @apply flex w-full items-start justify-center gap-3;
+  @apply flex w-full flex-col-reverse items-center gap-3 sm:flex-row sm:items-start sm:justify-center;
 }
