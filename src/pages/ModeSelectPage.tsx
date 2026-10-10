@@ -1,7 +1,32 @@
+import type { ReactNode } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
+import { Infinity as InfinityIcon, ListOrdered } from 'lucide-react'
 import '../components/SelectDeckCard.css'
+import './ModeSelectPage.css'
+
+interface ModeTileProps {
+  icon: ReactNode
+  label: string
+  subtitle: string
+  onClick: () => void
+}
+
+function ModeTile({ icon, label, subtitle, onClick }: ModeTileProps) {
+  return (
+    <button type="button" className="mode-tile" aria-label={label} onClick={onClick}>
+      <span className="mode-tile-icon" aria-hidden="true">
+        {icon}
+      </span>
+      <span className="mode-tile-label" aria-hidden="true">
+        {label}
+      </span>
+      <span className="mode-tile-subtitle" aria-hidden="true">
+        {subtitle}
+      </span>
+    </button>
+  )
+}
 
 export function ModeSelectPage() {
   const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
@@ -19,21 +44,19 @@ export function ModeSelectPage() {
           <CardTitle className="text-2xl">Select a mode</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="select-deck-grid">
-            <Button
-              variant="outline"
-              className="select-deck-button"
+          <div className="mode-select-grid">
+            <ModeTile
+              icon={<InfinityIcon size={20} />}
+              label="Practice"
+              subtitle="Untimed, keep going"
               onClick={() => navigate(`/flashcards/${deckType}/${categoryId}/practice`)}
-            >
-              Practice
-            </Button>
-            <Button
-              variant="outline"
-              className="select-deck-button"
+            />
+            <ModeTile
+              icon={<ListOrdered size={20} />}
+              label="10 Cards"
+              subtitle="Timed round, scored"
               onClick={() => navigate(`/flashcards/${deckType}/${categoryId}/ten-cards`)}
-            >
-              10 Cards
-            </Button>
+            />
           </div>
         </CardContent>
       </Card>

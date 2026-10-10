@@ -15,7 +15,7 @@ Every color value lives in `src/index.css`'s `:root` (light) and `.dark` blocks 
 
 **Current token inventory** (so a design decision doesn't have to re-derive this by reading `src/index.css` itself): `background`, `foreground`, `card`, `card-foreground`, `popover`, `popover-foreground`, `primary`, `primary-foreground`, `secondary`, `secondary-foreground`, `muted`, `muted-foreground`, `accent`, `accent-foreground`, `destructive`, `success`, `brand`, `brand-foreground`, `brand-strong`, `brand-muted`, `input`, `ring`, `chart-1` … `chart-5`, `sidebar`, `sidebar-foreground`, `sidebar-primary`, `sidebar-primary-foreground`, `sidebar-accent`, `sidebar-accent-foreground`, `sidebar-border`, `sidebar-ring`, `border`.
 
-**Known gap, don't silently "fix" it**: `--accent` and `--border` are defined only in `.dark`, not in `:root` — a real gap in the current code. If a design calls for either in light mode, flag it and ask rather than assuming a value or quietly adding one.
+**Known gap, don't silently "fix" it**: `--accent` is defined only in `.dark`, not in `:root` — a real gap in the current code. If a design calls for it in light mode, flag it and ask rather than assuming a value or quietly adding one. (`--border` had the same gap but was fixed — it's now defined in both `:root` and `.dark`.)
 
 ## Icons
 

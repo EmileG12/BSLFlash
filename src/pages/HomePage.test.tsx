@@ -2,12 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
-import { useAuth } from '../hooks/useAuth'
 import { HomePage } from './HomePage'
-
-vi.mock('../hooks/useAuth', () => ({
-  useAuth: vi.fn(),
-}))
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
@@ -31,24 +26,7 @@ function mockCategoriesByVocabulary() {
 }
 
 describe('HomePage', () => {
-  it('greets the user by email', () => {
-    vi.mocked(useAuth).mockReturnValue({
-      session: { user: { email: 'user@example.com' } },
-      loading: false,
-    } as never)
-    mockCategoriesByVocabulary()
-
-    render(
-      <MemoryRouter>
-        <HomePage />
-      </MemoryRouter>,
-    )
-
-    expect(screen.getByText(/welcome, user@example\.com/i)).toBeInTheDocument()
-  })
-
   it('renders the topic deck picker above the vocabulary deck picker, each with its own categories', async () => {
-    vi.mocked(useAuth).mockReturnValue({ session: null, loading: false } as never)
     mockCategoriesByVocabulary()
 
     render(
@@ -57,9 +35,9 @@ describe('HomePage', () => {
       </MemoryRouter>,
     )
 
-    const titles = screen.getAllByText(/select a/i)
-    expect(titles[0]).toHaveTextContent('Select a deck')
-    expect(titles[1]).toHaveTextContent('Select a vocabulary list')
+    const topicsTitle = screen.getByText('Everyday topics')
+    const qualificationTitle = screen.getByText('Exam & qualification lists')
+    expect(topicsTitle.compareDocumentPosition(qualificationTitle) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
 
     expect(await screen.findByRole('button', { name: 'Greetings' })).toBeInTheDocument()
     expect(await screen.findByRole('button', { name: 'GCSE' })).toBeInTheDocument()

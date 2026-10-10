@@ -1,0 +1,40 @@
+@reference "../index.css";
+
+.mode-select-grid {
+  @apply grid gap-3;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 240px));
+  justify-content: center;
+}
+
+.mode-tile {
+  @apply flex flex-col items-center gap-2 rounded-lg border border-border bg-background p-4 text-center transition-colors cursor-pointer;
+  border-bottom: 2px solid var(--border);
+}
+
+.mode-tile:hover,
+.mode-tile:focus-visible {
+  border-bottom-color: var(--brand);
+  color: var(--brand);
+}
+
+.mode-tile:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.mode-tile-icon {
+  @apply flex size-10 items-center justify-center rounded-full bg-brand-muted text-brand transition-colors;
+}
+
+.mode-tile:hover .mode-tile-icon,
+.mode-tile:focus-visible .mode-tile-icon {
+  @apply bg-brand text-brand-foreground;
+}
+
+.mode-tile-label {
+  @apply font-semibold;
+}
+
+.mode-tile-subtitle {
+  @apply text-sm text-muted-foreground;
+}

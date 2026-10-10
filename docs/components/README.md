@@ -6,7 +6,7 @@ React components, one doc file per component.
 |---|---|---|
 | [LoginPage](./LoginPage.md) | `src/pages/LoginPage.tsx` | Email/password login form. |
 | [SignupPage](./SignupPage.md) | `src/pages/SignupPage.tsx` | Account creation form (email, username, password, confirm password). |
-| [HomePage](./HomePage.md) | `src/pages/HomePage.tsx` | Landing page for logged-in users; greeting + deck picker. |
+| [HomePage](./HomePage.md) | `src/pages/HomePage.tsx` | Landing page for logged-in users; deck picker for everyday topics and exam/qualification lists. |
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.tsx` | Card listing flashcard categories as buttons to pick a deck; wraps `DeckGrid`. |
 | [DeckGrid](./DeckGrid.md) | `src/components/DeckGrid.tsx` | Presentational deck-list card (loading/error/empty/grid-of-buttons), shared by `SelectDeckCard` and `MyDecksPage`. |
 | [CreateDeckPage](./CreateDeckPage.md) | `src/pages/CreateDeckPage.tsx` | Builds a custom deck from the word list via a two-column picker, then names and saves it. |

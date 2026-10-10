@@ -66,6 +66,8 @@
 
   --input: oklch(0.922 0 0);
 
+  --border: oklch(0.922 0 0);
+
   --ring: var(--brand);
 
   --chart-1: oklch(0.87 0 0);
@@ -109,31 +111,6 @@ body {
   margin: 0;
 }
 
-h1,
-h2 {
-  font-family: var(--heading);
-  font-weight: 500;
-  color: var(--foreground);
-}
-
-h1 {
-  font-size: 56px;
-  letter-spacing: -1.68px;
-  margin: 32px 0;
-  @media (max-width: 1024px) {
-    font-size: 36px;
-    margin: 20px 0;
-  }
-}
-h2 {
-  font-size: 24px;
-  line-height: 118%;
-  letter-spacing: -0.24px;
-  margin: 0 0 8px;
-  @media (max-width: 1024px) {
-    font-size: 20px;
-  }
-}
 p {
   margin: 0;
 }
@@ -240,9 +217,32 @@ code {
 @layer base {
   * {
     @apply border-border outline-ring/50;}
+  h1,
+  h2 {
+    font-family: var(--heading);
+    font-weight: 500;
+    color: var(--foreground);}
+  h1 {
+    font-size: 56px;
+    letter-spacing: -1.68px;
+    margin: 32px 0;
+    @media (max-width: 1024px) {
+      font-size: 36px;
+      margin: 20px 0;}}
+  h2 {
+    font-size: 24px;
+    line-height: 118%;
+    letter-spacing: -0.24px;
+    margin: 0 0 8px;
+    @media (max-width: 1024px) {
+      font-size: 20px;}}
   body {
     @apply text-foreground;
-    background: linear-gradient(150deg, var(--background) 0%, var(--brand) 180%);
+    background: linear-gradient(
+      150deg,
+      var(--background) 0%,
+      color-mix(in oklab, var(--brand) 25%, var(--background)) 150%
+    );
     min-height: 100svh;}
   html {
     @apply font-sans;}}
