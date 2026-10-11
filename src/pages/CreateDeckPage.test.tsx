@@ -106,7 +106,7 @@ describe('CreateDeckPage', () => {
     await user.type(within(dialog).getByPlaceholderText(/deck name/i), 'My Greetings')
     await user.click(within(dialog).getByRole('button', { name: 'Confirm' }))
 
-    expect(supabase.rpc).toHaveBeenCalledWith('create_custom_category', {
+    expect(supabase.rpc).toHaveBeenCalledWith('create_custom_deck', {
       p_name: 'My Greetings',
       p_word_ids: ['word-1'],
     })

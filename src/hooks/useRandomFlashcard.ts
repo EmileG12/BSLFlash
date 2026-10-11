@@ -8,7 +8,7 @@ export interface Flashcard {
   videoUrl: string
 }
 
-/** 'standard' plays a public.categories deck; 'custom' plays a user-owned custom_categories deck (same id space otherwise). */
+/** 'standard' plays a public.categories deck; 'custom' plays a user-owned custom_decks deck (same id space otherwise). */
 export type DeckType = 'standard' | 'custom'
 
 interface RandomFlashcardState {

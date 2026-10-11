@@ -2,12 +2,13 @@ import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
+import { supabase } from '../lib/supabase'
 import { mockCategories, mockCategoriesPending } from '../test/mockCategories'
 import { SelectDeckCard } from './SelectDeckCard'
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
-    from: vi.fn(),
+    rpc: vi.fn(),
   },
 }))
 
@@ -44,7 +45,7 @@ describe('SelectDeckCard', () => {
   })
 
   it('filters by the vocabulary prop', async () => {
-    const { eq } = mockCategories({ data: [], error: null })
+    mockCategories({ data: [], error: null })
 
     render(
       <MemoryRouter>
@@ -53,7 +54,7 @@ describe('SelectDeckCard', () => {
     )
 
     await screen.findByText(/no categories yet/i)
-    expect(eq).toHaveBeenCalledWith('is_vocabulary', true)
+    expect(supabase.rpc).toHaveBeenCalledWith('get_categories_with_words', { p_is_vocabulary: true })
   })
 
   it('shows an error message when the fetch fails', async () => {

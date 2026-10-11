@@ -10,7 +10,7 @@ interface CategoryInfoState {
 
 /**
  * Looks up a single category's display name from `categories` (standard) or
- * `custom_categories` (custom), by id. Custom decks have no `is_vocabulary`
+ * `custom_decks` (custom), by id. Custom decks have no `is_vocabulary`
  * column, so they always report `isVocabulary: false`.
  */
 export function useCategoryInfo(categoryId: string, deckType: DeckType): CategoryInfoState {
@@ -23,12 +23,16 @@ export function useCategoryInfo(categoryId: string, deckType: DeckType): Categor
 
     const query =
       deckType === 'custom'
-        ? supabase.from('custom_categories').select('category_name').eq('id', categoryId).maybeSingle()
+        ? supabase.from('custom_decks').select('deck_name').eq('id', categoryId).maybeSingle()
         : supabase.from('categories').select('category_name, is_vocabulary').eq('id', categoryId).maybeSingle()
 
     query.then(({ data }) => {
       if (cancelled) return
-      setCategoryName(data?.category_name ?? null)
+      const name =
+        deckType === 'custom'
+          ? (data as { deck_name?: string } | null)?.deck_name
+          : (data as { category_name?: string } | null)?.category_name
+      setCategoryName(name ?? null)
       setIsVocabulary(deckType === 'standard' && (data as { is_vocabulary?: boolean } | null)?.is_vocabulary === true)
       setLoading(false)
     })

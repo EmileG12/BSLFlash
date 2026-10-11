@@ -5,7 +5,7 @@
 
 **Purpose:** Drives one round of the flashcard game for [FlashcardPage](../components/FlashcardPage.md) — fetches a random word (+ its primary sign video) from the given category or custom deck via the [`get_random_word_for_category`](../rpc-functions/get_random_word_for_category.md) RPC, and exposes `next()` to draw another.
 
-`DeckType = 'standard' | 'custom'` is exported from this file (re-exported by [useTenCardsRound](./useTenCardsRound.md) rather than redeclared): `'standard'` plays a `public.categories` deck; `'custom'` plays a user-owned `custom_categories` deck (same id space otherwise). This type is also what the URL's `:deckType` route segment is validated against in [FlashcardPage](../components/FlashcardPage.md)/[TenCardsPage](../components/TenCardsPage.md)/[ModeSelectPage](../components/ModeSelectPage.md).
+`DeckType = 'standard' | 'custom'` is exported from this file (re-exported by [useTenCardsRound](./useTenCardsRound.md) rather than redeclared): `'standard'` plays a `public.categories` deck; `'custom'` plays a user-owned `custom_decks` deck (same id space otherwise), including a published deck owned by another user. This type is also what the URL's `:deckType` route segment is validated against in [FlashcardPage](../components/FlashcardPage.md)/[TenCardsPage](../components/TenCardsPage.md)/[ModeSelectPage](../components/ModeSelectPage.md).
 
 `subcategoryId` further narrows the word pool to one topic category within a vocabulary category (see [SubCategoryChips](../components/SubCategoryChips.md)); omitted or `null`/`''`, it's left out of the RPC call entirely (via a conditional spread) rather than passed as `null`, so existing call sites that never set it send exactly what they sent before this parameter existed.
 

@@ -52,46 +52,55 @@ export type Database = {
         }
         Relationships: []
       }
-      custom_categories: {
+      custom_deck_tags: {
         Row: {
-          category_name: string
-          created_at: string
-          id: string
-          user_id: string
+          category_id: string
+          custom_deck_id: string
         }
         Insert: {
-          category_name: string
-          created_at?: string
-          id?: string
-          user_id?: string
+          category_id: string
+          custom_deck_id: string
         }
         Update: {
-          category_name?: string
-          created_at?: string
-          id?: string
-          user_id?: string
+          category_id?: string
+          custom_deck_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "custom_deck_tags_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "custom_deck_tags_custom_deck_id_fkey"
+            columns: ["custom_deck_id"]
+            isOneToOne: false
+            referencedRelation: "custom_decks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
-      custom_category_words: {
+      custom_deck_words: {
         Row: {
-          custom_category_id: string
+          custom_deck_id: string
           word_id: string
         }
         Insert: {
-          custom_category_id: string
+          custom_deck_id: string
           word_id: string
         }
         Update: {
-          custom_category_id?: string
+          custom_deck_id?: string
           word_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "custom_category_words_custom_category_id_fkey"
-            columns: ["custom_category_id"]
+            columns: ["custom_deck_id"]
             isOneToOne: false
-            referencedRelation: "custom_categories"
+            referencedRelation: "custom_decks"
             referencedColumns: ["id"]
           },
           {
@@ -99,6 +108,56 @@ export type Database = {
             columns: ["word_id"]
             isOneToOne: false
             referencedRelation: "words"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      custom_decks: {
+        Row: {
+          created_at: string
+          deck_name: string
+          id: string
+          is_public: boolean
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          deck_name: string
+          id?: string
+          is_public?: boolean
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          deck_name?: string
+          id?: string
+          is_public?: boolean
+          user_id?: string
+        }
+        Relationships: []
+      }
+      deck_likes: {
+        Row: {
+          created_at: string
+          custom_deck_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_deck_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          custom_deck_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deck_likes_custom_deck_id_fkey"
+            columns: ["custom_deck_id"]
+            isOneToOne: false
+            referencedRelation: "custom_decks"
             referencedColumns: ["id"]
           },
         ]
@@ -138,6 +197,32 @@ export type Database = {
           role_name?: string
         }
         Relationships: []
+      }
+      saved_decks: {
+        Row: {
+          created_at: string
+          custom_deck_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          custom_deck_id: string
+          user_id?: string
+        }
+        Update: {
+          created_at?: string
+          custom_deck_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_decks_custom_deck_id_fkey"
+            columns: ["custom_deck_id"]
+            isOneToOne: false
+            referencedRelation: "custom_decks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       sign_videos: {
         Row: {
@@ -291,15 +376,44 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      create_custom_category: {
+      create_custom_deck: {
         Args: { p_name: string; p_word_ids: string[] }
         Returns: string
+      }
+      get_available_deck_tags: {
+        Args: never
+        Returns: {
+          category_name: string
+          id: string
+        }[]
       }
       get_available_subcategories_for_category: {
         Args: { category_id: string }
         Returns: {
           category_name: string
           id: string
+        }[]
+      }
+      get_categories_with_words: {
+        Args: { p_is_vocabulary: boolean }
+        Returns: {
+          category_name: string
+          id: string
+          is_vocabulary: boolean
+        }[]
+      }
+      get_public_decks: {
+        Args: { p_search?: string; p_sort?: string; p_tag_ids?: string[] }
+        Returns: {
+          created_at: string
+          deck_name: string
+          id: string
+          like_count: number
+          liked_by_me: boolean
+          owner_name: string
+          owner_user_id: string
+          saved_by_me: boolean
+          tag_names: string[]
         }[]
       }
       get_random_word_for_category: {
@@ -331,7 +445,24 @@ export type Database = {
           word_id: string
         }[]
       }
+      get_saved_decks: {
+        Args: never
+        Returns: {
+          deck_name: string
+          id: string
+          owner_name: string
+          owner_user_id: string
+        }[]
+      }
       is_superadmin: { Args: never; Returns: boolean }
+      set_custom_deck_public: {
+        Args: { p_deck_id: string; p_is_public: boolean }
+        Returns: undefined
+      }
+      update_custom_deck: {
+        Args: { p_deck_id: string; p_name: string; p_word_ids: string[] }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

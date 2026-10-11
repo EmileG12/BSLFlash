@@ -6,23 +6,18 @@ import { HomePage } from './HomePage'
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
-    from: vi.fn(),
+    rpc: vi.fn(),
   },
 }))
 
 function mockCategoriesByVocabulary() {
-  vi.mocked(supabase.from).mockReturnValue({
-    select: vi.fn().mockReturnValue({
-      eq: vi.fn((_column: string, isVocabulary: boolean) => ({
-        order: vi.fn().mockResolvedValue({
-          data: isVocabulary
-            ? [{ id: 'gcse-1', category_name: 'GCSE', is_vocabulary: true }]
-            : [{ id: 'topic-1', category_name: 'Greetings', is_vocabulary: false }],
-          error: null,
-        }),
-      })),
-    }),
-  } as never)
+  vi.mocked(supabase.rpc).mockImplementation(((_fn: string, args: { p_is_vocabulary: boolean }) =>
+    Promise.resolve({
+      data: args.p_is_vocabulary
+        ? [{ id: 'gcse-1', category_name: 'GCSE', is_vocabulary: true }]
+        : [{ id: 'topic-1', category_name: 'Greetings', is_vocabulary: false }],
+      error: null,
+    })) as never)
 }
 
 describe('HomePage', () => {

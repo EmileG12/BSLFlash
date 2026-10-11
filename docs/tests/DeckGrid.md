@@ -9,6 +9,11 @@
 - Shows an error message.
 - Shows the given `emptyMessage` when `items` is empty.
 - Renders a button per item and calls `onSelect` with its `id` when clicked.
+- Omits the delete button when `onDelete` is not given.
+- Renders a delete button per item and calls `onDelete` with the item when given.
+- Renders an edit button per item and calls `onEdit` with the item when given.
+- Omits the edit button when `onEdit` is not given.
+- Uses `deleteActionLabel` for the delete button's `aria-label` when given (`"Remove Animals"`).
 
 ## Notes
 

@@ -1,7 +1,7 @@
 import type { ReactNode } from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
-import { CircleAlert, Inbox, Trash2 } from 'lucide-react'
+import { CircleAlert, Inbox, Pencil, Trash2 } from 'lucide-react'
 import './SelectDeckCard.css'
 
 export interface DeckGridItem {
@@ -18,6 +18,10 @@ interface DeckGridProps {
   onSelect: (id: string) => void
   /** When given, each item also gets a trailing delete icon button (a sibling of the select button, not nested inside it). Omit for a plain read-only list like SelectDeckCard's. */
   onDelete?: (item: DeckGridItem) => void
+  /** Verb shown in the delete button's aria-label (`"${deleteActionLabel} ${item.name}"`). Defaults to 'Delete' -- pass e.g. 'Remove' for a saved-deck "remove from library" action rather than an actual delete. */
+  deleteActionLabel?: string
+  /** When given, each item also gets a leading edit icon button (owner-only decks, e.g. MyDecksPage's own-decks section -- omitted for saved decks, which aren't editable). */
+  onEdit?: (item: DeckGridItem) => void
   /** Icon shown in a brand-muted circle beside the title. */
   icon?: ReactNode
   /** One-line description shown under the title. */
@@ -35,6 +39,8 @@ export function DeckGrid({
   emptyMessage,
   onSelect,
   onDelete,
+  deleteActionLabel = 'Delete',
+  onEdit,
   icon,
   subtitle,
   variant = 'card',
@@ -85,16 +91,28 @@ export function DeckGrid({
               >
                 {item.name}
               </Button>
-              {onDelete && (
-                <div className="flex items-center border-l border-border pl-2">
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label={`Delete ${item.name}`}
-                    onClick={() => onDelete(item)}
-                  >
-                    <Trash2 />
-                  </Button>
+              {(onEdit || onDelete) && (
+                <div className="flex items-center gap-1 border-l border-border pl-2">
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={`Edit ${item.name}`}
+                      onClick={() => onEdit(item)}
+                    >
+                      <Pencil />
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label={`${deleteActionLabel} ${item.name}`}
+                      onClick={() => onDelete(item)}
+                    >
+                      <Trash2 />
+                    </Button>
+                  )}
                 </div>
               )}
             </div>

@@ -35,6 +35,9 @@ export function NavBar() {
           <NavLink to="/my-decks" className="navbar-brand">
             My Decks
           </NavLink>
+          <NavLink to="/browse-decks" className="navbar-brand">
+            Browse Decks
+          </NavLink>
         </div>
       </div>
       <button

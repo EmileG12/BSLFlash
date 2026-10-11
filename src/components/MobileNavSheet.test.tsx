@@ -7,7 +7,7 @@ import { MobileNavSheet } from './MobileNavSheet'
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
-    from: vi.fn(),
+    rpc: vi.fn(),
   },
 }))
 

@@ -41,13 +41,13 @@ describe('useCategoryInfo', () => {
   })
 
   it('always reports isVocabulary: false for a custom deck', async () => {
-    mockFrom({ category_name: 'My Deck' })
+    mockFrom({ deck_name: 'My Deck' })
 
     const { result } = renderHook(() => useCategoryInfo('deck-1', 'custom'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.categoryName).toBe('My Deck')
     expect(result.current.isVocabulary).toBe(false)
-    expect(supabase.from).toHaveBeenCalledWith('custom_categories')
+    expect(supabase.from).toHaveBeenCalledWith('custom_decks')
   })
 })

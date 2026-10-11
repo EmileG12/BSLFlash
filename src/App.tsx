@@ -2,6 +2,7 @@ import { Route, Routes } from 'react-router-dom'
 import { AppLayout } from './components/AppLayout'
 import { GuestRoute } from './components/GuestRoute'
 import { ProtectedRoute } from './components/ProtectedRoute'
+import { BrowseDecksPage } from './pages/BrowseDecksPage'
 import { CreateDeckPage } from './pages/CreateDeckPage'
 import { FlashcardPage } from './pages/FlashcardPage'
 import { HomePage } from './pages/HomePage'
@@ -22,6 +23,7 @@ function App() {
       <Route element={<ProtectedRoute />}>
         <Route element={<AppLayout />}>
           <Route path="/" element={<HomePage />} />
+          <Route path="/browse-decks" element={<BrowseDecksPage />} />
           <Route path="/create-decks" element={<CreateDeckPage />} />
           <Route path="/my-decks" element={<MyDecksPage />} />
           <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />

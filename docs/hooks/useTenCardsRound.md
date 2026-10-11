@@ -5,7 +5,7 @@
 
 **Purpose:** Fetches the whole "10 Cards" round up front for [TenCardsPage](../components/TenCardsPage.md) — up to 10 distinct random words (+ primary sign videos) from the given category or custom deck, via the [`get_random_words_for_category`](../rpc-functions/get_random_words_for_category.md) RPC.
 
-`deckType: DeckType` (`'standard' | 'custom'`, imported from [useRandomFlashcard](./useRandomFlashcard.md) rather than redeclared) selects whether `categoryId` is looked up in `public.categories` or a user-owned `custom_categories` deck.
+`deckType: DeckType` (`'standard' | 'custom'`, imported from [useRandomFlashcard](./useRandomFlashcard.md) rather than redeclared) selects whether `categoryId` is looked up in `public.categories` or a user-owned `custom_decks` deck.
 
 `subcategoryId`, same convention as [useRandomFlashcard](./useRandomFlashcard.md)'s, further narrows the pool to one topic category within a vocabulary category; omitted or `null`/`''`, it's left out of the RPC call entirely via a conditional spread.
 

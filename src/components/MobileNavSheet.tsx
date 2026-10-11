@@ -114,6 +114,9 @@ export function MobileNavSheet({ onSignOut }: MobileNavSheetProps) {
           <NavLink to="/my-decks" className="mobile-nav-row" onClick={close}>
             My Decks
           </NavLink>
+          <NavLink to="/browse-decks" className="mobile-nav-row" onClick={close}>
+            Browse Decks
+          </NavLink>
           <div className="mobile-nav-divider" />
           <button
             type="button"

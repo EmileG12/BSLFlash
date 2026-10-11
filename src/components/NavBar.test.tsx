@@ -12,7 +12,7 @@ vi.mock('../lib/auth', () => ({
 
 vi.mock('../lib/supabase', () => ({
   supabase: {
-    from: vi.fn(),
+    rpc: vi.fn(),
   },
 }))
 

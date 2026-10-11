@@ -9,6 +9,8 @@
 
 That same dual-membership shape is also what lets a vocabulary category be narrowed to one topic category at play time, with no schema change: [`get_available_subcategories_for_category`](../rpc-functions/get_available_subcategories_for_category.md) finds which topic categories (`is_vocabulary = false`) overlap a given vocabulary category via a self-join on `word_categories`, and [`get_random_word_for_category`](../rpc-functions/get_random_word_for_category.md)/[`get_random_words_for_category`](../rpc-functions/get_random_words_for_category.md) apply the chosen subcategory as a second `word_categories` membership check, intersected with the usual category-membership predicate. [SubCategoryChips](../components/SubCategoryChips.md), rendered by [ModeSelectPage](../components/ModeSelectPage.md) only when `isVocabulary` is `true`, is the UI for this.
 
+A `categories` row can also exist purely as a tag for public custom decks, via [`custom_deck_tags`](./custom_deck_tags.md), with zero `word_categories` links. The standard deck-selection menus therefore read through [`get_categories_with_words`](../rpc-functions/get_categories_with_words.md), which only returns rows that have at least one word. The public directory's tag filter reads [`get_available_deck_tags`](../rpc-functions/get_available_deck_tags.md) instead.
+
 ## Columns
 
 | Column | Type | Nullable | Default | Description |

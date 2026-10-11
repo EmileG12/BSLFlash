@@ -107,4 +107,57 @@ describe('DeckGrid', () => {
 
     expect(onDelete).toHaveBeenCalledWith({ id: '1', name: 'Animals' })
   })
+
+  it('renders an edit button per item and calls onEdit with the item when given', async () => {
+    const onEdit = vi.fn()
+    const user = userEvent.setup()
+
+    render(
+      <DeckGrid
+        title="My Decks"
+        items={[{ id: '1', name: 'Animals' }]}
+        loading={false}
+        error={null}
+        emptyMessage="No decks yet."
+        onSelect={() => {}}
+        onEdit={onEdit}
+      />,
+    )
+
+    await user.click(screen.getByRole('button', { name: /edit animals/i }))
+
+    expect(onEdit).toHaveBeenCalledWith({ id: '1', name: 'Animals' })
+  })
+
+  it('omits the edit button when onEdit is not given', () => {
+    render(
+      <DeckGrid
+        title="My Decks"
+        items={[{ id: '1', name: 'Animals' }]}
+        loading={false}
+        error={null}
+        emptyMessage="No decks yet."
+        onSelect={() => {}}
+      />,
+    )
+
+    expect(screen.queryByRole('button', { name: /edit/i })).not.toBeInTheDocument()
+  })
+
+  it('uses deleteActionLabel for the delete button aria-label when given', () => {
+    render(
+      <DeckGrid
+        title="Saved Decks"
+        items={[{ id: '1', name: 'Animals' }]}
+        loading={false}
+        error={null}
+        emptyMessage="No decks yet."
+        onSelect={() => {}}
+        onDelete={() => {}}
+        deleteActionLabel="Remove"
+      />,
+    )
+
+    expect(screen.getByRole('button', { name: 'Remove Animals' })).toBeInTheDocument()
+  })
 })

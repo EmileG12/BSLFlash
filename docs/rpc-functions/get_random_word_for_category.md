@@ -2,9 +2,9 @@
 
 **Signature:** `public.get_random_word_for_category(category_id uuid, is_custom boolean DEFAULT false, subcategory_id uuid DEFAULT NULL) RETURNS TABLE(word_id uuid, word text, definition text, storage_path text, format text)`
 **Language:** SQL
-**Last touched by migration:** [`20261011135343_add_subcategory_filtering.sql`](../../supabase/migrations/20261011135343_add_subcategory_filtering.sql)
+**Last touched by migration:** [`20261011162150_rename_custom_categories_to_custom_decks.sql`](../../supabase/migrations/20261011162150_rename_custom_categories_to_custom_decks.sql)
 
-**Purpose:** Powers the flashcard game — given a category or custom deck, returns one random word from it along with its primary sign video's storage path and format, for [FlashcardPage](../components/FlashcardPage.md) to render. `is_custom` selects which: `false` (the default) looks the id up in [`word_categories`](../db-schema/word_categories.md) (a `public.categories` row); `true` looks it up in [`custom_category_words`](../db-schema/custom_category_words.md) (a user-owned `custom_categories` row).
+**Purpose:** Powers the flashcard game — given a category or custom deck, returns one random word from it along with its primary sign video's storage path and format, for [FlashcardPage](../components/FlashcardPage.md) to render. `is_custom` selects which: `false` (the default) looks the id up in [`word_categories`](../db-schema/word_categories.md) (a `public.categories` row); `true` looks it up in [`custom_deck_words`](../db-schema/custom_deck_words.md) (a `custom_decks` row).
 
 `subcategory_id`, when given, further restricts the result to words that *also* belong to that topic category — a second membership check against [`word_categories`](../db-schema/word_categories.md), intersected with the existing category-membership predicate. This reuses `word_categories` as-is rather than a new join table: a word already links to both its topic category and a vocabulary category through that one table, so narrowing by subcategory is just two `IN` checks against the same table. Defaults to `NULL`, which skips the check entirely, so every pre-existing call site (only ever passing `category_id`/`is_custom`) keeps matching the whole category unchanged. [SubCategoryChips](../components/SubCategoryChips.md)/[`get_available_subcategories_for_category`](./get_available_subcategories_for_category.md) is what keeps a caller from ever passing a `subcategory_id` that would zero out the result.
 
@@ -14,7 +14,9 @@ Deliberately has no "exclude previously shown word" parameter — repeats from a
 
 The standard-vs-custom lookup is a single `UNION ALL` with a boolean guard on each branch (`... AND NOT is_custom` / `... AND is_custom`), a plain-SQL stand-in for an if/else — exactly one branch's `WHERE` is satisfiable per call, since `is_custom` and `NOT is_custom` can't both hold. This extends the original category-only function in place rather than adding a second near-identical RPC for custom decks; the old overloads were **dropped**, not left coexisting — `CREATE OR REPLACE` can't change a function's parameter list, so Postgres would otherwise have kept an old overload alongside this one, and a call passing only `category_id`/`is_custom` would then be ambiguous (matching the old exactly, and this one via `subcategory_id`'s default).
 
-Not `SECURITY DEFINER`: it only reads `word_categories`/`custom_category_words`/`words`/`signs`/`sign_videos`. The standard-category branch relies on `word_categories`' plain `SELECT ... USING (true)` policy; the custom-deck branch relies on [`custom_category_words`](../rls-policies/custom_category_words/README.md)'s owner-scoped `select` policy, so a user passing someone else's custom deck id as `category_id` just gets zero rows back via that RLS, no extra ownership check needed here.
+The body refers to `custom_deck_words` and `custom_deck_id` by name. Postgres does not rewrite a function body when a table or column is renamed (bodies are stored as plain text, unlike RLS expressions), so this function must be recreated explicitly whenever those names change.
+
+Not `SECURITY DEFINER`: it only reads `word_categories`/`custom_deck_words`/`words`/`signs`/`sign_videos`. The standard-category branch relies on `word_categories`' plain `SELECT ... USING (true)` policy; the custom-deck branch relies on [`custom_deck_words`](../rls-policies/custom_deck_words/README.md)' select policies, so a caller gets the words of a deck they own, or of any published deck, and zero rows for anyone else's unpublished deck — no extra ownership check needed here.
 
 Not `STABLE`: it calls `random()`, which is genuinely volatile (different result on every call with the same input) — marking it `STABLE` would misrepresent that.
 
@@ -25,7 +27,7 @@ Not `STABLE`: it calls `random()`, which is genuinely volatile (different result
 
 ## Current definition
 
-*From `npx supabase db dump --local --schema public`:*
+*Reconstructed from the rename migration (which recreates this body), not from a live dump. Verify against `npx supabase db dump --local --schema public`.*
 
 ```sql
 CREATE OR REPLACE FUNCTION "public"."get_random_word_for_category"("category_id" "uuid", "is_custom" boolean DEFAULT false, "subcategory_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("word_id" "uuid", "word" "text", "definition" "text", "storage_path" "text", "format" "text")
@@ -46,8 +48,8 @@ CREATE OR REPLACE FUNCTION "public"."get_random_word_for_category"("category_id"
     WHERE category_id = get_random_word_for_category.category_id
       AND NOT get_random_word_for_category.is_custom
     UNION ALL
-    SELECT word_id FROM public.custom_category_words
-    WHERE custom_category_id = get_random_word_for_category.category_id
+    SELECT word_id FROM public.custom_deck_words
+    WHERE custom_deck_id = get_random_word_for_category.category_id
       AND get_random_word_for_category.is_custom
   )
   AND (
@@ -68,5 +70,3 @@ REVOKE ALL ON FUNCTION "public"."get_random_word_for_category"("category_id" "uu
 GRANT ALL ON FUNCTION "public"."get_random_word_for_category"("category_id" "uuid", "is_custom" boolean, "subcategory_id" "uuid") TO "authenticated";
 GRANT ALL ON FUNCTION "public"."get_random_word_for_category"("category_id" "uuid", "is_custom" boolean, "subcategory_id" "uuid") TO "service_role";
 ```
-
-Verified against a live `npx supabase db dump --local --schema public` on 2026-10-11 — matches exactly.

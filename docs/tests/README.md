@@ -33,10 +33,19 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.test.tsx` | [SelectDeckCard](../components/SelectDeckCard.md) |
 | [DeckGrid](./DeckGrid.md) | `src/components/DeckGrid.test.tsx` | [DeckGrid](../components/DeckGrid.md) |
 | [MyDecksPage](./MyDecksPage.md) | `src/pages/MyDecksPage.test.tsx` | [MyDecksPage](../components/MyDecksPage.md) |
+| [EditDeckModal](./EditDeckModal.md) | `src/components/EditDeckModal.test.tsx` | [EditDeckModal](../components/EditDeckModal.md) |
+| [BrowseDecksPage](./BrowseDecksPage.md) | `src/pages/BrowseDecksPage.test.tsx` | [BrowseDecksPage](../components/BrowseDecksPage.md) |
+| [TagFilterChips](./TagFilterChips.md) | `src/components/TagFilterChips.test.tsx` | [TagFilterChips](../components/TagFilterChips.md) |
+| [TagChipList](./TagChipList.md) | `src/components/TagChipList.test.tsx` | [TagChipList](../components/TagChipList.md) |
+| [TagPicker](./TagPicker.md) | `src/components/TagPicker.test.tsx` | [TagPicker](../components/TagPicker.md) |
 | [CreateDeckPage](./CreateDeckPage.md) | `src/pages/CreateDeckPage.test.tsx` | [CreateDeckPage](../components/CreateDeckPage.md) |
 | [HomePage](./HomePage.md) | `src/pages/HomePage.test.tsx` | [HomePage](../components/HomePage.md) |
 | [useWords](./useWords.md) | `src/hooks/useWords.test.ts` | [useWords](../hooks/useWords.md) |
-| [useCustomCategories](./useCustomCategories.md) | `src/hooks/useCustomCategories.test.ts` | [useCustomCategories](../hooks/useCustomCategories.md) |
+| [useCustomDecks](./useCustomDecks.md) | `src/hooks/useCustomDecks.test.ts` | [useCustomDecks](../hooks/useCustomDecks.md) |
+| [useCustomDeckDetail](./useCustomDeckDetail.md) | `src/hooks/useCustomDeckDetail.test.ts` | [useCustomDeckDetail](../hooks/useCustomDeckDetail.md) |
+| [useAllCategories](./useAllCategories.md) | `src/hooks/useAllCategories.test.ts` | [useAllCategories](../hooks/useAllCategories.md) |
+| [usePublicDecks](./usePublicDecks.md) | `src/hooks/usePublicDecks.test.ts` | [usePublicDecks](../hooks/usePublicDecks.md) |
+| [useAvailableDeckTags](./useAvailableDeckTags.md) | `src/hooks/useAvailableDeckTags.test.ts` | [useAvailableDeckTags](../hooks/useAvailableDeckTags.md) |
 | [useRandomFlashcard](./useRandomFlashcard.md) | `src/hooks/useRandomFlashcard.test.ts` | [useRandomFlashcard](../hooks/useRandomFlashcard.md) |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.test.tsx` | [WordGuessCombobox](../components/WordGuessCombobox.md) |
 | [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.test.tsx` | [FlashcardPage](../components/FlashcardPage.md) |
@@ -46,6 +55,7 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.test.tsx` | [TenCardsPage](../components/TenCardsPage.md) |
 | [useStreakScore](./useStreakScore.md) | `src/hooks/useStreakScore.test.ts` | [useStreakScore](../hooks/useStreakScore.md) |
 | [useRoundProgress](./useRoundProgress.md) | `src/hooks/useRoundProgress.test.ts` | [useRoundProgress](../hooks/useRoundProgress.md) |
+| [useSavedDecks](./useSavedDecks.md) | `src/hooks/useSavedDecks.test.ts` | [useSavedDecks](../hooks/useSavedDecks.md) |
 | [ScorePill](./ScorePill.md) | `src/components/ScorePill.test.tsx` | [ScorePill](../components/ScorePill.md) |
 | [SubCategoryChips](./SubCategoryChips.md) | `src/components/SubCategoryChips.test.tsx` | [SubCategoryChips](../components/SubCategoryChips.md) |
 | [useCategoryInfo](./useCategoryInfo.md) | `src/hooks/useCategoryInfo.test.ts` | [useCategoryInfo](../hooks/useCategoryInfo.md) |
@@ -54,4 +64,4 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 
 | Helper | Path | Purpose |
 |---|---|---|
-| [mockCategories](./mockCategories.md) | `src/test/mockCategories.ts` | Stubs the Supabase query chain behind `useCategories`. |
+| [mockCategories](./mockCategories.md) | `src/test/mockCategories.ts` | Stubs the `get_categories_with_words` RPC behind `useCategories`. |

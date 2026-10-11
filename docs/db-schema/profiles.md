@@ -22,7 +22,7 @@
 
 ## Row Level Security
 
-RLS is enabled. See [rls-policies/profiles/](../rls-policies/profiles/README.md): a user can read/insert/update/delete only their own row (`user_id = auth.uid()`); `superadmin` can do all of the above on every row.
+RLS is enabled. See [rls-policies/profiles/](../rls-policies/profiles/README.md): a user can read/insert/update/delete only their own row (`user_id = auth.uid()`); `superadmin` can do all of the above on every row. One additional SELECT policy, [`profiles_select_public_deck_owner`](../rls-policies/profiles/profiles_select_public_deck_owner.md), makes a profile readable by any authenticated user when its owner has at least one published custom deck, so the public deck directory can show the creator's username.
 
 ## Current DDL
 

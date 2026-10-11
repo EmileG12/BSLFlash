@@ -3,14 +3,20 @@
 **Path:** `src/pages/MyDecksPage.tsx`
 **Route:** `/my-decks` (authenticated, inside [AppLayout](./AppLayout.md))
 
-**Purpose:** Lists the signed-in user's custom decks and lets them play or delete each one. Reached via the "My Decks" link in [NavBar](./NavBar.md); decks themselves are built on [CreateDeckPage](./CreateDeckPage.md).
+**Purpose:** Lists the signed-in user's decks in two sections, and lets them play, edit, or remove each one. The "My Decks" section lists the caller's own custom decks from [useCustomDecks](../hooks/useCustomDecks.md), which can be edited or deleted. The "Saved Decks" section lists public decks the user added from [BrowseDecksPage](./BrowseDecksPage.md), which can only be removed from the library. Reached via the "My Decks" link in [NavBar](./NavBar.md); decks themselves are built on [CreateDeckPage](./CreateDeckPage.md).
 
 **Props:** None — fetches its own data.
 
-**Key behavior:** Uses [useCustomCategories](../hooks/useCustomCategories.md) to fetch the user's decks, renders them via [DeckGrid](./DeckGrid.md) — `onSelect` navigates to `/flashcards/custom/:categoryId` (the `custom` segment marking it as a `custom_categories` deck rather than a standard one — see [SelectDeckCard](./SelectDeckCard.md) for the counterpart), and `onDelete` opens a confirmation dialog for that item. One list serves both actions; there's no separate delete-only list.
+**Key behavior:** Two [DeckGrid](./DeckGrid.md)s render the sections. "My Decks" is fed by [useCustomDecks](../hooks/useCustomDecks.md), which is owner-scoped; "Saved Decks" is fed by [useSavedDecks](../hooks/useSavedDecks.md) and shows `"<deck name> — by <owner>"` when an owner name is present. In both sections `onSelect` navigates to `/flashcards/custom/:id`, the same route, since a saved deck is played exactly like the owner's own deck.
 
-Deletion is a `deleted: Set<string>` of ids removed from view locally rather than refetching from `useCustomCategories` after a successful delete, so the grid updates immediately without a second round trip. `onDelete` sets `pendingDelete: DeckGridItem | null`, which opens a confirmation `Dialog` naming the deck (`Delete "X"?`); confirming calls `supabase.from('custom_categories').delete().eq('id', pendingDelete.id)` and, only on success, adds the id to `deleted`. Deleting the `custom_categories` row cascades to its [`custom_category_words`](../db-schema/custom_category_words.md) links automatically (`ON DELETE CASCADE`), so no separate cleanup call is needed here.
+Editing an own deck: the "My Decks" `DeckGrid` passes `onEdit`, which sets `editingDeckId` and conditionally renders an [EditDeckModal](./EditDeckModal.md) for that id. `onSaved` maps the matching entry's `deck_name` in place through `setCustomDecks` from [useCustomDecks](../hooks/useCustomDecks.md), so the list reflects the new name without a refetch. Closing the modal clears `editingDeckId`. The "Saved Decks" `DeckGrid` does not get `onEdit`, because only a deck's owner can edit it.
 
-**Depends on:** [useCustomCategories](../hooks/useCustomCategories.md), [DeckGrid](./DeckGrid.md), `Button`/`Dialog` (and its subcomponents) from `src/components/ui/`, `useNavigate` from `react-router-dom`.
+Deletion of an own deck is a `deleted: Set<string>` of ids removed from view locally rather than refetching after a successful delete, so the grid updates immediately without a second round trip. `onDelete` sets `pendingDelete`, which opens a confirmation `Dialog` naming the deck; confirming calls `supabase.from('custom_decks').delete().eq('id', pendingDelete.id)` and, only on success, adds the id to `deleted`. Deleting the `custom_decks` row cascades to its [`custom_deck_words`](../db-schema/custom_deck_words.md), [`custom_deck_tags`](../db-schema/custom_deck_tags.md), [`saved_decks`](../db-schema/saved_decks.md) and [`deck_likes`](../db-schema/deck_likes.md) rows, so no separate cleanup call is needed.
+
+Removing a saved deck is a separate flow: `pendingUnsave` opens a `Dialog` titled `Remove "<name>" from My Decks?`, and confirming deletes the caller's [`saved_decks`](../db-schema/saved_decks.md) row by `custom_deck_id`. On success the entry is removed from the hook's state via `setSavedDecks`. The deck itself is not touched.
+
+The "Saved Decks" section uses `DeckGrid`'s `deleteActionLabel="Remove"`, so its buttons read "Remove \<name\>" rather than "Delete \<name\>".
+
+**Depends on:** [useCustomDecks](../hooks/useCustomDecks.md), [useSavedDecks](../hooks/useSavedDecks.md), [DeckGrid](./DeckGrid.md), [EditDeckModal](./EditDeckModal.md), `Button`/`Dialog` (and its subcomponents) from `src/components/ui/`, `useNavigate` from `react-router-dom`, the `supabase` client.
 
 **Tested by:** [docs/tests/MyDecksPage.md](../tests/MyDecksPage.md).

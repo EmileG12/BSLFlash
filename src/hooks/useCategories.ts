@@ -22,10 +22,7 @@ export function useCategories(vocabulary: boolean): CategoriesState {
     let cancelled = false
 
     supabase
-      .from('categories')
-      .select('id, category_name, is_vocabulary')
-      .eq('is_vocabulary', vocabulary)
-      .order('category_name')
+      .rpc('get_categories_with_words', { p_is_vocabulary: vocabulary })
       .then(({ data, error }) => {
         if (cancelled) return
         if (error) {
