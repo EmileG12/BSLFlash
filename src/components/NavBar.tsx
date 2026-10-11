@@ -1,4 +1,4 @@
-import { NavLink, useNavigate } from 'react-router-dom'
+import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, LogOut, Shield } from 'lucide-react'
 import { signOut } from '../lib/auth'
 import { useUserRoles } from '../hooks/useUserRoles'
@@ -29,6 +29,8 @@ import './AdminMenu.css'
 function AdminNavEntry() {
   const { isAdmin, isSuperadmin, loading } = useUserRoles()
   const { open, onOpenChange, groupProps, triggerProps, contentProps } = useHoverDropdownMenu()
+  const { pathname } = useLocation()
+  const isActive = pathname.startsWith('/admin') || pathname.startsWith('/superadmin')
 
   if (loading || (!isAdmin && !isSuperadmin)) return null
 
@@ -44,14 +46,17 @@ function AdminNavEntry() {
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange} modal={false}>
       <div className="admin-menu-group" {...groupProps}>
-        <DropdownMenuTrigger className="admin-menu-trigger" {...triggerProps}>
+        <DropdownMenuTrigger
+          className="admin-menu-trigger"
+          aria-current={isActive ? 'page' : undefined}
+          {...triggerProps}
+        >
           <Shield className="admin-menu-icon" size={16} />
           Admin
           <ChevronDown className="admin-menu-icon" size={16} />
         </DropdownMenuTrigger>
         <DropdownMenuContent
           className="admin-menu-content min-w-48 p-0"
-          align="end"
           sideOffset={10}
           {...contentProps}
         >

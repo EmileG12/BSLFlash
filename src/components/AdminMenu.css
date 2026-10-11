@@ -34,6 +34,10 @@
   outline-offset: 2px;
 }
 
+.admin-menu-trigger[aria-current='page']::after {
+  background: var(--admin);
+}
+
 .admin-menu-trigger:hover,
 .admin-menu-trigger[data-state='open'] {
   color: var(--admin);
