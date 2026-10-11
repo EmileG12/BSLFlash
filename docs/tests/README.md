@@ -63,6 +63,7 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [useCategoryInfo](./useCategoryInfo.md) | `src/hooks/useCategoryInfo.test.ts` | [useCategoryInfo](../hooks/useCategoryInfo.md) |
 | [useUserRoles](./useUserRoles.md) | `src/hooks/useUserRoles.test.ts` | [useUserRoles](../hooks/useUserRoles.md) |
 | [userStatus](./userStatus.md) | `src/lib/userStatus.test.ts` | [userStatus](../utils/userStatus.md) |
+| [TableCard](./TableCard.md) | `src/components/TableCard.test.tsx` | [TableCard](../components/TableCard.md) |
 
 ## Shared helpers
 

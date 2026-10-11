@@ -8,6 +8,6 @@
 
 Creating a word is not on this page; that is done on [AdminPage](./AdminPage.md), which admins and superadmins can both reach.
 
-**Depends on:** [useWords](../hooks/useWords.md), `Input`/`Table` from `src/components/ui/`.
+**Depends on:** [useWords](../hooks/useWords.md), [TableCard](./TableCard.md), `Input`/`Table` from `src/components/ui/`.
 
 **Used by:** the `/superadmin/words` route in `src/App.tsx`, linked from [NavBar](./NavBar.md) and [MobileNavSheet](./MobileNavSheet.md).

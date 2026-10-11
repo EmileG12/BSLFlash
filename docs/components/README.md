@@ -22,6 +22,7 @@ React components, one doc file per component.
 | [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | "Practice" mode: an endless loop of random words, tracking a consecutive-correct streak. |
 | [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.tsx` | "10 Cards" mode: a bounded, no-repeat round of up to 10 words, ending on a score. |
 | [FlashcardRound](./FlashcardRound.md) | `src/components/FlashcardRound.tsx` | Shared per-card gameplay (video + guess combobox + reveal), used by both game modes. |
+| [TableCard](./TableCard.md) | `src/components/TableCard.tsx` | Flush panel wrapper for admin data tables, with an optional toolbar band in the same shell. |
 | [ScorePill](./ScorePill.md) | `src/components/ScorePill.tsx` | Shared score badge ("Score: x" or "Round: x/N \| Score: y/N"), used by both game modes. |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
 | [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Create Decks/My Decks/Browse Decks links, role-gated Admin entry, Sign Out) shown on all authenticated pages. |

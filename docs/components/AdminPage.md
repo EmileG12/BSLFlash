@@ -11,6 +11,6 @@
 - **Category editing** uses a per-row expandable [TagPicker](./TagPicker.md). The first expand loads that word's current links; each toggle then inserts or deletes one `word_categories` row immediately, without a save button.
 - **Word list** is the shared [`useWords`](../hooks/useWords.md) result, filtered client-side by a case-insensitive substring match on the word.
 
-**Depends on:** [TagPicker](./TagPicker.md), [useWords](../hooks/useWords.md), [signVideoUpload](../utils/signVideoUpload.md), `Card`/`Input`/`Textarea`/`Table`/`Button` from `src/components/ui/`.
+**Depends on:** [TagPicker](./TagPicker.md), [useWords](../hooks/useWords.md), [signVideoUpload](../utils/signVideoUpload.md), [TableCard](./TableCard.md), `Card`/`Input`/`Textarea`/`Table`/`Button` from `src/components/ui/`.
 
 **Used by:** the `/admin` route in `src/App.tsx`. Linked from [NavBar](./NavBar.md) and [MobileNavSheet](./MobileNavSheet.md).

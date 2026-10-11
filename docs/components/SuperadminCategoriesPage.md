@@ -13,6 +13,6 @@
 
 `is_active` is stored and toggled here, but no browsing query reads it yet. See [categories](../db-schema/categories.md).
 
-**Depends on:** [useManagedCategories](../hooks/useManagedCategories.md), [supabase-client](../utils/supabase-client.md), `Card`/`Input`/`Switch`/`Badge`/`Table`/`Button` from `src/components/ui/`.
+**Depends on:** [useManagedCategories](../hooks/useManagedCategories.md), [supabase-client](../utils/supabase-client.md), [TableCard](./TableCard.md), `Card`/`Input`/`Switch`/`Badge`/`Table`/`Button` from `src/components/ui/`.
 
 **Used by:** the `/superadmin/categories` route in `src/App.tsx`, linked from the superadmin section of [NavBar](./NavBar.md) and [MobileNavSheet](./MobileNavSheet.md).

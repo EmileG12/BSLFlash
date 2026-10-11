@@ -10,6 +10,6 @@
 - The grant error is shown above the table, not in the dialog. Only revoke has a dialog.
 - Only roles in the `admin`/`superadmin` set are shown and changed. The `user` role is granted automatically at sign-up and is not shown here.
 
-**Depends on:** [useUsersWithRoles](../hooks/useUsersWithRoles.md), the [`assign_role`](../rpc-functions/assign_role.md) and [`revoke_role`](../rpc-functions/revoke_role.md) RPCs, `Select`/`Dialog`/`Table`/`Badge`/`Button` from `src/components/ui/`.
+**Depends on:** [useUsersWithRoles](../hooks/useUsersWithRoles.md), the [`assign_role`](../rpc-functions/assign_role.md) and [`revoke_role`](../rpc-functions/revoke_role.md) RPCs, [TableCard](./TableCard.md), `Select`/`Dialog`/`Table`/`Badge`/`Button` from `src/components/ui/`.
 
 **Used by:** the `/superadmin/roles` route in `src/App.tsx`, linked from [NavBar](./NavBar.md) and [MobileNavSheet](./MobileNavSheet.md).

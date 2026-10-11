@@ -11,6 +11,6 @@
 - **Search** is a client-side substring match on email or display name.
 - A ban is a real Supabase Auth ban, not an app flag. The Dialog copy says the user is signed out and cannot sign in until unbanned, and that their data is kept. The reason this is an Auth ban is recorded in [ban_user](../rpc-functions/ban_user.md).
 
-**Depends on:** [useUsersWithRoles](../hooks/useUsersWithRoles.md), [userStatus](../utils/userStatus.md), the [`ban_user`](../rpc-functions/ban_user.md) and [`unban_user`](../rpc-functions/unban_user.md) RPCs, `Dialog`/`Table`/`Badge`/`Button`/`Input` from `src/components/ui/`.
+**Depends on:** [useUsersWithRoles](../hooks/useUsersWithRoles.md), [userStatus](../utils/userStatus.md), the [`ban_user`](../rpc-functions/ban_user.md) and [`unban_user`](../rpc-functions/unban_user.md) RPCs, [TableCard](./TableCard.md), `Dialog`/`Table`/`Badge`/`Button`/`Input` from `src/components/ui/`.
 
 **Used by:** the `/superadmin/accounts` route in `src/App.tsx`, linked from [NavBar](./NavBar.md) and [MobileNavSheet](./MobileNavSheet.md).

@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { TableCard } from '../components/TableCard'
 import { TagPicker } from '../components/TagPicker'
 import { useWords, type WordOption } from '../hooks/useWords'
 import { supabase } from '../lib/supabase'
@@ -207,40 +208,45 @@ export function AdminPage() {
 
       <AddWordForm />
 
-      <h2>Edit word categories</h2>
-      <Input
-        placeholder="Search words"
-        value={search}
-        onChange={(event) => setSearch(event.target.value)}
-        className="max-w-sm"
-      />
-
-      {loading && <p className="text-sm text-muted-foreground">Loading words…</p>}
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-      {!loading && !error && filtered.length === 0 && (
-        <p className="text-sm text-muted-foreground">No words match.</p>
-      )}
-
-      {!loading && !error && filtered.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Word</TableHead>
-              <TableHead>Definition</TableHead>
-              <TableHead>Categories</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {filtered.map((word) => (
-              <EditWordCategoriesRow key={word.id} word={word} />
-            ))}
-          </TableBody>
-        </Table>
-      )}
+      <TableCard
+        toolbar={
+          <>
+            <h2 className="text-base font-medium">Edit word categories</h2>
+            <Input
+              placeholder="Search words"
+              value={search}
+              onChange={(event) => setSearch(event.target.value)}
+              className="w-full sm:max-w-xs"
+            />
+          </>
+        }
+      >
+        {loading && <p className="px-4 py-6 text-sm text-muted-foreground">Loading words…</p>}
+        {error && (
+          <p role="alert" className="px-4 py-6 text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        {!loading && !error && filtered.length === 0 && (
+          <p className="px-4 py-6 text-sm text-muted-foreground">No words match.</p>
+        )}
+        {!loading && !error && filtered.length > 0 && (
+          <Table>
+            <TableHeader className="bg-muted/40">
+              <TableRow>
+                <TableHead>Word</TableHead>
+                <TableHead>Definition</TableHead>
+                <TableHead>Categories</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((word) => (
+                <EditWordCategoriesRow key={word.id} word={word} />
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </TableCard>
     </div>
   )
 }

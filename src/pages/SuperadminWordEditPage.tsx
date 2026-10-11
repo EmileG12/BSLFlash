@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { TableCard } from '../components/TableCard'
 import {
   Dialog,
   DialogContent,
@@ -276,91 +277,94 @@ export function SuperadminWordEditPage() {
         </Card>
       )}
 
-      <div className="flex items-center justify-between">
-        <h2>Variants</h2>
-        <Button size="sm" onClick={() => setAddVariantOpen(true)}>
-          <Plus aria-hidden="true" className="size-4" />
-          Add variant
-        </Button>
-      </div>
-
       {primaryError && (
         <p role="alert" className="text-sm text-destructive">
           {primaryError}
         </p>
       )}
 
-      {loading && <p className="text-sm text-muted-foreground">Loading variants…</p>}
-      {error && (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
-        </p>
-      )}
-      {!loading && !error && variants.length === 0 && (
-        <p className="text-sm text-muted-foreground">No variants yet.</p>
-      )}
-
-      {!loading && !error && variants.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Variant</TableHead>
-              <TableHead>Region</TableHead>
-              <TableHead>Primary</TableHead>
-              <TableHead>Videos</TableHead>
-              <TableHead>Actions</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {variants.map((variant) => (
-              <TableRow key={variant.id}>
-                <TableCell className="font-medium">{variant.variant_name}</TableCell>
-                <TableCell className="text-muted-foreground">{variant.region ?? '—'}</TableCell>
-                <TableCell>
-                  <button
-                    type="button"
-                    onClick={() => handleMakePrimary(variant)}
-                    aria-pressed={variant.is_primary}
-                    aria-label={
-                      variant.is_primary
-                        ? `${variant.variant_name} is the primary variant`
-                        : `Make ${variant.variant_name} the primary variant`
-                    }
-                    className="inline-flex items-center"
-                  >
-                    <Star
-                      aria-hidden="true"
-                      className={cn(
-                        'size-4',
-                        variant.is_primary ? 'fill-brand text-brand' : 'text-muted-foreground',
-                      )}
-                    />
-                  </button>
-                </TableCell>
-                <TableCell>
-                  <ul className="flex flex-col gap-1">
-                    {variant.sign_videos.map((video) => (
-                      <li key={video.id} className="flex items-center gap-1.5 text-sm text-muted-foreground">
-                        <Video aria-hidden="true" className="size-3.5" />
-                        {video.format} · {formatDuration(video.duration_ms)} · {video.width}×{video.height}
-                      </li>
-                    ))}
-                    {variant.sign_videos.length === 0 && (
-                      <li className="text-sm text-muted-foreground">No videos yet</li>
-                    )}
-                  </ul>
-                </TableCell>
-                <TableCell>
-                  <Button variant="outline" size="sm" onClick={() => setAddVideoTarget(variant)}>
-                    <Plus aria-hidden="true" className="size-3.5" />
-                    Add video
-                  </Button>
-                </TableCell>
+      <TableCard
+        toolbar={
+          <>
+            <h2 className="text-base font-medium">Variants</h2>
+            <Button size="sm" onClick={() => setAddVariantOpen(true)}>
+              <Plus aria-hidden="true" className="size-4" />
+              Add variant
+            </Button>
+          </>
+        }
+      >
+        {loading && <p className="px-4 py-6 text-sm text-muted-foreground">Loading variants…</p>}
+        {error && (
+          <p role="alert" className="px-4 py-6 text-sm text-destructive">
+            {error}
+          </p>
+        )}
+        {!loading && !error && variants.length === 0 && (
+          <p className="px-4 py-6 text-sm text-muted-foreground">No variants yet.</p>
+        )}
+        {!loading && !error && variants.length > 0 && (
+          <Table>
+            <TableHeader className="bg-muted/40">
+              <TableRow>
+                <TableHead>Variant</TableHead>
+                <TableHead>Region</TableHead>
+                <TableHead>Primary</TableHead>
+                <TableHead>Videos</TableHead>
+                <TableHead>Actions</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
-      )}
+            </TableHeader>
+            <TableBody>
+              {variants.map((variant) => (
+                <TableRow key={variant.id}>
+                  <TableCell className="font-medium">{variant.variant_name}</TableCell>
+                  <TableCell className="text-muted-foreground">{variant.region ?? '—'}</TableCell>
+                  <TableCell>
+                    <button
+                      type="button"
+                      onClick={() => handleMakePrimary(variant)}
+                      aria-pressed={variant.is_primary}
+                      aria-label={
+                        variant.is_primary
+                          ? `${variant.variant_name} is the primary variant`
+                          : `Make ${variant.variant_name} the primary variant`
+                      }
+                      className="inline-flex items-center"
+                    >
+                      <Star
+                        aria-hidden="true"
+                        className={cn(
+                          'size-4',
+                          variant.is_primary ? 'fill-brand text-brand' : 'text-muted-foreground',
+                        )}
+                      />
+                    </button>
+                  </TableCell>
+                  <TableCell>
+                    <ul className="flex flex-col gap-1">
+                      {variant.sign_videos.map((video) => (
+                        <li key={video.id} className="flex items-center gap-1.5 text-sm text-muted-foreground">
+                          <Video aria-hidden="true" className="size-3.5" />
+                          {video.format} · {formatDuration(video.duration_ms)} · {video.width}×{video.height}
+                        </li>
+                      ))}
+                      {variant.sign_videos.length === 0 && (
+                        <li className="text-sm text-muted-foreground">No videos yet</li>
+                      )}
+                    </ul>
+                  </TableCell>
+                  <TableCell>
+                    <Button variant="outline" size="sm" onClick={() => setAddVideoTarget(variant)}>
+                      <Plus aria-hidden="true" className="size-3.5" />
+                      Add video
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
+      </TableCard>
 
       {addVideoTarget && (
         <AddVideoDialog

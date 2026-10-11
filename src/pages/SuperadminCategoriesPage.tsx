@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input'
 import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
+import { TableCard } from '../components/TableCard'
 import { cn } from '@/lib/utils'
 import { useManagedCategories, type ManagedCategory } from '../hooks/useManagedCategories'
 import { supabase } from '../lib/supabase'
@@ -127,69 +128,71 @@ export function SuperadminCategoriesPage() {
       )}
 
       {!loading && !error && categories.length > 0 && (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Name</TableHead>
-              <TableHead>Vocabulary</TableHead>
-              <TableHead>Active</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {categories.map((category) => (
-              <TableRow
-                key={category.id}
-                className={cn(!category.is_active && 'text-muted-foreground')}
-              >
-                <TableCell>
-                  <div className="flex items-center gap-2">
-                    {editingId === category.id ? (
-                      <Input
-                        autoFocus
-                        value={editingName}
-                        onChange={(event) => setEditingName(event.target.value)}
-                        onBlur={() => handleRenameSave(category)}
-                        onKeyDown={(event) => {
-                          if (event.key === 'Enter') event.currentTarget.blur()
-                          if (event.key === 'Escape') setEditingId(null)
-                        }}
-                        className="h-8"
-                      />
-                    ) : (
-                      <button
-                        type="button"
-                        className="text-left hover:underline"
-                        onClick={() => {
-                          setEditingId(category.id)
-                          setEditingName(category.category_name)
-                        }}
-                      >
-                        {category.category_name}
-                      </button>
-                    )}
-                    {!category.is_active && (
-                      <Badge className="bg-warning text-warning-foreground">Hidden</Badge>
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <Switch
-                    checked={category.is_vocabulary}
-                    onCheckedChange={(value) => handleToggle(category, 'is_vocabulary', value)}
-                    aria-label={`Vocabulary category: ${category.category_name}`}
-                  />
-                </TableCell>
-                <TableCell>
-                  <Switch
-                    checked={category.is_active}
-                    onCheckedChange={(value) => handleToggle(category, 'is_active', value)}
-                    aria-label={`Active: ${category.category_name}`}
-                  />
-                </TableCell>
+        <TableCard>
+          <Table>
+            <TableHeader className="bg-muted/40">
+              <TableRow>
+                <TableHead>Name</TableHead>
+                <TableHead>Vocabulary</TableHead>
+                <TableHead>Active</TableHead>
               </TableRow>
-            ))}
-          </TableBody>
-        </Table>
+            </TableHeader>
+            <TableBody>
+              {categories.map((category) => (
+                <TableRow
+                  key={category.id}
+                  className={cn(!category.is_active && 'text-muted-foreground')}
+                >
+                  <TableCell>
+                    <div className="flex items-center gap-2">
+                      {editingId === category.id ? (
+                        <Input
+                          autoFocus
+                          value={editingName}
+                          onChange={(event) => setEditingName(event.target.value)}
+                          onBlur={() => handleRenameSave(category)}
+                          onKeyDown={(event) => {
+                            if (event.key === 'Enter') event.currentTarget.blur()
+                            if (event.key === 'Escape') setEditingId(null)
+                          }}
+                          className="h-8"
+                        />
+                      ) : (
+                        <button
+                          type="button"
+                          className="text-left hover:underline"
+                          onClick={() => {
+                            setEditingId(category.id)
+                            setEditingName(category.category_name)
+                          }}
+                        >
+                          {category.category_name}
+                        </button>
+                      )}
+                      {!category.is_active && (
+                        <Badge className="bg-warning text-warning-foreground">Hidden</Badge>
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={category.is_vocabulary}
+                      onCheckedChange={(value) => handleToggle(category, 'is_vocabulary', value)}
+                      aria-label={`Vocabulary category: ${category.category_name}`}
+                    />
+                  </TableCell>
+                  <TableCell>
+                    <Switch
+                      checked={category.is_active}
+                      onCheckedChange={(value) => handleToggle(category, 'is_active', value)}
+                      aria-label={`Active: ${category.category_name}`}
+                    />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </TableCard>
       )}
     </div>
   )
