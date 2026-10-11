@@ -24,7 +24,7 @@ React components, one doc file per component.
 | [FlashcardRound](./FlashcardRound.md) | `src/components/FlashcardRound.tsx` | Shared per-card gameplay (video + guess combobox + reveal), used by both game modes. |
 | [ScorePill](./ScorePill.md) | `src/components/ScorePill.tsx` | Shared score badge ("Score: x" or "Round: x/N \| Score: y/N"), used by both game modes. |
 | [WordGuessCombobox](./WordGuessCombobox.md) | `src/components/WordGuessCombobox.tsx` | Searchable combobox over all words, used to guess the flashcard's word. |
-| [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Create Decks/My Decks/Browse Decks links, Sign Out) shown on all authenticated pages. |
+| [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Create Decks/My Decks/Browse Decks links, role-gated Admin entry, Sign Out) shown on all authenticated pages. |
 | [CategoryMenu](./CategoryMenu.md) | `src/components/CategoryMenu.tsx` | Hover-triggered nav dropdown listing flashcard categories; used twice by `NavBar` for Categories and Vocabulary. |
 | [MobileNavSheet](./MobileNavSheet.md) | `src/components/MobileNavSheet.tsx` | Hamburger-triggered slide-in nav menu for narrow screens, rendered by `NavBar` alongside the desktop bar. |
 | [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar`. |
@@ -33,3 +33,11 @@ React components, one doc file per component.
 | [AuthCard](./AuthCard.md) | `src/components/AuthCard.tsx` | Shared Card scaffold for `LoginPage`/`SignupPage`. |
 | [LabeledInput](./LabeledInput.md) | `src/components/LabeledInput.tsx` | Shared label + input field, used by `LoginPage`/`SignupPage`. |
 | [AuthSwitchLink](./AuthSwitchLink.md) | `src/components/AuthSwitchLink.tsx` | Shared "switch to the other auth page" link, used by `LoginPage`/`SignupPage`. |
+| [AdminRoute](./AdminRoute.md) | `src/components/AdminRoute.tsx` | Route guard for `/admin`: admins and superadmins only. |
+| [SuperadminRoute](./SuperadminRoute.md) | `src/components/SuperadminRoute.tsx` | Route guard for `/superadmin/*`: superadmins only. |
+| [AdminPage](./AdminPage.md) | `src/pages/AdminPage.tsx` | `/admin`: add a new word with its first video and tag it into categories; add or remove a word's category tags. |
+| [SuperadminCategoriesPage](./SuperadminCategoriesPage.md) | `src/pages/SuperadminCategoriesPage.tsx` | `/superadmin/categories`: create categories, rename them, toggle vocabulary and active flags. |
+| [SuperadminRolesPage](./SuperadminRolesPage.md) | `src/pages/SuperadminRolesPage.tsx` | `/superadmin/roles`: grant and revoke the admin and superadmin roles. |
+| [SuperadminAccountsPage](./SuperadminAccountsPage.md) | `src/pages/SuperadminAccountsPage.tsx` | `/superadmin/accounts`: ban and unban accounts. |
+| [SuperadminWordsPage](./SuperadminWordsPage.md) | `src/pages/SuperadminWordsPage.tsx` | `/superadmin/words`: searchable word list that links to each word's edit page. |
+| [SuperadminWordEditPage](./SuperadminWordEditPage.md) | `src/pages/SuperadminWordEditPage.tsx` | `/superadmin/words/:wordId`: edit a word, choose its primary variant, and add videos and variants. |

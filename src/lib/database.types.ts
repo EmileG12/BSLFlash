@@ -38,16 +38,19 @@ export type Database = {
         Row: {
           category_name: string
           id: string
+          is_active: boolean
           is_vocabulary: boolean
         }
         Insert: {
           category_name: string
           id?: string
+          is_active?: boolean
           is_vocabulary?: boolean
         }
         Update: {
           category_name?: string
           id?: string
+          is_active?: boolean
           is_vocabulary?: boolean
         }
         Relationships: []
@@ -231,7 +234,6 @@ export type Database = {
           format: string
           height: number
           id: string
-          is_primary: boolean
           sign_id: string
           storage_path: string
           width: number
@@ -242,7 +244,6 @@ export type Database = {
           format: string
           height: number
           id?: string
-          is_primary?: boolean
           sign_id: string
           storage_path: string
           width: number
@@ -253,7 +254,6 @@ export type Database = {
           format?: string
           height?: number
           id?: string
-          is_primary?: boolean
           sign_id?: string
           storage_path?: string
           width?: number
@@ -271,18 +271,21 @@ export type Database = {
       signs: {
         Row: {
           id: string
+          is_primary: boolean
           region: string | null
           variant_name: string
           word_id: string
         }
         Insert: {
           id?: string
+          is_primary?: boolean
           region?: string | null
           variant_name: string
           word_id: string
         }
         Update: {
           id?: string
+          is_primary?: boolean
           region?: string | null
           variant_name?: string
           word_id?: string
@@ -376,6 +379,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      assign_role: {
+        Args: { p_role_name: string; p_user_id: string }
+        Returns: undefined
+      }
+      ban_user: { Args: { p_user_id: string }; Returns: undefined }
       create_custom_deck: {
         Args: { p_name: string; p_word_ids: string[] }
         Returns: string
@@ -454,11 +462,28 @@ export type Database = {
           owner_user_id: string
         }[]
       }
+      is_admin: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
+      list_users_with_roles: {
+        Args: never
+        Returns: {
+          banned_until: string
+          email: string
+          roles: string[]
+          user_id: string
+          user_name: string
+        }[]
+      }
+      revoke_role: {
+        Args: { p_role_name: string; p_user_id: string }
+        Returns: undefined
+      }
       set_custom_deck_public: {
         Args: { p_deck_id: string; p_is_public: boolean }
         Returns: undefined
       }
+      set_primary_sign: { Args: { p_sign_id: string }; Returns: undefined }
+      unban_user: { Args: { p_user_id: string }; Returns: undefined }
       update_custom_deck: {
         Args: { p_deck_id: string; p_name: string; p_word_ids: string[] }
         Returns: undefined

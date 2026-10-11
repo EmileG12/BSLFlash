@@ -1,9 +1,82 @@
 import { NavLink, useNavigate } from 'react-router-dom'
-import { LogOut } from 'lucide-react'
+import { ChevronDown, LogOut, Shield } from 'lucide-react'
 import { signOut } from '../lib/auth'
+import { useUserRoles } from '../hooks/useUserRoles'
+import { useHoverDropdownMenu } from '../hooks/useHoverDropdownMenu'
 import { CategoryMenu } from './CategoryMenu'
 import { MobileNavSheet } from './MobileNavSheet'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from './ui/dropdown-menu'
 import './NavBar.css'
+import './AdminMenu.css'
+
+/**
+ * Admin nav entry -- a plain link for admin-only users (one destination
+ * isn't worth a dropdown), a full dropdown for superadmins (who pass every
+ * admin-gated route too). Renders nothing while roles are resolving or for a
+ * plain user, to avoid a flash of the wrong nav state. Styled with the
+ * --admin token (not --brand, which already means "current page/CTA" on
+ * every other nav item) and a Shield icon, so this privileged area reads as
+ * distinct from the regular content destinations around it -- in both the
+ * link and dropdown-trigger forms. The dropdown opens on hover, matching
+ * CategoryMenu's mechanics via the shared useHoverDropdownMenu hook.
+ */
+function AdminNavEntry() {
+  const { isAdmin, isSuperadmin, loading } = useUserRoles()
+  const { open, onOpenChange, groupProps, triggerProps, contentProps } = useHoverDropdownMenu()
+
+  if (loading || (!isAdmin && !isSuperadmin)) return null
+
+  if (!isSuperadmin) {
+    return (
+      <NavLink to="/admin" className="navbar-admin-link">
+        <Shield className="navbar-admin-icon" size={16} />
+        Admin
+      </NavLink>
+    )
+  }
+
+  return (
+    <DropdownMenu open={open} onOpenChange={onOpenChange} modal={false}>
+      <div className="admin-menu-group" {...groupProps}>
+        <DropdownMenuTrigger className="admin-menu-trigger" {...triggerProps}>
+          <Shield className="admin-menu-icon" size={16} />
+          Admin
+          <ChevronDown className="admin-menu-icon" size={16} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          className="admin-menu-content min-w-48 p-0"
+          align="end"
+          sideOffset={10}
+          {...contentProps}
+        >
+          <DropdownMenuItem className="admin-menu-item" asChild>
+            <NavLink to="/admin">Add & tag words</NavLink>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="admin-menu-item" asChild>
+            <NavLink to="/superadmin/categories">Manage categories</NavLink>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="admin-menu-item" asChild>
+            <NavLink to="/superadmin/words">Manage words</NavLink>
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="admin-menu-item" asChild>
+            <NavLink to="/superadmin/roles">Manage roles</NavLink>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="admin-menu-item" asChild>
+            <NavLink to="/superadmin/accounts">Manage accounts</NavLink>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </div>
+    </DropdownMenu>
+  )
+}
 
 export function NavBar() {
   const navigate = useNavigate()
@@ -38,6 +111,7 @@ export function NavBar() {
           <NavLink to="/browse-decks" className="navbar-brand">
             Browse Decks
           </NavLink>
+          <AdminNavEntry />
         </div>
       </div>
       <button

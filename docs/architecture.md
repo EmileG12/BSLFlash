@@ -48,7 +48,7 @@ Both modes reveal correct/incorrect by comparing word **ids**, never text, since
 
 Subcategory narrowing is enforced at the same two RPCs, not as separate functions: both take an optional `subcategory_id uuid DEFAULT NULL`, which intersects the existing category-membership predicate with a second [`word_categories`](./db-schema/word_categories.md) membership check when set. [`get_available_subcategories_for_category`](./rpc-functions/get_available_subcategories_for_category.md) is what `SubCategoryChips` calls to list only the topic categories that actually overlap the current vocabulary category, so a choice that would produce zero words is never offered.
 
-The `categories → words → signs → sign_videos` relationship chain (see [db-schema/](./db-schema/README.md)) is: a category has many words (via [word_categories](./db-schema/word_categories.md)), a word has many sign variants ([signs](./db-schema/signs.md)), and a sign has many videos ([sign_videos](./db-schema/sign_videos.md)), at most one marked `is_primary` per sign. Videos live in the [`sign-videos`](./storage/sign-videos.md) Storage bucket.
+The `categories → words → signs → sign_videos` relationship chain (see [db-schema/](./db-schema/README.md)) is: a category has many words (via [word_categories](./db-schema/word_categories.md)), a word has many sign variants ([signs](./db-schema/signs.md)), at most one marked `is_primary` per word, and a sign has many videos ([sign_videos](./db-schema/sign_videos.md)). Quizzing plays a random video from the word's primary sign. Videos live in the [`sign-videos`](./storage/sign-videos.md) Storage bucket.
 
 ### Custom decks
 

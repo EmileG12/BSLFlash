@@ -1,7 +1,8 @@
 import { render, screen } from '@testing-library/react'
 import { userEvent } from 'vitest/browser'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { useUserRoles } from '../hooks/useUserRoles'
 import { mockCategories } from '../test/mockCategories'
 import { NavBar } from './NavBar'
 
@@ -13,6 +14,10 @@ vi.mock('../lib/supabase', () => ({
   supabase: {
     rpc: vi.fn(),
   },
+}))
+
+vi.mock('../hooks/useUserRoles', () => ({
+  useUserRoles: vi.fn(),
 }))
 
 /**
@@ -31,6 +36,10 @@ vi.mock('../lib/supabase', () => ({
  * jsdom and live in NavBar.test.tsx.
  */
 describe('NavBar in a real browser', () => {
+  beforeEach(() => {
+    vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: false, loading: false })
+  })
+
   it('opens the Categories menu when the trigger is hovered', async () => {
     mockCategories({
       data: [
@@ -110,5 +119,20 @@ describe('NavBar in a real browser', () => {
     await expect
       .poll(() => screen.queryByRole('menuitem', { name: 'Animals' }), { timeout: 1000 })
       .not.toBeInTheDocument()
+  })
+
+  it('opens the Admin menu when the trigger is hovered, for a superadmin', async () => {
+    mockCategories({ data: [], error: null })
+    vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: true, loading: false })
+
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    )
+
+    await userEvent.hover(screen.getByRole('button', { name: /^admin$/i }))
+
+    expect(await screen.findByRole('menuitem', { name: /add & tag words/i })).toBeInTheDocument()
   })
 })

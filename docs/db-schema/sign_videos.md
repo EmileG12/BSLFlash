@@ -1,9 +1,9 @@
 # sign_videos
 
 **Schema:** `public`
-**Last touched by migration:** [`20260918101738_create_flashcard_content_tables.sql`](../../supabase/migrations/20260918101738_create_flashcard_content_tables.sql)
+**Last touched by migration:** [`20261011193904_move_primary_flag_from_sign_videos_to_signs.sql`](../../supabase/migrations/20261011193904_move_primary_flag_from_sign_videos_to_signs.sql)
 
-**Purpose:** Video files demonstrating a [sign](./signs.md), stored in the [`sign-videos`](../storage/sign-videos.md) Storage bucket. A sign may have several videos (reshoots, different angles); at most one may be `is_primary` — the app always plays that one.
+**Purpose:** Video files demonstrating a [sign](./signs.md), stored in the [`sign-videos`](../storage/sign-videos.md) Storage bucket. A sign may have several videos (reshoots, different angles). No video is pinned: quizzing picks one at random from the pool of its word's primary sign (see [`signs.is_primary`](./signs.md)).
 
 ## Columns
 
@@ -17,7 +17,6 @@
 | `width` | `integer` | No | — | Video width in pixels. Must be `> 0`. |
 | `height` | `integer` | No | — | Video height in pixels. Must be `> 0`. |
 | `file_size` | `bigint` | No | — | File size in bytes. `bigint`, not `integer` — video files can exceed the ~2GB range of `int4`. Must be `> 0`. |
-| `is_primary` | `boolean` | No | `false` | Whether this is the video the app shows by default for its sign. At most one `true` per `sign_id`, enforced by `sign_videos_one_primary_per_sign`. |
 
 ## Constraints & indexes
 
@@ -27,11 +26,10 @@
 - `CHECK (duration_ms > 0)`, `CHECK (width > 0)`, `CHECK (height > 0)`, `CHECK (file_size > 0)`
 - `FOREIGN KEY (sign_id) REFERENCES signs(id) ON DELETE CASCADE`
 - `INDEX (sign_id)`
-- `UNIQUE INDEX sign_videos_one_primary_per_sign ON (sign_id) WHERE is_primary` — partial unique index enforcing at most one primary video per sign at the database level, not just in application code.
 
 ## Row Level Security
 
-RLS is enabled. See [rls-policies/sign_videos/](../rls-policies/sign_videos/README.md): any authenticated user can read all rows; only `superadmin` can insert/update/delete. See [storage/sign-videos.md](../storage/sign-videos.md) for the matching Storage bucket policies.
+RLS is enabled. See [rls-policies/sign_videos/](../rls-policies/sign_videos/README.md): any authenticated user can read all rows; `admin` or `superadmin` can insert; only `superadmin` can update/delete. See [storage/sign-videos.md](../storage/sign-videos.md) for the matching Storage bucket policies.
 
 ## Current DDL
 
@@ -47,7 +45,6 @@ CREATE TABLE IF NOT EXISTS "public"."sign_videos" (
     "width" integer NOT NULL,
     "height" integer NOT NULL,
     "file_size" bigint NOT NULL,
-    "is_primary" boolean DEFAULT false NOT NULL,
     CONSTRAINT "sign_videos_duration_ms_check" CHECK (("duration_ms" > 0)),
     CONSTRAINT "sign_videos_file_size_check" CHECK (("file_size" > 0)),
     CONSTRAINT "sign_videos_format_check" CHECK (("format" = ANY (ARRAY['mp4'::"text", 'webm'::"text"]))),
@@ -55,15 +52,13 @@ CREATE TABLE IF NOT EXISTS "public"."sign_videos" (
     CONSTRAINT "sign_videos_width_check" CHECK (("width" > 0))
 );
 
-COMMENT ON TABLE "public"."sign_videos" IS 'Video files (in the sign-videos storage bucket) demonstrating a sign. A sign may have several videos; at most one may be is_primary (see sign_videos_one_primary_per_sign).';
+COMMENT ON TABLE "public"."sign_videos" IS 'Video files (in the sign-videos storage bucket) demonstrating a sign. A sign may have several videos; which one is shown during quizzing is picked at random from its variant''s pool, not pinned per-video (see public.signs.is_primary).';
 
 ALTER TABLE ONLY "public"."sign_videos"
     ADD CONSTRAINT "sign_videos_pkey" PRIMARY KEY ("id");
 
 ALTER TABLE ONLY "public"."sign_videos"
     ADD CONSTRAINT "sign_videos_sign_id_storage_path_key" UNIQUE ("sign_id", "storage_path");
-
-CREATE UNIQUE INDEX "sign_videos_one_primary_per_sign" ON "public"."sign_videos" USING "btree" ("sign_id") WHERE "is_primary";
 
 CREATE INDEX "sign_videos_sign_id_idx" ON "public"."sign_videos" USING "btree" ("sign_id");
 

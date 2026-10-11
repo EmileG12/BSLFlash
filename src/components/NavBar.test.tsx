@@ -1,8 +1,9 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { signOut } from '../lib/auth'
+import { useUserRoles } from '../hooks/useUserRoles'
 import { mockCategories } from '../test/mockCategories'
 import { NavBar } from './NavBar'
 
@@ -14,6 +15,10 @@ vi.mock('../lib/supabase', () => ({
   supabase: {
     rpc: vi.fn(),
   },
+}))
+
+vi.mock('../hooks/useUserRoles', () => ({
+  useUserRoles: vi.fn(),
 }))
 
 /**
@@ -31,6 +36,10 @@ async function openMenu(user: ReturnType<typeof userEvent.setup>, name: RegExp) 
 }
 
 describe('NavBar', () => {
+  beforeEach(() => {
+    vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: false, loading: false })
+  })
+
   it('renders a Home link', () => {
     mockCategories({ data: [], error: null })
 
@@ -165,5 +174,51 @@ describe('NavBar', () => {
     await openMenu(user, /categories/i)
 
     expect(await screen.findByText(/no categories yet/i)).toBeInTheDocument()
+  })
+
+  it('shows no Admin entry for a plain user', () => {
+    mockCategories({ data: [], error: null })
+
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    )
+
+    expect(screen.queryByText('Admin')).not.toBeInTheDocument()
+  })
+
+  it('shows a plain Admin link (not a dropdown) for an admin-only user', () => {
+    mockCategories({ data: [], error: null })
+    vi.mocked(useUserRoles).mockReturnValue({ isAdmin: true, isSuperadmin: false, loading: false })
+
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    )
+
+    expect(screen.getByRole('link', { name: 'Admin' })).toHaveAttribute('href', '/admin')
+    expect(screen.queryByRole('button', { name: /admin/i })).not.toBeInTheDocument()
+  })
+
+  it('shows the full Admin dropdown with all 5 destinations for a superadmin', async () => {
+    mockCategories({ data: [], error: null })
+    vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: true, loading: false })
+    const user = userEvent.setup()
+
+    render(
+      <MemoryRouter>
+        <NavBar />
+      </MemoryRouter>,
+    )
+
+    await openMenu(user, /^admin$/i)
+
+    expect(screen.getByRole('menuitem', { name: /add & tag words/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /manage categories/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /manage words/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /manage roles/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /manage accounts/i })).toBeInTheDocument()
   })
 })

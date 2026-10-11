@@ -5,6 +5,13 @@ Postgres functions exposed via Supabase RPC, one doc file per function.
 | Function | Signature | Purpose |
 |---|---|---|
 | [is_superadmin](./is_superadmin.md) | `is_superadmin() RETURNS boolean` | Checks whether the current user holds the `superadmin` role; used inside RLS policies, also directly callable. |
+| [is_admin](./is_admin.md) | `is_admin() RETURNS boolean` | Checks whether the current user holds the `admin` role. Does not imply superadmin; policies check `is_superadmin() OR is_admin()`. |
+| [list_users_with_roles](./list_users_with_roles.md) | `list_users_with_roles() RETURNS TABLE(user_id, email, user_name, banned_until, roles text[])` | Superadmin-only: every account with its email, display name, ban status and role names. Backs the Roles and Accounts pages. |
+| [assign_role](./assign_role.md) | `assign_role(p_user_id uuid, p_role_name text) RETURNS void` | Superadmin-only: grants `admin` or `superadmin` to a user. Idempotent. |
+| [revoke_role](./revoke_role.md) | `revoke_role(p_user_id uuid, p_role_name text) RETURNS void` | Superadmin-only: removes `admin` or `superadmin`. Refuses to remove the last active superadmin. |
+| [ban_user](./ban_user.md) | `ban_user(p_user_id uuid) RETURNS void` | Superadmin-only: indefinitely bans an account via `auth.users.banned_until`. Refuses to ban the last active superadmin. |
+| [unban_user](./unban_user.md) | `unban_user(p_user_id uuid) RETURNS void` | Superadmin-only: clears a ban. |
+| [set_primary_sign](./set_primary_sign.md) | `set_primary_sign(p_sign_id uuid) RETURNS void` | Superadmin-only: atomically makes one sign the primary variant of its word. |
 | [handle_new_user](./handle_new_user.md) | `handle_new_user() RETURNS trigger` | Trigger-only (not RPC-callable): auto-creates a `profiles` row + `user` role grant whenever a new `auth.users` row is inserted. |
 | [get_random_word_for_category](./get_random_word_for_category.md) | `get_random_word_for_category(category_id uuid, is_custom boolean DEFAULT false, subcategory_id uuid DEFAULT NULL) RETURNS TABLE(...)` | Returns one random word (+ primary sign video) from a category or custom deck, optionally narrowed to a subcategory, for the flashcard game. |
 | [get_random_words_for_category](./get_random_words_for_category.md) | `get_random_words_for_category(category_id uuid, card_count integer DEFAULT 10, is_custom boolean DEFAULT false, subcategory_id uuid DEFAULT NULL) RETURNS TABLE(...)` | Returns up to card_count distinct random words (+ primary sign videos) from a category or custom deck, optionally narrowed to a subcategory, for the "10 Cards" mode. |

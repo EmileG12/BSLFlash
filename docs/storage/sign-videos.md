@@ -23,7 +23,7 @@ allowed_mime_types = ["video/mp4", "video/webm"]
 | Policy | Command | Applies to | Behavior |
 |---|---|---|---|
 | `sign_videos_bucket_select_authenticated` | SELECT | authenticated | Any logged-in user can read object rows (in addition to the public URL read path above). |
-| `sign_videos_bucket_insert_superadmin` | INSERT | authenticated | Superadmin only (via [`is_superadmin()`](../rpc-functions/is_superadmin.md)). |
+| `sign_videos_bucket_insert_admin_or_superadmin` | INSERT | authenticated | Admin or superadmin (via [`is_superadmin()`](../rpc-functions/is_superadmin.md) OR [`is_admin()`](../rpc-functions/is_admin.md)). |
 | `sign_videos_bucket_update_superadmin` | UPDATE | authenticated | Superadmin only. |
 | `sign_videos_bucket_delete_superadmin` | DELETE | authenticated | Superadmin only. |
 
@@ -36,7 +36,7 @@ All four policies are written `to authenticated` (never `to public`/`anon`), so 
 ```sql
 CREATE POLICY "sign_videos_bucket_select_authenticated" ON "storage"."objects" FOR SELECT TO "authenticated" USING (("bucket_id" = 'sign-videos'::"text"));
 
-CREATE POLICY "sign_videos_bucket_insert_superadmin" ON "storage"."objects" FOR INSERT TO "authenticated" WITH CHECK ((("bucket_id" = 'sign-videos'::"text") AND "public"."is_superadmin"()));
+CREATE POLICY "sign_videos_bucket_insert_admin_or_superadmin" ON "storage"."objects" FOR INSERT TO "authenticated" WITH CHECK ((("bucket_id" = 'sign-videos'::"text") AND ("public"."is_superadmin"() OR "public"."is_admin"())));
 
 CREATE POLICY "sign_videos_bucket_update_superadmin" ON "storage"."objects" FOR UPDATE TO "authenticated" USING ((("bucket_id" = 'sign-videos'::"text") AND "public"."is_superadmin"())) WITH CHECK ((("bucket_id" = 'sign-videos'::"text") AND "public"."is_superadmin"()));
 
@@ -47,5 +47,5 @@ CREATE POLICY "sign_videos_bucket_delete_superadmin" ON "storage"."objects" FOR 
 
 `supabase/config.toml`/`supabase/migrations/` and `supabase/seed.sql` don't cover binary file uploads, so sample videos are seeded by a separate script, chained after `db reset` via `npm run db:reset:seeded`:
 
-- `supabase/seed.sql` inserts the "Greetings" category, "Hello"/"World" words, and their `signs` rows (fixed UUIDs, pure SQL — re-applies automatically on every `db reset`).
+- `supabase/seed.sql` inserts the "Greetings" category, "Hello"/"World" words, and their `signs` rows, each with `is_primary = true` (fixed UUIDs, pure SQL — re-applies automatically on every `db reset`).
 - [`scripts/seed-sign-videos.mjs`](../../scripts/seed-sign-videos.mjs) uploads `vids/hellosign.mp4`/`vids/world.mp4` to this bucket (using the local service role key, which bypasses RLS) and inserts their matching `sign_videos` rows, with real `duration_ms`/`width`/`height`/`file_size` read off the files via `ffprobe-static`. Run manually (or via `npm run db:reset:seeded`) after every reset — it is not itself part of `db reset`.

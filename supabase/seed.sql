@@ -174,10 +174,10 @@ values
   ('cccccccc-cccc-cccc-cccc-cccccccccccc', 'aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa')
 on conflict (word_id, category_id) do nothing;
 
-insert into public.signs (id, word_id, variant_name, region)
+insert into public.signs (id, word_id, variant_name, region, is_primary)
 values
-  ('bbbbbbbb-1111-1111-1111-111111111111', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Standard', null),
-  ('cccccccc-1111-1111-1111-111111111111', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Standard', null)
+  ('bbbbbbbb-1111-1111-1111-111111111111', 'bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb', 'Standard', null, true),
+  ('cccccccc-1111-1111-1111-111111111111', 'cccccccc-cccc-cccc-cccc-cccccccccccc', 'Standard', null, true)
 on conflict (id) do nothing;
 
 -- 6. Colours / Time topic categories + GCSE vocabulary category ---------
@@ -250,20 +250,20 @@ values
   ('93a87f35-1760-452d-9923-a045da046eac', '3ea15bef-5166-4c26-86fc-b3e7ed006087')
 on conflict (word_id, category_id) do nothing;
 
-insert into public.signs (id, word_id, variant_name, region)
+insert into public.signs (id, word_id, variant_name, region, is_primary)
 values
-  ('7ff0b84c-0e37-4686-8bc7-d37276aada13', 'f291ab46-e2fc-4b38-a332-01747c244803', 'Standard', null),
-  ('b2da2501-f611-4e2f-b0bd-d3fa16dadf0c', '403d0d6a-e0b3-40fb-a7f2-db6191f80dea', 'Standard', null),
-  ('d99478b8-4ed6-491b-80e2-32a4811c36e1', '62f17de7-0450-4520-a9d2-e7cae56481a6', 'Standard', null),
-  ('4bc7eedb-a642-49b0-9929-554ca3271edb', '21e51549-31ec-4303-9c6f-ff162047ebcd', 'Standard', null),
-  ('ec3febcf-2d9c-43bb-b780-610aa78ecc1e', '3c501c6d-06f1-460b-9176-d6efffcc7a3e', 'Standard', null),
-  ('c75b4e3d-f7d5-4837-b890-f5c7e902077b', '4576b884-cf78-4bce-9f21-ab0d4a98fce9', 'Standard', null),
-  ('4df58e8c-d3be-4ac8-8012-484f99970ed3', '5b2f3bea-8284-41a1-a239-f480960c8f9d', 'Standard', null),
-  ('42cb71b7-50c6-4708-b6fe-a68e78407672', 'dd6c5ae5-04cb-476d-aa45-ea00940a05ba', 'Standard', null),
-  ('87e58fdf-cdda-443f-83a0-d90c74399ceb', '7d573786-25ac-47f0-8273-24a8e2143216', 'Standard', null),
-  ('e5cbd071-8fec-4902-8e62-5ef179d0fbcc', '1b388fe0-1330-4d0d-8f32-66022b139aad', 'Standard', null),
-  ('1ebecb8e-0dae-4b29-a39f-a1cc52fb423e', 'cfff5dad-5443-4beb-8537-e56fc6f35539', 'Standard', null),
-  ('3c94953c-96d4-4a9a-8cd5-2a22185cfc3c', '677547cc-83ca-4d24-9e4f-4982cebed9a1', 'Standard', null),
-  ('bd33fcdc-2b55-469d-9db1-31e53e6ceb8b', '99454a6d-d55c-442d-9da8-938a06c4ac2f', 'Standard', null),
-  ('3b8ad2e6-25e8-4001-8828-41981f4c5598', '93a87f35-1760-452d-9923-a045da046eac', 'Standard', null)
+  ('7ff0b84c-0e37-4686-8bc7-d37276aada13', 'f291ab46-e2fc-4b38-a332-01747c244803', 'Standard', null, true),
+  ('b2da2501-f611-4e2f-b0bd-d3fa16dadf0c', '403d0d6a-e0b3-40fb-a7f2-db6191f80dea', 'Standard', null, true),
+  ('d99478b8-4ed6-491b-80e2-32a4811c36e1', '62f17de7-0450-4520-a9d2-e7cae56481a6', 'Standard', null, true),
+  ('4bc7eedb-a642-49b0-9929-554ca3271edb', '21e51549-31ec-4303-9c6f-ff162047ebcd', 'Standard', null, true),
+  ('ec3febcf-2d9c-43bb-b780-610aa78ecc1e', '3c501c6d-06f1-460b-9176-d6efffcc7a3e', 'Standard', null, true),
+  ('c75b4e3d-f7d5-4837-b890-f5c7e902077b', '4576b884-cf78-4bce-9f21-ab0d4a98fce9', 'Standard', null, true),
+  ('4df58e8c-d3be-4ac8-8012-484f99970ed3', '5b2f3bea-8284-41a1-a239-f480960c8f9d', 'Standard', null, true),
+  ('42cb71b7-50c6-4708-b6fe-a68e78407672', 'dd6c5ae5-04cb-476d-aa45-ea00940a05ba', 'Standard', null, true),
+  ('87e58fdf-cdda-443f-83a0-d90c74399ceb', '7d573786-25ac-47f0-8273-24a8e2143216', 'Standard', null, true),
+  ('e5cbd071-8fec-4902-8e62-5ef179d0fbcc', '1b388fe0-1330-4d0d-8f32-66022b139aad', 'Standard', null, true),
+  ('1ebecb8e-0dae-4b29-a39f-a1cc52fb423e', 'cfff5dad-5443-4beb-8537-e56fc6f35539', 'Standard', null, true),
+  ('3c94953c-96d4-4a9a-8cd5-2a22185cfc3c', '677547cc-83ca-4d24-9e4f-4982cebed9a1', 'Standard', null, true),
+  ('bd33fcdc-2b55-469d-9db1-31e53e6ceb8b', '99454a6d-d55c-442d-9da8-938a06c4ac2f', 'Standard', null, true),
+  ('3b8ad2e6-25e8-4001-8828-41981f4c5598', '93a87f35-1760-452d-9923-a045da046eac', 'Standard', null, true)
 on conflict (id) do nothing;

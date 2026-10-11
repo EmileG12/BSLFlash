@@ -14,10 +14,13 @@
 - The Categories menu lists topic categories, and selecting one navigates to `/flashcards/:deckType/:categoryId`.
 - The Vocabulary menu lists vocabulary categories, fetched separately from the Categories menu.
 - A menu with zero categories shows a "No categories yet" item.
+- A plain user sees no "Admin" entry.
+- An admin-only user sees a plain "Admin" link to `/admin`, not a dropdown.
+- A superadmin sees an "Admin" dropdown with all five destinations: Add & tag words, Manage categories, Manage words, Manage roles, Manage accounts.
 
 ## Notes
 
-Mocks `../lib/auth` (`signOut`) via an explicit factory — see [auth](../utils/auth.md). Category data comes from the shared [`mockCategories`](./mockCategories.md) helper. Navigation is verified by rendering real routes and asserting on the resulting screen content, not by mocking `useNavigate`.
+Mocks `../lib/auth` (`signOut`) via an explicit factory — see [auth](../utils/auth.md). Mocks `../hooks/useUserRoles` in a `beforeEach` (defaulting to no roles), because [NavBar](../components/NavBar.md) renders its admin entry unconditionally and would otherwise read from an undefined roles result. The admin cases override that default per test. See [useUserRoles](../hooks/useUserRoles.md). Category data comes from the shared [`mockCategories`](./mockCategories.md) helper. Navigation is verified by rendering real routes and asserting on the resulting screen content, not by mocking `useNavigate`.
 
 **Menus are opened by keyboard here, via the file's `openMenu` helper** (focus the trigger, press Enter) rather than by hovering or clicking. The Categories/Vocabulary menus, [CategoryMenu](../components/CategoryMenu.md), open on real mouse hover, and hovering can't be simulated meaningfully in jsdom — there's no real layout or hit-testing, so a synthetic `mouseenter` doesn't reproduce what a real cursor crossing the trigger's bounds does. The trigger also has its own click-to-toggle suppressed (`onPointerDown` calling `preventDefault`) precisely so clicks don't fight with the hover-driven open state, which rules out simulating a click here too.
 

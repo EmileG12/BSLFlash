@@ -55,6 +55,48 @@
   outline-offset: 2px;
 }
 
+.navbar-admin-link {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--foreground);
+  font-weight: 500;
+  text-decoration: none;
+  outline: none;
+}
+
+.navbar-admin-link::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: transparent;
+}
+
+.navbar-admin-link[aria-current='page']::after {
+  background: var(--admin);
+}
+
+.navbar-admin-link:hover {
+  color: var(--admin);
+}
+
+.navbar-admin-link:hover::after {
+  background: var(--admin);
+}
+
+.navbar-admin-link:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.navbar-admin-icon {
+  pointer-events: none;
+}
+
 .navbar-signout {
   font: inherit;
   font-weight: 600;

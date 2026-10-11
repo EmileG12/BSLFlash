@@ -2,13 +2,13 @@
 
 **Signature:** `public.get_random_words_for_category(category_id uuid, card_count integer DEFAULT 10, is_custom boolean DEFAULT false, subcategory_id uuid DEFAULT NULL) RETURNS TABLE(word_id uuid, word text, definition text, storage_path text, format text)`
 **Language:** SQL
-**Last touched by migration:** [`20261011162150_rename_custom_categories_to_custom_decks.sql`](../../supabase/migrations/20261011162150_rename_custom_categories_to_custom_decks.sql)
+**Last touched by migration:** [`20261011193933_rewrite_random_word_functions_for_sign_level_primary.sql`](../../supabase/migrations/20261011193933_rewrite_random_word_functions_for_sign_level_primary.sql)
 
-**Purpose:** Powers the "10 Cards" game mode — given a category or custom deck, returns up to `card_count` **distinct** random words (never repeating one within the same call), each with its primary sign video's storage path and format, for [TenCardsPage](../components/TenCardsPage.md) to draw a whole round up front. `is_custom` selects which deck table backs the lookup, same as [`get_random_word_for_category`](./get_random_word_for_category.md): `false` (the default) looks the id up in [`word_categories`](../db-schema/word_categories.md); `true` looks it up in [`custom_deck_words`](../db-schema/custom_deck_words.md).
+**Purpose:** Powers the "10 Cards" game mode — given a category or custom deck, returns up to `card_count` **distinct** random words (never repeating one within the same call), each with a random video from the word's primary sign variant (storage path and format), for [TenCardsPage](../components/TenCardsPage.md) to draw a whole round up front. `is_custom` selects which deck table backs the lookup, same as [`get_random_word_for_category`](./get_random_word_for_category.md): `false` (the default) looks the id up in [`word_categories`](../db-schema/word_categories.md); `true` looks it up in [`custom_deck_words`](../db-schema/custom_deck_words.md).
 
 `subcategory_id`, when given, further restricts the eligible set to words that *also* belong to that topic category — the same second `word_categories` membership check, intersected with the existing predicate, as [`get_random_word_for_category`](./get_random_word_for_category.md). Defaults to `NULL`, which skips the check, so pre-existing callers are unaffected.
 
-Same eligibility rule as `get_random_word_for_category`: only words with an `is_primary = true` sign video are considered. First collapses to one row per distinct word via `SELECT DISTINCT ON (w.id) ... ORDER BY w.id, random()` (picking a random sign variant to represent each word), then applies a second, independent `ORDER BY random() LIMIT card_count` on top of that deduplicated set to choose which — and how many — words come back. If the category/deck (and subcategory, if given) has fewer than `card_count` eligible words, it simply returns all of them; callers don't need to handle an error for that case, only a possibly-shorter-than-requested array.
+Same eligibility rule as `get_random_word_for_category`: only the word's primary sign variant (`signs.is_primary = true`) is considered, and only words whose primary variant has at least one video are eligible. First collapses to one row per distinct word via `SELECT DISTINCT ON (w.id) ... ORDER BY w.id, random()` (picking one random video from the primary variant's pool to represent each word), then applies a second, independent `ORDER BY random() LIMIT card_count` on top of that deduplicated set to choose which — and how many — words come back. If the category/deck (and subcategory, if given) has fewer than `card_count` eligible words, it simply returns all of them; callers don't need to handle an error for that case, only a possibly-shorter-than-requested array.
 
 Same `UNION ALL` boolean-guard pattern as `get_random_word_for_category` for the standard-vs-custom branch, and the same reason the old overloads were **dropped** rather than left alongside this one: `CREATE OR REPLACE` can't change a function's parameter list, so an old overload would otherwise make a call passing only `category_id`/`card_count`/`is_custom` ambiguous against this one's `subcategory_id` default.
 
@@ -18,12 +18,12 @@ Not `SECURITY DEFINER` and not `STABLE`, for the same reasons as `get_random_wor
 
 ## Grants
 
-- `EXECUTE` revoked from `PUBLIC` and from `anon` explicitly — same local-environment default-grant quirk as every other function here. Verified directly (pre-existing, under the old signature): an `anon`-authenticated call returns `42501 permission denied for function get_random_words_for_category`.
+- `EXECUTE` revoked from `PUBLIC` and from `anon` explicitly — same local-environment default-grant quirk as every other function here.
 - `EXECUTE` granted to `authenticated` only (and `service_role`, which bypasses RLS/grants entirely).
 
 ## Current definition
 
-*Reconstructed from the rename migration (which recreates this body), not from a live dump. Verify against `npx supabase db dump --local --schema public`.*
+*Derived from the migrations (`20261011193933_rewrite_random_word_functions_for_sign_level_primary.sql`); to be confirmed against `npx supabase db dump --local --schema public`.*
 
 ```sql
 CREATE OR REPLACE FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer DEFAULT 10, "is_custom" boolean DEFAULT false, "subcategory_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("word_id" "uuid", "word" "text", "definition" "text", "storage_path" "text", "format" "text")
@@ -34,8 +34,8 @@ SELECT * FROM (
     SELECT DISTINCT ON (w.id)
         w.id AS "word_id", w.word, w.definition, sv.storage_path, sv.format
     FROM public.words w
-    JOIN public.signs s ON s.word_id = w.id
-    JOIN public.sign_videos sv ON sv.sign_id = s.id AND sv.is_primary
+    JOIN public.signs s ON s.word_id = w.id AND s.is_primary
+    JOIN public.sign_videos sv ON sv.sign_id = s.id
     WHERE w.id IN (
       SELECT word_id FROM public.word_categories
       WHERE category_id = get_random_words_for_category.category_id
@@ -58,7 +58,7 @@ ORDER BY random()
 LIMIT get_random_words_for_category.card_count;
 $$;
 
-COMMENT ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") IS 'Returns up to card_count distinct random words (with primary sign videos) in the given category or custom deck (is_custom selects which), optionally also restricted to subcategory_id via word_categories, for the 10 Cards game mode. Never repeats a word within one call; returns fewer rows if fewer than card_count are eligible.';
+COMMENT ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") IS 'Returns up to card_count distinct random words (each with a random video from its primary sign variant) in the given category or custom deck (is_custom selects which), optionally also restricted to subcategory_id via word_categories, for the 10 Cards game mode. Never repeats a word within one call; returns fewer rows if fewer than card_count are eligible.';
 
 REVOKE ALL ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") FROM "anon";

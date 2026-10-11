@@ -157,7 +157,6 @@ async function main() {
           width: metadata.width,
           height: metadata.height,
           file_size: metadata.fileSize,
-          is_primary: true,
         },
         { onConflict: 'sign_id,storage_path' },
       )

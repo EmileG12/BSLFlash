@@ -1,0 +1,63 @@
+@reference "../index.css";
+
+.admin-menu-group {
+  display: inline-flex;
+}
+
+.admin-menu-trigger {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font: inherit;
+  font-weight: 500;
+  color: var(--foreground);
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+}
+
+.admin-menu-trigger::after {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -6px;
+  height: 2px;
+  background: transparent;
+}
+
+.admin-menu-trigger:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+.admin-menu-trigger:hover,
+.admin-menu-trigger[data-state='open'] {
+  color: var(--admin);
+}
+
+.admin-menu-trigger:hover::after,
+.admin-menu-trigger[data-state='open']::after {
+  background: var(--admin);
+}
+
+.admin-menu-icon {
+  pointer-events: none;
+}
+
+.admin-menu-content {
+  border-bottom: 2px solid var(--admin);
+}
+
+.admin-menu-item {
+  @apply cursor-pointer rounded-none first:rounded-t-lg last:rounded-b-lg;
+}
+
+.admin-menu-item:focus {
+  background: color-mix(in oklab, var(--admin) 12%, var(--popover));
+  color: var(--admin);
+  font-weight: 600;
+}

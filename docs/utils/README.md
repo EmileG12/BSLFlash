@@ -8,3 +8,5 @@ Non-hook, non-component modules, one doc file per module.
 | [auth](./auth.md) | `src/lib/auth.ts` | Wraps Supabase Auth sign-in/sign-out calls. |
 | [database.types](./database.types.md) | `src/lib/database.types.ts` | Generated TypeScript types for the live Supabase schema. |
 | [chipStyles](./chipStyles.md) | `src/lib/chipStyles.ts` | Shared Tailwind class strings for the pill-style toggle chips. |
+| [signVideoUpload](./signVideoUpload.md) | `src/lib/signVideoUpload.ts` | Uploads a sign video to the `sign-videos` bucket and inserts its `sign_videos` row, reading duration and dimensions in the browser. |
+| [userStatus](./userStatus.md) | `src/lib/userStatus.ts` | `isBanned()`: whether an account is currently banned, including the indefinite `'infinity'` sentinel. |

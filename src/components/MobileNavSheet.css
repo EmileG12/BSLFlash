@@ -47,6 +47,22 @@
   outline-offset: -2px;
 }
 
+.mobile-nav-row--admin[aria-current='page'],
+.mobile-nav-row--admin[aria-expanded='true'] {
+  border-left-color: var(--admin);
+  color: var(--admin);
+}
+
+.mobile-nav-admin-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.mobile-nav-admin-icon {
+  pointer-events: none;
+}
+
 .mobile-nav-row--signout {
   font-weight: 600;
 }

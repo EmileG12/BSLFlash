@@ -30,6 +30,8 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [NavBar](./NavBar.md) | `src/components/NavBar.test.tsx` | [NavBar](../components/NavBar.md) |
 | [NavBar.browser](./NavBar.browser.md) | `src/components/NavBar.browser.test.tsx` | [NavBar](../components/NavBar.md) — real-browser click behavior |
 | [MobileNavSheet](./MobileNavSheet.md) | `src/components/MobileNavSheet.test.tsx` | [MobileNavSheet](../components/MobileNavSheet.md) |
+| [AdminRoute](./AdminRoute.md) | `src/components/AdminRoute.test.tsx` | [AdminRoute](../components/AdminRoute.md) |
+| [SuperadminRoute](./SuperadminRoute.md) | `src/components/SuperadminRoute.test.tsx` | [SuperadminRoute](../components/SuperadminRoute.md) |
 | [SelectDeckCard](./SelectDeckCard.md) | `src/components/SelectDeckCard.test.tsx` | [SelectDeckCard](../components/SelectDeckCard.md) |
 | [DeckGrid](./DeckGrid.md) | `src/components/DeckGrid.test.tsx` | [DeckGrid](../components/DeckGrid.md) |
 | [MyDecksPage](./MyDecksPage.md) | `src/pages/MyDecksPage.test.tsx` | [MyDecksPage](../components/MyDecksPage.md) |
@@ -59,6 +61,8 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [ScorePill](./ScorePill.md) | `src/components/ScorePill.test.tsx` | [ScorePill](../components/ScorePill.md) |
 | [SubCategoryChips](./SubCategoryChips.md) | `src/components/SubCategoryChips.test.tsx` | [SubCategoryChips](../components/SubCategoryChips.md) |
 | [useCategoryInfo](./useCategoryInfo.md) | `src/hooks/useCategoryInfo.test.ts` | [useCategoryInfo](../hooks/useCategoryInfo.md) |
+| [useUserRoles](./useUserRoles.md) | `src/hooks/useUserRoles.test.ts` | [useUserRoles](../hooks/useUserRoles.md) |
+| [userStatus](./userStatus.md) | `src/lib/userStatus.test.ts` | [userStatus](../utils/userStatus.md) |
 
 ## Shared helpers
 

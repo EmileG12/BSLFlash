@@ -2,9 +2,9 @@
 
 **Signature:** `public.get_available_subcategories_for_category(category_id uuid) RETURNS TABLE(id uuid, category_name text)`
 **Language:** SQL
-**Last touched by migration:** [`20261011135343_add_subcategory_filtering.sql`](../../supabase/migrations/20261011135343_add_subcategory_filtering.sql)
+**Last touched by migration:** [`20261011202947_filter_disabled_categories_from_browsing.sql`](../../supabase/migrations/20261011202947_filter_disabled_categories_from_browsing.sql)
 
-**Purpose:** Returns the topic categories (`is_vocabulary = false`) that share at least one word with the given category, for [SubCategoryChips](../components/SubCategoryChips.md) to offer as "narrow by topic" choices on [ModeSelectPage](../components/ModeSelectPage.md). Exists specifically so a subcategory with zero overlapping words never appears as a choice at all — not shown and then found empty once picked.
+**Purpose:** Returns the active topic categories (`is_vocabulary = false`) that share at least one word with the given category, for [SubCategoryChips](../components/SubCategoryChips.md) to offer as "narrow by topic" choices on [ModeSelectPage](../components/ModeSelectPage.md). Exists specifically so a subcategory with zero overlapping words never appears as a choice at all — not shown and then found empty once picked. `AND c.is_active` additionally excludes a category the superadmin has disabled.
 
 Finds the overlap via a self-join on [`word_categories`](../db-schema/word_categories.md) (`wc1` fixed to `category_id`, `wc2` fixed to each candidate topic category `c`, joined on `word_id`): a row survives the `EXISTS` only if at least one word links to both. This is the same table [`get_random_word_for_category`](./get_random_word_for_category.md)/[`get_random_words_for_category`](./get_random_words_for_category.md) intersect against when `subcategory_id` is actually applied at play time — this function only decides which subcategory ids are legal to pass to those.
 
@@ -27,6 +27,7 @@ CREATE OR REPLACE FUNCTION "public"."get_available_subcategories_for_category"("
   SELECT c.id, c.category_name
   FROM public.categories c
   WHERE c.is_vocabulary = false
+    AND c.is_active
     AND EXISTS (
       SELECT 1 FROM public.word_categories wc1
       JOIN public.word_categories wc2 ON wc1.word_id = wc2.word_id
@@ -36,7 +37,7 @@ CREATE OR REPLACE FUNCTION "public"."get_available_subcategories_for_category"("
   ORDER BY c.category_name;
 $$;
 
-COMMENT ON FUNCTION "public"."get_available_subcategories_for_category"("category_id" "uuid") IS 'Returns the topic categories (is_vocabulary = false) that share at least one word with the given category, for narrowing a vocabulary category''s word pool by subcategory. Excludes topic categories with zero overlapping words.';
+COMMENT ON FUNCTION "public"."get_available_subcategories_for_category"("category_id" "uuid") IS 'Returns the active topic categories (is_vocabulary = false) that share at least one word with the given category, for narrowing a vocabulary category''s word pool by subcategory. Excludes disabled categories and topic categories with zero overlapping words.';
 
 REVOKE ALL ON FUNCTION "public"."get_available_subcategories_for_category"("category_id" "uuid") FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."get_available_subcategories_for_category"("category_id" "uuid") FROM "anon";
@@ -44,4 +45,4 @@ GRANT ALL ON FUNCTION "public"."get_available_subcategories_for_category"("categ
 GRANT ALL ON FUNCTION "public"."get_available_subcategories_for_category"("category_id" "uuid") TO "service_role";
 ```
 
-Verified against a live `npx supabase db dump --local --schema public` on 2026-10-11 — matches the migration's text exactly.
+Verified against a live `npx supabase db dump --local --schema public` on 2026-10-11 (re-verified after the `is_active` filter was added) — matches exactly.
