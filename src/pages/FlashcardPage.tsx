@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
+import { useParams, useSearchParams } from 'react-router-dom'
 import { useRandomFlashcard } from '../hooks/useRandomFlashcard'
 import { useWords } from '../hooks/useWords'
 import { useStreakScore } from '../hooks/useStreakScore'
@@ -10,16 +10,19 @@ import './FlashcardPage.css'
 export function FlashcardPage() {
   const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
   const isValidDeckType = deckType === 'standard' || deckType === 'custom'
+  const [searchParams] = useSearchParams()
+  const subcategoryId = searchParams.get('subcategory')
   const { flashcard, loading, error, empty, next } = useRandomFlashcard(
     categoryId ?? '',
     isValidDeckType ? deckType : 'standard',
+    subcategoryId,
   )
   const { words, loading: wordsLoading, error: wordsError } = useWords()
   const { streak, recordResult, reset } = useStreakScore()
 
   useEffect(() => {
     reset()
-  }, [categoryId, reset])
+  }, [categoryId, subcategoryId, reset])
 
   function handleAdvance(result: { wordId: string; correct: boolean }) {
     recordResult(result.correct)

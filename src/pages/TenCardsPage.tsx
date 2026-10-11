@@ -1,4 +1,4 @@
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useTenCardsRound } from '../hooks/useTenCardsRound'
 import { useWords } from '../hooks/useWords'
@@ -9,9 +9,12 @@ import { ScorePill } from '../components/ScorePill'
 export function TenCardsPage() {
   const { deckType, categoryId } = useParams<{ deckType: string; categoryId: string }>()
   const isValidDeckType = deckType === 'standard' || deckType === 'custom'
+  const [searchParams] = useSearchParams()
+  const subcategoryId = searchParams.get('subcategory')
   const { cards, loading, error, empty } = useTenCardsRound(
     categoryId ?? '',
     isValidDeckType ? deckType : 'standard',
+    subcategoryId,
   )
   const { words, loading: wordsLoading, error: wordsError } = useWords()
   const navigate = useNavigate()
@@ -44,7 +47,11 @@ export function TenCardsPage() {
         <p className="text-lg font-medium">
           You scored {correctCount}/{cards.length}
         </p>
-        <Button onClick={() => navigate(`/flashcards/${deckType}/${categoryId}`)}>
+        <Button
+          onClick={() =>
+            navigate(`/flashcards/${deckType}/${categoryId}${subcategoryId ? `?subcategory=${subcategoryId}` : ''}`)
+          }
+        >
           Back to modes
         </Button>
       </div>

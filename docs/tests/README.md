@@ -47,6 +47,8 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [useStreakScore](./useStreakScore.md) | `src/hooks/useStreakScore.test.ts` | [useStreakScore](../hooks/useStreakScore.md) |
 | [useRoundProgress](./useRoundProgress.md) | `src/hooks/useRoundProgress.test.ts` | [useRoundProgress](../hooks/useRoundProgress.md) |
 | [ScorePill](./ScorePill.md) | `src/components/ScorePill.test.tsx` | [ScorePill](../components/ScorePill.md) |
+| [SubCategoryChips](./SubCategoryChips.md) | `src/components/SubCategoryChips.test.tsx` | [SubCategoryChips](../components/SubCategoryChips.md) |
+| [useCategoryInfo](./useCategoryInfo.md) | `src/hooks/useCategoryInfo.test.ts` | [useCategoryInfo](../hooks/useCategoryInfo.md) |
 
 ## Shared helpers
 

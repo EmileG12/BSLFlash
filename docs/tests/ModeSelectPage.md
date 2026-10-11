@@ -8,7 +8,13 @@
 - Renders "Practice" and "10 Cards" buttons.
 - Clicking "Practice" navigates to `/flashcards/:deckType/:categoryId/practice`.
 - Clicking "10 Cards" navigates to `/flashcards/:deckType/:categoryId/ten-cards`.
+- Shows an error instead of mode buttons for an unrecognized `deckType`.
+- Shows no subcategory section for a non-vocabulary category, or for a custom deck.
+- Shows the subcategory section, with "All" pre-selected, for a vocabulary category.
+- Navigates without a query string when "All" is selected.
+- Appends `?subcategory=<id>` to both mode-tile navigation targets once a subcategory chip is picked.
+- Pre-selects the subcategory chip matching a `?subcategory=` already present in the URL.
 
 ## Notes
 
-No Supabase mocking needed — the page does no data fetching of its own. Navigation is tested by rendering real routes (`MemoryRouter`/`Routes`) with stub destination routes and asserting on what ends up on screen, same convention as [SelectDeckCard.test.tsx](./SelectDeckCard.md).
+Mocks `../lib/supabase`'s `from` (for [useCategoryInfo](../hooks/useCategoryInfo.md)'s category lookup) and `rpc` (for [SubCategoryChips](../components/SubCategoryChips.md)'s subcategory list) — this file had no Supabase mocking before this feature, a pre-existing gap now closed since the page's `useCategoryInfo` call (previously `useCategoryName`) already queried Supabase for the display name. Navigation is tested by rendering real routes (`MemoryRouter`/`Routes`) with stub destination routes and asserting on what ends up on screen, same convention as [SelectDeckCard.test.tsx](./SelectDeckCard.md); the query-string-forwarding cases use a small location-probe component to assert on `location.search` at the destination route.

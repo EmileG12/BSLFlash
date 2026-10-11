@@ -1,6 +1,6 @@
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
 import { TenCardsPage } from './TenCardsPage'
@@ -47,15 +47,20 @@ function mockBackend({ rpcData = ROWS }: { rpcData?: unknown[] } = {}) {
   } as never)
 }
 
-function renderPage() {
+function renderPage(initialEntry = '/flashcards/standard/cat-1/ten-cards') {
   return render(
-    <MemoryRouter initialEntries={['/flashcards/standard/cat-1/ten-cards']}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path="/flashcards/:deckType/:categoryId/ten-cards" element={<TenCardsPage />} />
-        <Route path="/flashcards/:deckType/:categoryId" element={<div>Mode select page</div>} />
+        <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectLocationProbe />} />
       </Routes>
     </MemoryRouter>,
   )
+}
+
+function ModeSelectLocationProbe() {
+  const location = useLocation()
+  return <div>Mode select page{location.search}</div>
 }
 
 async function answer(user: ReturnType<typeof userEvent.setup>, wordName: string) {
@@ -142,6 +147,28 @@ describe('TenCardsPage', () => {
     await user.click(await screen.findByRole('button', { name: /back to modes/i }))
 
     expect(await screen.findByText('Mode select page')).toBeInTheDocument()
+  })
+
+  it('forwards the subcategory query param to the RPC call, and preserves it on "Back to modes"', async () => {
+    mockBackend()
+    const user = userEvent.setup()
+
+    renderPage('/flashcards/standard/cat-1/ten-cards?subcategory=sub-1')
+
+    await answer(user, 'Hello')
+    expect(supabase.rpc).toHaveBeenCalledWith('get_random_words_for_category', {
+      category_id: 'cat-1',
+      is_custom: false,
+      subcategory_id: 'sub-1',
+    })
+
+    await user.click(screen.getByRole('button', { name: 'Next card' }))
+    await answer(user, 'World')
+    await user.click(screen.getByRole('button', { name: 'See results' }))
+
+    await user.click(await screen.findByRole('button', { name: /back to modes/i }))
+
+    expect(await screen.findByText('Mode select page?subcategory=sub-1')).toBeInTheDocument()
   })
 
   it('reaches a summary instead of hanging when the category has fewer eligible words than requested', async () => {

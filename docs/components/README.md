@@ -12,6 +12,7 @@ React components, one doc file per component.
 | [CreateDeckPage](./CreateDeckPage.md) | `src/pages/CreateDeckPage.tsx` | Builds a custom deck from the word list via a two-column picker, then names and saves it. |
 | [MyDecksPage](./MyDecksPage.md) | `src/pages/MyDecksPage.tsx` | Lists the user's custom decks; play or delete each one. |
 | [ModeSelectPage](./ModeSelectPage.md) | `src/pages/ModeSelectPage.tsx` | Choose "Practice" or "10 Cards" for a category or custom deck. |
+| [SubCategoryChips](./SubCategoryChips.md) | `src/components/SubCategoryChips.tsx` | "Narrow by topic" chip picker, shown on `ModeSelectPage` for vocabulary categories only. |
 | [FlashcardPage](./FlashcardPage.md) | `src/pages/FlashcardPage.tsx` | "Practice" mode: an endless loop of random words, tracking a consecutive-correct streak. |
 | [TenCardsPage](./TenCardsPage.md) | `src/pages/TenCardsPage.tsx` | "10 Cards" mode: a bounded, no-repeat round of up to 10 words, ending on a score. |
 | [FlashcardRound](./FlashcardRound.md) | `src/components/FlashcardRound.tsx` | Shared per-card gameplay (video + guess combobox + reveal), used by both game modes. |

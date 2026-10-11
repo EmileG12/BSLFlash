@@ -7,6 +7,8 @@
 
 `is_vocabulary` distinguishes two independent kinds of grouping over the same `words`: topic categories (Animals, Greetings, Colours, Time — `is_vocabulary = false`) versus educational vocabulary-requirement categories (e.g. GCSE required vocabulary — `is_vocabulary = true`). A word can belong to both a topic category and a vocabulary category simultaneously via separate `word_categories` rows (e.g. "Monday" belongs to both `Time` and `GCSE`). [SelectDeckCard](../components/SelectDeckCard.md) uses this flag to show two separate deck pickers on the home page.
 
+That same dual-membership shape is also what lets a vocabulary category be narrowed to one topic category at play time, with no schema change: [`get_available_subcategories_for_category`](../rpc-functions/get_available_subcategories_for_category.md) finds which topic categories (`is_vocabulary = false`) overlap a given vocabulary category via a self-join on `word_categories`, and [`get_random_word_for_category`](../rpc-functions/get_random_word_for_category.md)/[`get_random_words_for_category`](../rpc-functions/get_random_words_for_category.md) apply the chosen subcategory as a second `word_categories` membership check, intersected with the usual category-membership predicate. [SubCategoryChips](../components/SubCategoryChips.md), rendered by [ModeSelectPage](../components/ModeSelectPage.md) only when `isVocabulary` is `true`, is the UI for this.
+
 ## Columns
 
 | Column | Type | Nullable | Default | Description |

@@ -11,6 +11,9 @@
 - Sets an error message when the RPC call fails.
 - `next()` re-triggers the RPC call to draw a new word, going back through a loading state.
 - Passes `is_custom: true` to the RPC when called with `deckType: 'custom'` (every other test calls it with `'standard'`).
+- Omits `subcategory_id` from the RPC call when none is given.
+- Passes `subcategory_id` to the RPC when given.
+- Refetches (going back through a loading state) when `subcategoryId` changes.
 
 ## Notes
 

@@ -26,11 +26,15 @@ interface Result {
   empty: boolean
 }
 
-export function useRandomFlashcard(categoryId: string, deckType: DeckType): RandomFlashcardState {
+export function useRandomFlashcard(
+  categoryId: string,
+  deckType: DeckType,
+  subcategoryId?: string | null,
+): RandomFlashcardState {
   const [refreshKey, setRefreshKey] = useState(0)
   const [result, setResult] = useState<Result | null>(null)
 
-  const requestKey = `${deckType}:${categoryId}:${refreshKey}`
+  const requestKey = `${deckType}:${categoryId}:${subcategoryId ?? ''}:${refreshKey}`
   // Loading is derived, not stored: it's simply "the last completed fetch
   // doesn't match what we're currently asking for" -- so there's no separate
   // reset-to-loading setState call needed when categoryId/refreshKey change.
@@ -43,6 +47,7 @@ export function useRandomFlashcard(categoryId: string, deckType: DeckType): Rand
       .rpc('get_random_word_for_category', {
         category_id: categoryId,
         is_custom: deckType === 'custom',
+        ...(subcategoryId ? { subcategory_id: subcategoryId } : {}),
       })
       .then(({ data, error }) => {
         if (cancelled) return
@@ -74,7 +79,7 @@ export function useRandomFlashcard(categoryId: string, deckType: DeckType): Rand
     return () => {
       cancelled = true
     }
-  }, [categoryId, deckType, requestKey])
+  }, [categoryId, deckType, subcategoryId, requestKey])
 
   function next() {
     setRefreshKey((key) => key + 1)

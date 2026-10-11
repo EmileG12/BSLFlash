@@ -9,7 +9,11 @@ interface TenCardsRoundState {
   empty: boolean
 }
 
-export function useTenCardsRound(categoryId: string, deckType: DeckType): TenCardsRoundState {
+export function useTenCardsRound(
+  categoryId: string,
+  deckType: DeckType,
+  subcategoryId?: string | null,
+): TenCardsRoundState {
   const [cards, setCards] = useState<Flashcard[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -22,6 +26,7 @@ export function useTenCardsRound(categoryId: string, deckType: DeckType): TenCar
       .rpc('get_random_words_for_category', {
         category_id: categoryId,
         is_custom: deckType === 'custom',
+        ...(subcategoryId ? { subcategory_id: subcategoryId } : {}),
       })
       .then(({ data, error }) => {
         if (cancelled) return
@@ -53,7 +58,7 @@ export function useTenCardsRound(categoryId: string, deckType: DeckType): TenCar
     return () => {
       cancelled = true
     }
-  }, [categoryId, deckType])
+  }, [categoryId, deckType, subcategoryId])
 
   return { cards, loading, error, empty }
 }

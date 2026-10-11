@@ -295,8 +295,19 @@ export type Database = {
         Args: { p_name: string; p_word_ids: string[] }
         Returns: string
       }
+      get_available_subcategories_for_category: {
+        Args: { category_id: string }
+        Returns: {
+          category_name: string
+          id: string
+        }[]
+      }
       get_random_word_for_category: {
-        Args: { category_id: string; is_custom?: boolean }
+        Args: {
+          category_id: string
+          is_custom?: boolean
+          subcategory_id?: string
+        }
         Returns: {
           definition: string
           format: string
@@ -306,7 +317,12 @@ export type Database = {
         }[]
       }
       get_random_words_for_category: {
-        Args: { card_count?: number; category_id: string; is_custom?: boolean }
+        Args: {
+          card_count?: number
+          category_id: string
+          is_custom?: boolean
+          subcategory_id?: string
+        }
         Returns: {
           definition: string
           format: string

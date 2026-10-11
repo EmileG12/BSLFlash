@@ -115,4 +115,47 @@ describe('useRandomFlashcard', () => {
       is_custom: true,
     })
   })
+
+  it('omits subcategory_id when none is given', async () => {
+    mockRpc({ data: [], error: null })
+
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(supabase.rpc).toHaveBeenCalledWith('get_random_word_for_category', {
+      category_id: 'cat-1',
+      is_custom: false,
+    })
+  })
+
+  it('passes subcategory_id when given', async () => {
+    mockRpc({ data: [], error: null })
+
+    const { result } = renderHook(() => useRandomFlashcard('cat-1', 'standard', 'sub-1'))
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    expect(supabase.rpc).toHaveBeenCalledWith('get_random_word_for_category', {
+      category_id: 'cat-1',
+      is_custom: false,
+      subcategory_id: 'sub-1',
+    })
+  })
+
+  it('refetches when subcategoryId changes', async () => {
+    mockRpc({ data: [], error: null })
+
+    const { result, rerender } = renderHook(
+      ({ subcategoryId }: { subcategoryId: string | null }) =>
+        useRandomFlashcard('cat-1', 'standard', subcategoryId),
+      { initialProps: { subcategoryId: null } },
+    )
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(supabase.rpc).toHaveBeenCalledTimes(1)
+
+    rerender({ subcategoryId: 'sub-1' })
+
+    expect(result.current.loading).toBe(true)
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(supabase.rpc).toHaveBeenCalledTimes(2)
+  })
 })

@@ -23,6 +23,8 @@ Client-side routing via `react-router-dom`, defined in `src/App.tsx`:
 | `/flashcards/:deckType/:categoryId/practice` | [FlashcardPage](./components/FlashcardPage.md) | Authenticated |
 | `/flashcards/:deckType/:categoryId/ten-cards` | [TenCardsPage](./components/TenCardsPage.md) | Authenticated |
 
+All three `/flashcards/...` routes also accept an optional `?subcategory=<id>` query param, carried through by [ModeSelectPage](./components/ModeSelectPage.md) when the category is a vocabulary category and a topic has been chosen via [SubCategoryChips](./components/SubCategoryChips.md); see the Flashcard game section below.
+
 Authenticated routes are also wrapped in [AppLayout](./components/AppLayout.md), which renders the persistent [NavBar](./components/NavBar.md).
 
 ## Auth
@@ -37,12 +39,14 @@ The client is typed against the live schema via a generated `Database` type (`sr
 
 ## Flashcard game
 
-The core feature: [HomePage](./components/HomePage.md) shows [SelectDeckCard](./components/SelectDeckCard.md), listing [categories](./db-schema/categories.md) as buttons. Clicking one navigates to [ModeSelectPage](./components/ModeSelectPage.md), which offers two game modes, both built on the same shared [FlashcardRound](./components/FlashcardRound.md) component for per-card gameplay (video + [WordGuessCombobox](./components/WordGuessCombobox.md) + reveal — [useWords](./hooks/useWords.md) supplies the full searchable word list to both):
+The core feature: [HomePage](./components/HomePage.md) shows [SelectDeckCard](./components/SelectDeckCard.md), listing [categories](./db-schema/categories.md) as buttons. Clicking one navigates to [ModeSelectPage](./components/ModeSelectPage.md). For a vocabulary category (`is_vocabulary = true`, via [useCategoryInfo](./hooks/useCategoryInfo.md)), it also renders [SubCategoryChips](./components/SubCategoryChips.md), letting the user narrow the category's word pool to one overlapping topic category before picking a mode; the choice travels onward as a `?subcategory=` query param rather than a route segment, since it's an optional filter on an already-selected deck, not a new identity. [ModeSelectPage](./components/ModeSelectPage.md) offers two game modes, both built on the same shared [FlashcardRound](./components/FlashcardRound.md) component for per-card gameplay (video + [WordGuessCombobox](./components/WordGuessCombobox.md) + reveal — [useWords](./hooks/useWords.md) supplies the full searchable word list to both):
 
 - **Practice** ([FlashcardPage](./components/FlashcardPage.md)): draws one random word at a time via [`get_random_word_for_category`](./rpc-functions/get_random_word_for_category.md) ([useRandomFlashcard](./hooks/useRandomFlashcard.md)), looping indefinitely with no score. Repeats are possible — a deliberate simplicity choice.
 - **10 Cards** ([TenCardsPage](./components/TenCardsPage.md)): fetches up to 10 *distinct* random words up front via [`get_random_words_for_category`](./rpc-functions/get_random_words_for_category.md) ([useTenCardsRound](./hooks/useTenCardsRound.md)), steps through them one at a time, and ends on a score screen.
 
 Both modes reveal correct/incorrect by comparing word **ids**, never text, since two different words can share text with different definitions — that comparison lives only in `FlashcardRound`.
+
+Subcategory narrowing is enforced at the same two RPCs, not as separate functions: both take an optional `subcategory_id uuid DEFAULT NULL`, which intersects the existing category-membership predicate with a second [`word_categories`](./db-schema/word_categories.md) membership check when set. [`get_available_subcategories_for_category`](./rpc-functions/get_available_subcategories_for_category.md) is what `SubCategoryChips` calls to list only the topic categories that actually overlap the current vocabulary category, so a choice that would produce zero words is never offered.
 
 The `categories → words → signs → sign_videos` relationship chain (see [db-schema/](./db-schema/README.md)) is: a category has many words (via [word_categories](./db-schema/word_categories.md)), a word has many sign variants ([signs](./db-schema/signs.md)), and a sign has many videos ([sign_videos](./db-schema/sign_videos.md)), at most one marked `is_primary` per sign. Videos live in the [`sign-videos`](./storage/sign-videos.md) Storage bucket.
 

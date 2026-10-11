@@ -38,9 +38,9 @@ function mockBackend({ rpcData = [FLASHCARD_ROW] }: { rpcData?: unknown[] } = {}
   } as never)
 }
 
-function renderPage() {
+function renderPage(initialEntry = '/flashcards/standard/cat-1/practice') {
   return render(
-    <MemoryRouter initialEntries={['/flashcards/standard/cat-1/practice']}>
+    <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path="/flashcards/:deckType/:categoryId/practice" element={<FlashcardPage />} />
       </Routes>
@@ -100,6 +100,19 @@ describe('FlashcardPage', () => {
 
     expect(await screen.findByRole('combobox')).toBeInTheDocument()
     expect(supabase.rpc).toHaveBeenCalledTimes(2)
+  })
+
+  it('forwards the subcategory query param to the RPC call', async () => {
+    mockBackend()
+
+    renderPage('/flashcards/standard/cat-1/practice?subcategory=sub-1')
+
+    await screen.findByRole('combobox')
+    expect(supabase.rpc).toHaveBeenCalledWith('get_random_word_for_category', {
+      category_id: 'cat-1',
+      is_custom: false,
+      subcategory_id: 'sub-1',
+    })
   })
 
   it('tracks a consecutive-correct streak in the score pill, resetting on a wrong guess', async () => {
