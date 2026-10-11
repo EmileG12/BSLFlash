@@ -1,5 +1,29 @@
 @reference "../index.css";
 
+.mode-select-masthead {
+  @apply flex flex-col gap-1.5;
+}
+
+.mode-select-masthead-kicker {
+  @apply flex items-center gap-1.5;
+}
+
+.mode-select-masthead-kicker-icon {
+  @apply shrink-0 text-brand;
+}
+
+.mode-select-masthead-kicker-text {
+  @apply text-base font-semibold text-foreground;
+}
+
+.mode-select-masthead-kicker-skeleton {
+  @apply h-6 w-24 rounded-md bg-muted;
+}
+
+.mode-select-masthead-title {
+  @apply font-heading text-3xl leading-tight font-semibold tracking-tight text-foreground md:text-4xl;
+}
+
 .mode-select-grid {
   @apply grid gap-3;
   grid-template-columns: repeat(auto-fit, minmax(200px, 240px));

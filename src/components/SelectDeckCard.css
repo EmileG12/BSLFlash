@@ -4,6 +4,14 @@
   @apply w-full max-w-4xl shadow-lg;
 }
 
+.selection-band {
+  background: linear-gradient(
+    150deg,
+    var(--background) 0%,
+    color-mix(in oklab, var(--brand) 30%, var(--background)) 150%
+  );
+}
+
 .select-deck-grid {
   @apply grid gap-3;
   grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));

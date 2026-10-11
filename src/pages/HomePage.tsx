@@ -3,7 +3,6 @@ import { GraduationCap, Search, Tags } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { SelectDeckCard } from '../components/SelectDeckCard'
-import './HomePage.css'
 
 export function HomePage() {
   const [search, setSearch] = useState('')
@@ -11,7 +10,7 @@ export function HomePage() {
   return (
     <div className="mx-auto flex max-w-4xl flex-col gap-4 p-4">
       <Card className="select-deck-card">
-        <CardHeader className="home-header-band -mt-(--card-spacing) border-b border-brand pt-(--card-spacing)">
+        <CardHeader className="selection-band -mt-(--card-spacing) border-b border-brand pt-(--card-spacing)">
           <CardTitle className="text-2xl">Pick a deck to practise</CardTitle>
           <CardDescription>
             SignStack teaches British Sign Language through short video flashcards. Pick an

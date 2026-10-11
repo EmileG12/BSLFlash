@@ -2,7 +2,7 @@
 name: docs-auditor
 description: Compares /docs against the current code and writes the corrections. Use when whole doc files need producing or several need updating. Requires a why-brief from the caller for any non-obvious design decision.
 tools: Read, Grep, Glob, Edit, Write
-model: sonnet
+model: haiku
 ---
 
 You bring `/docs` back in line with the code, and you write the corrections yourself.

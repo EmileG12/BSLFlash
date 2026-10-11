@@ -1,9 +1,0 @@
-@reference "../index.css";
-
-.home-header-band {
-  background: linear-gradient(
-    150deg,
-    var(--background) 0%,
-    color-mix(in oklab, var(--brand) 30%, var(--background)) 150%
-  );
-}
