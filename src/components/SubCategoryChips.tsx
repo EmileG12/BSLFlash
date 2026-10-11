@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { cn } from 'cn'
+import { cn } from '@/lib/utils'
 import { supabase } from '../lib/supabase'
 
 interface SubCategory {

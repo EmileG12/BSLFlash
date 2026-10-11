@@ -21,7 +21,7 @@ Selected chips use `CHIP_SELECTED_CLASS` (`bg-brand text-brand-contrast`). `--br
 
 While loading, shows 4 skeleton pills (`motion-safe:animate-pulse`, `aria-hidden="true"`) beside the always-present "All" chip, plus a `sr-only` "Loading topics…" announcement. On RPC failure, shows only "All" plus a muted note ("Topics unavailable — showing all signs") — an empty result (a category with no available subcategories) shows the same "All"-only chip row, but silently, with no note, since that's a valid state rather than a failure.
 
-**Depends on:** `cn` (class merging), `supabase` client, the [`get_available_subcategories_for_category`](../rpc-functions/get_available_subcategories_for_category.md) RPC.
+**Depends on:** `cn` (class merging, imported from `@/lib/utils` — the convention every hand-written component follows, as opposed to importing directly from the `cn` package, which only the generated shadcn primitives under `src/components/ui/` do), `supabase` client, the [`get_available_subcategories_for_category`](../rpc-functions/get_available_subcategories_for_category.md) RPC.
 
 **Used by:** [ModeSelectPage](./ModeSelectPage.md).
 
