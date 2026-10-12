@@ -20,6 +20,9 @@ __pycache__/
 *.pyc
 .coverage
 
+# Playwright MCP runtime output (logs, snapshots, screenshots)
+.playwright-mcp/
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
