@@ -60,6 +60,11 @@
   @apply cursor-pointer rounded-none first:rounded-t-lg last:rounded-b-lg;
 }
 
+.admin-menu-content [data-slot='dropdown-menu-separator'] {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
 .admin-menu-item:focus {
   background: color-mix(in oklab, var(--admin) 12%, var(--popover));
   color: var(--admin);
