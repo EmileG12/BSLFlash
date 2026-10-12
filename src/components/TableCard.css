@@ -1,0 +1,9 @@
+@reference "../index.css";
+
+.admin-toolbar {
+  background: linear-gradient(
+    100deg,
+    var(--background) 0%,
+    color-mix(in oklab, var(--admin) 12%, var(--background)) 100%
+  );
+}

@@ -9,7 +9,7 @@
 - **The steps are not one transaction.** Each insert is a separate client request, so a failure partway through (for example the upload) leaves the earlier rows in place. The form shows the error, and the admin has to finish or clean up by hand. This is how the page is written, not a deliberate trade-off.
 - **Admin is insert-only on content.** The page never edits or deletes a word, sign or video. Its one removal is on `word_categories`, to untag a category from a word. Those permissions come from the `*_admin_or_superadmin` policies (see [words](../rls-policies/words/README.md), [word_categories](../rls-policies/word_categories/README.md)).
 - **Category editing** uses a per-row expandable [TagPicker](./TagPicker.md). The first expand loads that word's current links; each toggle then inserts or deletes one `word_categories` row immediately, without a save button.
-- **Word list** is the shared [`useWords`](../hooks/useWords.md) result, filtered client-side by a case-insensitive substring match on the word.
+- **Word list** is the shared [`useWords`](../hooks/useWords.md) result, filtered client-side by a case-insensitive substring match on the word. The search `Input` carries an explicit `bg-card dark:bg-card` so it reads as a solid control against the toolbar's gradient background — see [TableCard](./TableCard.md).
 
 **Depends on:** [TagPicker](./TagPicker.md), [useWords](../hooks/useWords.md), [signVideoUpload](../utils/signVideoUpload.md), [TableCard](./TableCard.md), `Card`/`Input`/`Textarea`/`Table`/`Button` from `src/components/ui/`.
 

@@ -22,7 +22,7 @@ export function SuperadminWordsPage() {
             placeholder="Search words"
             value={search}
             onChange={(event) => setSearch(event.target.value)}
-            className="w-full sm:max-w-xs"
+            className="w-full bg-card sm:max-w-xs dark:bg-card"
           />
         }
       >
