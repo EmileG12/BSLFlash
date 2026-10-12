@@ -22,10 +22,22 @@ Client-side routing via `react-router-dom`, defined in `src/App.tsx`:
 | `/flashcards/:deckType/:categoryId` | [ModeSelectPage](./components/ModeSelectPage.md) | Authenticated |
 | `/flashcards/:deckType/:categoryId/practice` | [FlashcardPage](./components/FlashcardPage.md) | Authenticated |
 | `/flashcards/:deckType/:categoryId/ten-cards` | [TenCardsPage](./components/TenCardsPage.md) | Authenticated |
+| `/admin` | [AdminPage](./components/AdminPage.md) | Admin or superadmin ([AdminRoute](./components/AdminRoute.md)) |
+| `/superadmin/categories` | [SuperadminCategoriesPage](./components/SuperadminCategoriesPage.md) | Superadmin only ([SuperadminRoute](./components/SuperadminRoute.md)) |
+| `/superadmin/words` | [SuperadminWordsPage](./components/SuperadminWordsPage.md) | Superadmin only |
+| `/superadmin/words/:wordId` | [SuperadminWordEditPage](./components/SuperadminWordEditPage.md) | Superadmin only |
+| `/superadmin/roles` | [SuperadminRolesPage](./components/SuperadminRolesPage.md) | Superadmin only |
+| `/superadmin/accounts` | [SuperadminAccountsPage](./components/SuperadminAccountsPage.md) | Superadmin only |
 
 All three `/flashcards/...` routes also accept an optional `?subcategory=<id>` query param, carried through by [ModeSelectPage](./components/ModeSelectPage.md) when the category is a vocabulary category and a topic has been chosen via [SubCategoryChips](./components/SubCategoryChips.md); see the Flashcard game section below.
 
 Authenticated routes are also wrapped in [AppLayout](./components/AppLayout.md), which renders the persistent [NavBar](./components/NavBar.md).
+
+## Roles and admin area
+
+Three roles exist in [`roles`](./db-schema/roles.md)/[`user_roles`](./db-schema/user_roles.md): `user` (granted automatically on signup by [`handle_new_user`](./rpc-functions/handle_new_user.md)), `admin`, and `superadmin`. `admin` is a separate role in the data, not a subset of `superadmin` — [`is_admin()`](./rpc-functions/is_admin.md) does not return true for a superadmin, so every "admin or superadmin" check (route guards, RLS policies) composes both checks explicitly. [useUserRoles](./hooks/useUserRoles.md) resolves both flags client-side for routing and nav; the database re-checks independently inside each RPC and RLS policy, since the client-side check is for UX only, not the security boundary.
+
+An `admin` can add new words (with a first sign variant and video) and tag existing words into existing categories, via [AdminPage](./components/AdminPage.md) — nothing else. A `superadmin` additionally manages categories ([SuperadminCategoriesPage](./components/SuperadminCategoriesPage.md)), edits words and their full set of sign variants/videos ([SuperadminWordsPage](./components/SuperadminWordsPage.md), [SuperadminWordEditPage](./components/SuperadminWordEditPage.md)), grants/revokes roles ([SuperadminRolesPage](./components/SuperadminRolesPage.md)), and bans/unbans accounts ([SuperadminAccountsPage](./components/SuperadminAccountsPage.md)). [NavBar](./components/NavBar.md)'s Admin entry renders a single link for an admin and a dropdown over all five destinations for a superadmin.
 
 ## Auth
 

@@ -18,7 +18,7 @@ A `categories` row can also exist purely as a tag for public custom decks, via [
 | `id` | `uuid` | No | `gen_random_uuid()` | Primary key. |
 | `category_name` | `text` | No | — | Unique, case-sensitive category name. |
 | `is_vocabulary` | `boolean` | No | `false` | `true` for educational vocabulary-requirement categories (e.g. GCSE); `false` for ordinary topic categories. |
-| `is_active` | `boolean` | No | `true` | Soft-disable flag, toggled by superadmin on the Categories page. Stored only: no browsing query or RPC reads it yet (see below). Existing rows default to `true`. |
+| `is_active` | `boolean` | No | `true` | Soft-disable flag, toggled by superadmin on the Categories page. Excludes the category from browsing (see below). Existing rows default to `true`. |
 
 ## Constraints & indexes
 
@@ -29,7 +29,7 @@ A `categories` row can also exist purely as a tag for public custom decks, via [
 
 RLS is enabled. See [rls-policies/categories/](../rls-policies/categories/README.md): any authenticated user can read all rows; only `superadmin` can insert/update/delete. Admins have no write access to `categories` — they can only tag words into existing categories via [`word_categories`](./word_categories.md).
 
-`is_active` is intended to hide a category from browsing without deleting it or its `word_categories` links, and to leave the words themselves visible. No reader currently applies that filter: [`useCategories`](../hooks/useCategories.md), [`useAllCategories`](../hooks/useAllCategories.md), [`get_categories_with_words`](../rpc-functions/get_categories_with_words.md) and the random-word RPCs do not reference the column. The superadmin Categories page reads every row, disabled ones included, via [`useManagedCategories`](../hooks/useManagedCategories.md).
+`is_active` hides a category from browsing without deleting it or its `word_categories` links, and leaves the words themselves visible. [`get_categories_with_words`](../rpc-functions/get_categories_with_words.md) (used by [`useCategories`](../hooks/useCategories.md)) and [`get_available_subcategories_for_category`](../rpc-functions/get_available_subcategories_for_category.md) both filter on `is_active`. Deliberately not filtered: direct single-category lookups ([`useCategoryInfo`](../hooks/useCategoryInfo.md)) and the full-categories list used for deck/word tagging ([`useAllCategories`](../hooks/useAllCategories.md), the `get_public_decks` `custom_deck_tags` flow) — disabling only hides a category from browsing, it doesn't revoke an in-progress session or stop it being tagged. The superadmin Categories page reads every row, disabled ones included, via [`useManagedCategories`](../hooks/useManagedCategories.md).
 
 ## Current DDL
 

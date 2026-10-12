@@ -11,7 +11,7 @@
 - **Errors** from row updates (rename and toggles) share one message on the page. Create errors show in the create card.
 - Admins have no access to this page: `categories` has no admin write policy.
 
-`is_active` is stored and toggled here, but no browsing query reads it yet. See [categories](../db-schema/categories.md).
+`is_active` is toggled here and excludes the category from the standard deck-selection menus and subcategory chips (not from tagging or single-category lookups). See [categories](../db-schema/categories.md).
 
 **Depends on:** [useManagedCategories](../hooks/useManagedCategories.md), [supabase-client](../utils/supabase-client.md), [TableCard](./TableCard.md), `Card`/`Input`/`Switch`/`Badge`/`Table`/`Button` from `src/components/ui/`.
 
