@@ -1,7 +1,7 @@
 # custom_decks
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011162526_add_is_public_to_custom_decks.sql`](../../supabase/migrations/20261011162526_add_is_public_to_custom_decks.sql)
+**Last touched by migration:** [`20261012105608_rename_custom_category_constraints_to_custom_deck.sql`](../../supabase/migrations/20261012105608_rename_custom_category_constraints_to_custom_deck.sql)
 
 **Purpose:** User-created decks assembled from [`words`](./words.md) — the "custom decks" counterpart to [`categories`](./categories.md), but owned by the user who built it rather than superadmin-curated reference data. These never appear in the standard category menus ([CategoryMenu](../components/CategoryMenu.md), [SelectDeckCard](../components/SelectDeckCard.md)'s standard listing), since those only query `categories`; a user's own decks are listed by [MyDecksPage](../components/MyDecksPage.md) via [useCustomDecks](../hooks/useCustomDecks.md).
 
@@ -25,15 +25,13 @@
 - `FOREIGN KEY (user_id) REFERENCES auth.users(id) ON DELETE CASCADE`
 - `INDEX (user_id)` — supports the owner-scoped lookup every RLS policy and `useCustomDecks` query makes.
 
-Constraint names keep the `custom_categories_` prefix: renaming a table does not rename its constraints, and the rename migration does not rename them.
+Constraint names match the table (`custom_decks_pkey`, `custom_decks_user_id_fkey`) — a follow-up migration renamed them after the original table rename left them on the old `custom_categories_` prefix.
 
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/custom_decks/](../rls-policies/custom_decks/README.md). Owners get full read/write on their own rows (`user_id = auth.uid()`). Any authenticated user can additionally read rows where `is_public` is `true`; these are OR-ed with the owner policy, so a deck is readable if either holds. There is no superadmin override, unlike `categories`' "everyone reads, only superadmin writes" shape.
 
 ## Current DDL
-
-*Reconstructed from the migrations listed above, not from a live `npx supabase db dump --local --schema public`. Verify against a live dump before relying on it.*
 
 ```sql
 CREATE TABLE IF NOT EXISTS "public"."custom_decks" (
@@ -47,12 +45,12 @@ CREATE TABLE IF NOT EXISTS "public"."custom_decks" (
 COMMENT ON TABLE "public"."custom_decks" IS 'User-created decks assembled from public.words. user_id is the owner -- these never appear in the standard category menus (those only query public.categories).';
 
 ALTER TABLE ONLY "public"."custom_decks"
-    ADD CONSTRAINT "custom_categories_pkey" PRIMARY KEY ("id");
+    ADD CONSTRAINT "custom_decks_pkey" PRIMARY KEY ("id");
 
 CREATE INDEX "custom_decks_user_id_idx" ON "public"."custom_decks" USING "btree" ("user_id");
 
 ALTER TABLE ONLY "public"."custom_decks"
-    ADD CONSTRAINT "custom_categories_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
+    ADD CONSTRAINT "custom_decks_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "auth"."users"("id") ON DELETE CASCADE;
 
 ALTER TABLE "public"."custom_decks" ENABLE ROW LEVEL SECURITY;
 ```

@@ -100,14 +100,14 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "custom_category_words_custom_category_id_fkey"
+            foreignKeyName: "custom_deck_words_custom_deck_id_fkey"
             columns: ["custom_deck_id"]
             isOneToOne: false
             referencedRelation: "custom_decks"
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "custom_category_words_word_id_fkey"
+            foreignKeyName: "custom_deck_words_word_id_fkey"
             columns: ["word_id"]
             isOneToOne: false
             referencedRelation: "words"
