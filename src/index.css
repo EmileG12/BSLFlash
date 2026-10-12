@@ -202,7 +202,7 @@ code {
   --brand: oklch(0.75 0.16 75);
   --brand-foreground: oklch(0.871 0.148 86.4);
   --brand-strong: oklch(0.81 0.154 80.7);
-  --brand-muted: oklch(0.98 0.025 89);
+  --brand-muted: oklch(0.26 0.04 75);
   --brand-contrast: oklch(1 0 0);
   --ring-on-brand: var(--foreground);
   --background: oklch(0.145 0 0);
