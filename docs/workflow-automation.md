@@ -1,6 +1,6 @@
 # Workflow automation
 
-Why this project enforces its own workflow with hooks, why it uses only two subagents, and which ideas were rejected. A decision record — the alternatives matter as much as the choice, because each was rejected for a reason that still applies.
+Why this project enforces its own workflow with hooks, why it uses only three subagents, and which ideas were rejected. A decision record — the alternatives matter as much as the choice, because each was rejected for a reason that still applies.
 
 ## The problem
 
@@ -29,11 +29,14 @@ Three principles follow:
 | | Trigger | Does | Cost |
 |---|---|---|---|
 | Pre-action | `PreToolUse` on Bash (`.claude/hooks/require-test-redirect.mjs`) | Denies an unredirected test run, handing over the corrected command | only when triggered |
-| Boundary | `.githooks/pre-commit` | Runs the docs mapping check, lint, and `--changed`; **blocks** | once per commit |
+| Pre-action | `PreToolUse` on Bash, `agent_type === 'ui-designer'` only (`.claude/hooks/block-ui-designer-writes.mjs`) | Denies any Bash command that would write a file by another means (redirects, `sed -i`, `cp`/`mv`/`tee`/`rm`, or a write-capable script flag) | only when triggered |
+| Pre-action | `PreToolUse` on Skill (`.claude/hooks/block-vendored-design-skills.mjs`) | Denies the main session (or any non-`ui-designer` agent) invoking a vendored design-intelligence skill directly, routing it through `build-ui` instead | only when triggered |
+| Boundary | `.githooks/pre-commit` | Runs the docs mapping check (`.claude/hooks/check-docs.mjs`), lint, and `--changed`; **blocks** | once per commit |
 
-One detail worth knowing:
+Two wiring mechanisms are in play here, each for a different tool:
 
-- **`core.hooksPath=.githooks`.** By default git looks for hooks in `.git/hooks/`, which it never tracks — so a hook there can't be reviewed, shared, or survive a clone. `core.hooksPath` (git 2.9+) overrides that location, letting the hook scripts live in a tracked directory. Note it is an **override, not an addition**: once set, `.git/hooks/` is ignored entirely, with no warning that a hook placed there will never run. The config itself lives in `.git/config`, which is *still* not tracked — deliberately, since a repo that could configure itself to execute scripts on clone would make `git clone` remote code execution. So the pointer needs a local opt-in: `npm run setup-hooks` (just `git config core.hooksPath .githooks`), run automatically by `postinstall`. This is the same mechanism Husky uses, which is why Husky isn't a dependency here — the only part needed is the one-line config.
+- **`.claude/settings.json` for Claude Code's own tools.** The three `PreToolUse` hooks above are registered in `.claude/settings.json` under a `matcher` (`Bash` or `Skill`) — the harness calls them before the matched tool runs and reads a JSON `permissionDecision` back on stdout. This file is tracked, so the wiring survives a clone with no separate opt-in step (unlike the git mechanism below).
+- **`core.hooksPath=.githooks` for git itself.** By default git looks for hooks in `.git/hooks/`, which it never tracks — so a hook there can't be reviewed, shared, or survive a clone. `core.hooksPath` (git 2.9+) overrides that location, letting the hook scripts live in a tracked directory. Note it is an **override, not an addition**: once set, `.git/hooks/` is ignored entirely, with no warning that a hook placed there will never run. The config itself lives in `.git/config`, which is *still* not tracked — deliberately, since a repo that could configure itself to execute scripts on clone would make `git clone` remote code execution. So the pointer needs a local opt-in: `npm run setup-hooks` (just `git config core.hooksPath .githooks`), run automatically by `postinstall`. This is the same mechanism Husky uses, which is why Husky isn't a dependency here — the only part needed is the one-line config.
 
 ## Removed: the per-turn `Stop` hook
 
@@ -50,7 +53,7 @@ Deleted instead. `.githooks/pre-commit` was never affected by this bug — it bl
 
 ## Verifying the enforcement: `npm run test-hooks`
 
-The hooks are deterministic scripts, so they don't need a behavioural test — they need a **wiring** test, because every way they break is silent. `scripts/test-hooks.mjs` asserts observable behaviour (not config values) across 16 checks: that `core.hooksPath` is set and points somewhere real, that the docs gate rejects a staged source file with no matching doc and names the right one, that `src/pages/*` maps into `docs/components/` and not a `docs/pages/`, that vendored `src/components/ui/**` and test files are exempt, that the test-output gate denies an unredirected run and hands over a usable replacement, and that it leaves the working tree exactly as it found it.
+The hooks are deterministic scripts, so they don't need a behavioural test — they need a **wiring** test, because every way they break is silent. `scripts/test-hooks.mjs` asserts observable behaviour (not config values) across 26 checks: that `core.hooksPath` is set and points somewhere real, that the docs gate rejects a staged source file with no matching doc and names the right one, that `src/pages/*` maps into `docs/components/` and not a `docs/pages/`, that vendored `src/components/ui/**` and test files are exempt, that the test-output gate denies an unredirected run and hands over a usable replacement, and that it leaves the working tree exactly as it found it.
 
 Proven to fail when it should: unsetting `core.hooksPath` makes it exit 1 with the recovery command in the message, and `npm run setup-hooks` restores a clean run.
 
@@ -78,14 +81,15 @@ Designed, then rejected. It would have run the suite and reported failures dedup
 
 **Fixing is never delegated**, and that is a correctness argument, not just a cost one. Deciding *regression vs. stale assertion* (see [reading-test-output.md](./tests/reading-test-output.md)) requires knowing what the change intended — which lives only in the conversation. A cold agent sees "component changed, tests fail" and may restore the old markup, silently reverting a deliberate redesign.
 
-## The two agents that survived
+## The three agents that survived
 
 Chosen on one criterion: does the task *benefit* from a cold start or output isolation, or suffer from it?
 
 - **`diff-reviewer`** — read-only. Cold start is a feature: an agent that has not seen the author's reasoning gives an independent read instead of rubber-stamping. Its false positives are the accepted price.
 - **`docs-auditor`** — write-capable, the one exception. Doc prose is output-heavy, so generating it in a subagent is a real saving, and it is safe *because the decision content arrives with the task* (a why-brief from the caller) rather than being derived by the agent.
+- **`ui-designer`** — read-only (`tools: Read, Grep, Glob, Bash, Skill, mcp__playwright`), invoked by the `build-ui` skill. A visual-design decision (color, spacing, layout, icon, component structure) benefits from the same cold-start independence as `diff-reviewer`, but the risk is different: the agent still holds `Bash` and `Skill`, either of which could write a file by another route even without `Edit`/`Write` (a shell redirect, `sed -i`, or a vendored design skill's own `--persist`/write flags). The `tools:` frontmatter alone doesn't close that gap, so it's backed by the two hooks in the table above — `block-ui-designer-writes.mjs` and `block-vendored-design-skills.mjs` — rather than relying on the agent's own restraint. It decides and reports a spec; `build-ui` does the actual implementation.
 
-The line: **read-only when the agent's output is a decision; write-capable when it is prose expansion of intent the caller supplies.** Enforced structurally via `tools:` frontmatter, not by instruction.
+The line: **read-only when the agent's output is a decision; write-capable when it is prose expansion of intent the caller supplies.** Enforced structurally via `tools:` frontmatter — and, where a decision-only agent still keeps a tool general enough to write through a side door, by a `PreToolUse` hook closing that door — not by instruction.
 
 And the rule that generalizes all of it: **delegate decided work, never the decision.**
 
