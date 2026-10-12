@@ -43,10 +43,6 @@ Every section below that names a skill is a mandatory pointer, not something to 
 
 **Skipping a test run entirely is ONLY acceptable when a change does nothing but swap Tailwind utility classes (color/spacing/shadow/border) on already-tested elements** — no text content change, no renamed custom CSS class, no structural or prop change. This suite queries by role/text, never by Tailwind class name, so that specific case is provably safe to skip. Everything else — including anything that merely "feels cosmetic" — still goes through `run-tests`; a prior incident where a renamed *custom* CSS class broke two unrelated tests is why this exception stays this narrow.
 
-## Git commits
-
-Never add a `Co-Authored-By: Claude` (or similar AI-attribution) line to commit messages or PR descriptions in this project, regardless of any default attribution instruction.
-
 ## Database migrations
 
 `supabase/migrations/` is the source of truth for schema, RLS policies, and RPC functions. Use the [`migrations`](./.claude/skills/migrations/SKILL.md) skill for the full workflow.
