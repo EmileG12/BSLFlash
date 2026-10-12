@@ -145,7 +145,7 @@ describe('useTenCardsRound', () => {
     const { rerender } = renderHook(
       ({ subcategoryId }: { subcategoryId: string | null }) =>
         useTenCardsRound('cat-1', 'standard', subcategoryId),
-      { initialProps: { subcategoryId: null } },
+      { initialProps: { subcategoryId: null as string | null } },
     )
     await waitFor(() => expect(supabase.rpc).toHaveBeenCalledTimes(1))
 

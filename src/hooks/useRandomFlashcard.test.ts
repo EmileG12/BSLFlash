@@ -147,7 +147,7 @@ describe('useRandomFlashcard', () => {
     const { result, rerender } = renderHook(
       ({ subcategoryId }: { subcategoryId: string | null }) =>
         useRandomFlashcard('cat-1', 'standard', subcategoryId),
-      { initialProps: { subcategoryId: null } },
+      { initialProps: { subcategoryId: null as string | null } },
     )
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(supabase.rpc).toHaveBeenCalledTimes(1)
