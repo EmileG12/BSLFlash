@@ -77,28 +77,38 @@ describe('EditDeckModal', () => {
     render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
 
     expect(await screen.findByDisplayValue('My Animals')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Unpublished' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Published' })).not.toBeChecked()
     expect(await screen.findByRole('button', { name: 'GCSE' })).toHaveAttribute('aria-pressed', 'true')
     expect(await screen.findByText('Hello')).toBeInTheDocument()
   })
 
-  it('toggles publish immediately via set_custom_deck_public', async () => {
+  it('does not call any RPC when the publish checkbox is toggled -- it only persists on Save', async () => {
     mockBackend()
     const user = userEvent.setup()
 
     render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
     await screen.findByDisplayValue('My Animals')
 
-    await user.click(screen.getByRole('button', { name: 'Unpublished' }))
+    await user.click(screen.getByRole('checkbox', { name: 'Published' }))
 
-    expect(supabase.rpc).toHaveBeenCalledWith('set_custom_deck_public', {
-      p_deck_id: 'deck-1',
-      p_is_public: true,
-    })
-    expect(await screen.findByRole('button', { name: 'Published' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: 'Published' })).toBeChecked()
+    expect(supabase.rpc).not.toHaveBeenCalled()
   })
 
-  it('saves the rename and word list, then calls onSaved and onClose', async () => {
+  it('disables the publish checkbox once the last word is removed, with a hint', async () => {
+    mockBackend()
+    const user = userEvent.setup()
+
+    render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
+    await screen.findByDisplayValue('My Animals')
+
+    await user.click(await screen.findByRole('button', { name: /remove hello/i }))
+
+    expect(screen.getByRole('checkbox', { name: 'Published' })).toBeDisabled()
+    expect(screen.getByText('Add at least one word to publish this deck.')).toBeInTheDocument()
+  })
+
+  it('saves the rename, word list, and publish state together, then calls onSaved and onClose', async () => {
     mockBackend()
     const onSaved = vi.fn()
     const onClose = vi.fn()
@@ -111,6 +121,7 @@ describe('EditDeckModal', () => {
     await user.clear(nameInput)
     await user.type(nameInput, 'My Pets')
 
+    await user.click(screen.getByRole('checkbox', { name: 'Published' }))
     await user.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() =>
@@ -118,6 +129,7 @@ describe('EditDeckModal', () => {
         p_deck_id: 'deck-1',
         p_name: 'My Pets',
         p_word_ids: ['word-1'],
+        p_is_public: true,
       }),
     )
     expect(onSaved).toHaveBeenCalledWith('deck-1', 'My Pets')

@@ -15,19 +15,21 @@
 
 **Key behavior:**
 
-- **Publish toggle.** The Published/Unpublished button calls [`set_custom_deck_public`](../rpc-functions/set_custom_deck_public.md) immediately on click. It is not part of Save. The button is disabled while the call is in flight. The displayed state changes only after the call succeeds, and a failure shows its message under the toggle.
+- **Publish control.** A `Checkbox` and `Label` pair titled "Published", bound to a local `isPublic` draft seeded from `detail.isPublic`. Clicking it changes only that draft and makes no network call. The value is persisted only by Save, as `p_is_public` on [`update_custom_deck`](../rpc-functions/update_custom_deck.md). A line of helper text under the label describes the current choice: it says anyone can find and play the deck when published, and that only the owner can when not.
+- **Empty word list.** The checkbox is disabled whenever no words are selected, and its helper text reads "Add at least one word to publish this deck." The checkbox is disabled rather than validated on Save, so an empty deck is rejected client-side without a server round-trip. Save is also disabled in this state.
+- **Why publish is saved with the rest.** Publish is not a separate call. An earlier version fired a publish RPC on click, which checked the empty-deck rule against the persisted word list only. Edits made in the same session were therefore not seen, and the outcome depended on click order. One save now sends the name, the word list, and the publish flag together.
 - **Save.** Enabled only when the trimmed name is non-empty, at least one word is selected, and no save is in flight. Save runs these steps in order:
-  1. [`update_custom_deck`](../rpc-functions/update_custom_deck.md) with the trimmed name and the full selected word list. This is a full replace.
+  1. [`update_custom_deck`](../rpc-functions/update_custom_deck.md) with the trimmed name, the full selected word list (a full replace), and `p_is_public` set to the draft publish flag.
   2. If any tag was removed from the original `detail.tagIds`, a `custom_deck_tags` delete for those category ids.
   3. If any tag was added, a `custom_deck_tags` insert for those category ids.
 
   Steps 2 and 3 are skipped when their list is empty. Tags are written with direct table calls, not an RPC, and rely on the owner-gated [`custom_deck_tags_delete_own`](../rls-policies/custom_deck_tags/custom_deck_tags_delete_own.md) and [`custom_deck_tags_insert_own`](../rls-policies/custom_deck_tags/custom_deck_tags_insert_own.md) policies. On success it calls `onSaved(deckId, trimmedName)`, then `onClose()`.
 - **Diff baseline.** The tag diff compares against `detail.tagIds` as loaded when the modal opened. The modal does not refetch between attempts, so a retried Save recomputes the diff against that same baseline.
-- **Partial failure.** Steps 1, 2, and 3 are separate requests, not one transaction. If step 1 succeeds and a later step fails, the rename and word list are already saved, the modal stays open with the error, and `onSaved` is not called. The caller's list therefore keeps the old name until it refetches.
+- **Partial failure.** Steps 1, 2, and 3 are separate requests, not one transaction. If step 1 succeeds and a later step fails, the rename, word list, and publish flag are already saved, the modal stays open with the error, and `onSaved` is not called. The caller's list therefore keeps the old name until it refetches.
 - **Word list.** [WordPicker](./WordPicker.md) is fed by [useWords](../hooks/useWords.md), which is fetched inside `EditDeckForm`, so the word catalog loads after the deck detail has loaded.
 - **Tags.** [TagPicker](./TagPicker.md) toggles ids in `selectedTagIds`.
 
-**Depends on:** [useCustomDeckDetail](../hooks/useCustomDeckDetail.md), [useWords](../hooks/useWords.md), [WordPicker](./WordPicker.md), [TagPicker](./TagPicker.md), [`set_custom_deck_public`](../rpc-functions/set_custom_deck_public.md), [`update_custom_deck`](../rpc-functions/update_custom_deck.md), the [`custom_deck_tags`](../db-schema/custom_deck_tags.md) table, `Dialog`/`Button`/`Input` from `src/components/ui/`, the `supabase` client.
+**Depends on:** [useCustomDeckDetail](../hooks/useCustomDeckDetail.md), [useWords](../hooks/useWords.md), [WordPicker](./WordPicker.md), [TagPicker](./TagPicker.md), [`update_custom_deck`](../rpc-functions/update_custom_deck.md), the [`custom_deck_tags`](../db-schema/custom_deck_tags.md) table, `Dialog`/`Button`/`Input`/`Checkbox`/`Label` from `src/components/ui/`, the `supabase` client.
 
 **Used by:** [MyDecksPage](./MyDecksPage.md).
 

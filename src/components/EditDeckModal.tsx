@@ -9,6 +9,9 @@ import {
 } from '@/components/ui/dialog'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
+import { Checkbox } from '@/components/ui/checkbox'
+import { Label } from '@/components/ui/label'
+import { cn } from 'cn'
 import { useWords } from '../hooks/useWords'
 import { useCustomDeckDetail, type CustomDeckDetail } from '../hooks/useCustomDeckDetail'
 import { WordPicker } from './WordPicker'
@@ -37,8 +40,6 @@ function EditDeckForm({ deckId, detail, onClose, onSaved }: EditDeckFormProps) {
   const [selectedWordIds, setSelectedWordIds] = useState<string[]>(detail.wordIds)
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>(detail.tagIds)
   const [isPublic, setIsPublic] = useState(detail.isPublic)
-  const [publishError, setPublishError] = useState<string | null>(null)
-  const [publishing, setPublishing] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saveError, setSaveError] = useState<string | null>(null)
 
@@ -56,22 +57,6 @@ function EditDeckForm({ deckId, detail, onClose, onSaved }: EditDeckFormProps) {
     )
   }
 
-  async function handleTogglePublish() {
-    const next = !isPublic
-    setPublishing(true)
-    setPublishError(null)
-    const { error } = await supabase.rpc('set_custom_deck_public', {
-      p_deck_id: deckId,
-      p_is_public: next,
-    })
-    setPublishing(false)
-    if (error) {
-      setPublishError(error.message)
-      return
-    }
-    setIsPublic(next)
-  }
-
   async function handleSave() {
     if (deckName.trim() === '' || selectedWordIds.length === 0) return
     setSaving(true)
@@ -81,6 +66,7 @@ function EditDeckForm({ deckId, detail, onClose, onSaved }: EditDeckFormProps) {
       p_deck_id: deckId,
       p_name: deckName.trim(),
       p_word_ids: selectedWordIds,
+      p_is_public: isPublic,
     })
     if (updateError) {
       setSaving(false)
@@ -132,27 +118,33 @@ function EditDeckForm({ deckId, detail, onClose, onSaved }: EditDeckFormProps) {
           aria-label="Deck name"
         />
 
-        <div className="flex items-center justify-between gap-2 rounded-lg border border-border p-3">
-          <div>
-            <p className="text-sm font-medium text-foreground">Published</p>
+        <div className="flex items-start gap-3 rounded-lg border border-border p-3">
+          <Checkbox
+            id="deck-published"
+            checked={isPublic}
+            onCheckedChange={(checked) => setIsPublic(checked === true)}
+            disabled={selectedWordIds.length === 0}
+            className="mt-0.5"
+          />
+          <div className="grid gap-1">
+            <Label
+              htmlFor="deck-published"
+              className={cn(
+                'text-sm font-medium text-foreground',
+                selectedWordIds.length === 0 && 'text-muted-foreground',
+              )}
+            >
+              Published
+            </Label>
             <p className="text-xs text-muted-foreground">
-              {isPublic
-                ? 'Anyone can find and play this deck in Browse decks.'
-                : 'Only you can see and play this deck.'}
+              {selectedWordIds.length === 0
+                ? 'Add at least one word to publish this deck.'
+                : isPublic
+                  ? 'Anyone can find and play this deck in Browse decks.'
+                  : 'Only you can see and play this deck.'}
             </p>
           </div>
-          <Button
-            type="button"
-            variant={isPublic ? 'default' : 'outline'}
-            size="sm"
-            aria-pressed={isPublic}
-            disabled={publishing}
-            onClick={handleTogglePublish}
-          >
-            {isPublic ? 'Published' : 'Unpublished'}
-          </Button>
         </div>
-        {publishError && <p className="text-sm text-destructive">{publishError}</p>}
 
         <TagPicker selectedIds={selectedTagIds} onToggle={handleToggleTag} />
 

@@ -478,14 +478,15 @@ export type Database = {
         Args: { p_role_name: string; p_user_id: string }
         Returns: undefined
       }
-      set_custom_deck_public: {
-        Args: { p_deck_id: string; p_is_public: boolean }
-        Returns: undefined
-      }
       set_primary_sign: { Args: { p_sign_id: string }; Returns: undefined }
       unban_user: { Args: { p_user_id: string }; Returns: undefined }
       update_custom_deck: {
-        Args: { p_deck_id: string; p_name: string; p_word_ids: string[] }
+        Args: {
+          p_deck_id: string
+          p_is_public: boolean
+          p_name: string
+          p_word_ids: string[]
+        }
         Returns: undefined
       }
     }

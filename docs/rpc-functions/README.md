@@ -21,7 +21,6 @@ Postgres functions exposed via Supabase RPC, one doc file per function.
 | [get_public_decks](./get_public_decks.md) | `get_public_decks(p_search text DEFAULT NULL, p_tag_ids uuid[] DEFAULT NULL, p_sort text DEFAULT 'likes') RETURNS TABLE(...)` | Lists published custom decks with owner, tags, like count, and the caller's like/save state, filtered by name and tags (AND), sorted by likes, newest or name. |
 | [get_saved_decks](./get_saved_decks.md) | `get_saved_decks() RETURNS TABLE(id uuid, deck_name text, owner_user_id uuid, owner_name text)` | Lists the caller's saved decks joined to their current `custom_decks` row; a deck the owner has unpublished is omitted, and reappears on republish. |
 | [create_custom_deck](./create_custom_deck.md) | `create_custom_deck(p_name text, p_word_ids uuid[]) RETURNS uuid` | Creates a custom deck (header row + word links) owned by the calling user, atomically. |
-| [set_custom_deck_public](./set_custom_deck_public.md) | `set_custom_deck_public(p_deck_id uuid, p_is_public boolean) RETURNS void` | Publishes or unpublishes a custom deck owned by the caller. Refuses to publish a deck with no words. |
-| [update_custom_deck](./update_custom_deck.md) | `update_custom_deck(p_deck_id uuid, p_name text, p_word_ids uuid[]) RETURNS void` | Renames a custom deck and replaces its word list in one transaction. Owner-only via RLS. |
+| [update_custom_deck](./update_custom_deck.md) | `update_custom_deck(p_deck_id uuid, p_name text, p_word_ids uuid[], p_is_public boolean) RETURNS void` | Renames a custom deck, replaces its word list, and sets its publish flag in one transaction. Refuses an empty word list. Owner-only via RLS. |
 
 See the `migrations` skill for the workflow.

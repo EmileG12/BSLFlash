@@ -3,7 +3,7 @@
 **Table:** [custom_decks](../../db-schema/custom_decks.md)
 **Command:** UPDATE · **Role:** authenticated
 
-**Purpose:** A user can only update their own custom decks, and can't reassign one to a different owner (`USING` and `WITH CHECK` both pin `user_id = auth.uid()`). This is also the policy that gates [`set_custom_deck_public`](../../rpc-functions/set_custom_deck_public.md) — that RPC runs as the caller and has no `SECURITY DEFINER`, so a non-owner's publish attempt updates zero rows. It also gates the rename in [`update_custom_deck`](../../rpc-functions/update_custom_deck.md).
+**Purpose:** A user can only update their own custom decks, and can't reassign one to a different owner (`USING` and `WITH CHECK` both pin `user_id = auth.uid()`). This is also the policy that gates the rename and the `is_public` change in [`update_custom_deck`](../../rpc-functions/update_custom_deck.md). That function runs as the caller and has no `SECURITY DEFINER`, so a non-owner's update matches zero rows here.
 
 ## Current definition
 
