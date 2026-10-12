@@ -1,3 +1,4 @@
+import { queryClient } from './queryClient'
 import { supabase } from './supabase'
 
 export const LOGIN_ERROR_MESSAGE = 'Email or password are incorrect.'
@@ -58,4 +59,9 @@ export async function signOut(): Promise<void> {
   if (error) {
     throw new Error(UNEXPECTED_ERROR_MESSAGE)
   }
+
+  // Query cache keys (e.g. ['customDecks']) don't include the user id, so a
+  // second user signing in on the same tab would otherwise briefly see the
+  // previous user's cached data before the next fetch replaces it.
+  queryClient.clear()
 }

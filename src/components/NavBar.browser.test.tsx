@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { userEvent } from 'vitest/browser'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useUserRoles } from '../hooks/useUserRoles'
 import { mockCategories } from '../test/mockCategories'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { NavBar } from './NavBar'
 
 vi.mock('../lib/auth', () => ({
@@ -49,7 +50,7 @@ describe('NavBar in a real browser', () => {
       error: null,
     })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -67,7 +68,7 @@ describe('NavBar in a real browser', () => {
       error: null,
     })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<NavBar />} />
@@ -88,7 +89,7 @@ describe('NavBar in a real browser', () => {
       error: null,
     })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -105,7 +106,7 @@ describe('NavBar in a real browser', () => {
       error: null,
     })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -125,7 +126,7 @@ describe('NavBar in a real browser', () => {
     mockCategories({ data: [], error: null })
     vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: true, loading: false })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,

@@ -11,4 +11,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `from` via an explicit factory, chaining a mocked `select().order()`. Uses `renderHook`/`waitFor` from `@testing-library/react`.
+Mocks `../lib/supabase`'s `from` via an explicit factory, chaining a mocked `select().order()`. Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (wraps in a fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), then uses `waitFor` from `@testing-library/react`.

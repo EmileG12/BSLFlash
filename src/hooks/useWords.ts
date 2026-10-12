@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface WordOption {
@@ -14,31 +14,14 @@ interface WordsState {
 }
 
 export function useWords(): WordsState {
-  const [words, setWords] = useState<WordOption[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['words'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('words').select('id, word, definition').order('word')
+      if (error) throw new Error(error.message)
+      return data
+    },
+  })
 
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .from('words')
-      .select('id, word, definition')
-      .order('word')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setError(error.message)
-        } else {
-          setWords(data)
-        }
-        setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { words, loading, error }
+  return { words: data ?? [], loading: isLoading, error: error?.message ?? null }
 }

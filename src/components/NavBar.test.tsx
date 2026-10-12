@@ -1,10 +1,11 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { signOut } from '../lib/auth'
 import { useUserRoles } from '../hooks/useUserRoles'
 import { mockCategories } from '../test/mockCategories'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { NavBar } from './NavBar'
 
 vi.mock('../lib/auth', () => ({
@@ -43,7 +44,7 @@ describe('NavBar', () => {
   it('renders a Home link', () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -55,7 +56,7 @@ describe('NavBar', () => {
   it('renders the SignStack logo', () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -69,7 +70,7 @@ describe('NavBar', () => {
     vi.mocked(signOut).mockResolvedValueOnce(undefined)
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<NavBar />} />
@@ -89,7 +90,7 @@ describe('NavBar', () => {
     vi.mocked(signOut).mockRejectedValueOnce(new Error('network error'))
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<NavBar />} />
@@ -106,7 +107,7 @@ describe('NavBar', () => {
   it('renders Categories and Vocabulary menu triggers', () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -126,7 +127,7 @@ describe('NavBar', () => {
     })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<NavBar />} />
@@ -150,7 +151,7 @@ describe('NavBar', () => {
     })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -165,7 +166,7 @@ describe('NavBar', () => {
     mockCategories({ data: [], error: null })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -179,7 +180,7 @@ describe('NavBar', () => {
   it('shows no Admin entry for a plain user', () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -192,7 +193,7 @@ describe('NavBar', () => {
     mockCategories({ data: [], error: null })
     vi.mocked(useUserRoles).mockReturnValue({ isAdmin: true, isSuperadmin: false, loading: false })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,
@@ -207,7 +208,7 @@ describe('NavBar', () => {
     vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: true, loading: false })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <NavBar />
       </MemoryRouter>,

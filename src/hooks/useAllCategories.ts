@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface CategoryTag {
@@ -20,31 +20,14 @@ interface AllCategoriesState {
  * exists purely as a deck tag.
  */
 export function useAllCategories(): AllCategoriesState {
-  const [categories, setCategories] = useState<CategoryTag[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['categories', 'all'],
+    queryFn: async () => {
+      const { data, error } = await supabase.from('categories').select('id, category_name').order('category_name')
+      if (error) throw new Error(error.message)
+      return data
+    },
+  })
 
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .from('categories')
-      .select('id, category_name')
-      .order('category_name')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setError(error.message)
-        } else {
-          setCategories(data)
-        }
-        setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { categories, loading, error }
+  return { categories: data ?? [], loading: isLoading, error: error?.message ?? null }
 }

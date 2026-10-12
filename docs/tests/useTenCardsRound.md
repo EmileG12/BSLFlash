@@ -17,4 +17,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `rpc` and `storage.from(...).getPublicUrl` via explicit factories, same style as [useRandomFlashcard.test.ts](./useRandomFlashcard.md). Uses `renderHook`/`waitFor` from `@testing-library/react`. No `next()`/refetch to test here, unlike `useRandomFlashcard` — the whole round is fetched once.
+Mocks `../lib/supabase`'s `rpc` and `storage.from(...).getPublicUrl` via explicit factories, same style as [useRandomFlashcard.test.ts](./useRandomFlashcard.md). Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), with `waitFor` from `@testing-library/react`. No `next()` to test here, unlike `useRandomFlashcard` — the whole round is fetched once. The `subcategoryId` refetch case relies on the query key changing, not on a manual refetch call.

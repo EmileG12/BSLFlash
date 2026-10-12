@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { TagPicker } from './TagPicker'
 
 vi.mock('../lib/supabase', () => ({
@@ -20,7 +21,7 @@ describe('TagPicker', () => {
   it('shows the empty message when there are no categories at all', async () => {
     mockCategories([])
 
-    render(<TagPicker selectedIds={[]} onToggle={vi.fn()} />)
+    renderWithQueryClient(<TagPicker selectedIds={[]} onToggle={vi.fn()} />)
 
     expect(await screen.findByText('No tags available yet.')).toBeInTheDocument()
   })
@@ -33,7 +34,7 @@ describe('TagPicker', () => {
     const onToggle = vi.fn()
     const user = userEvent.setup()
 
-    render(<TagPicker selectedIds={['tag-1']} onToggle={onToggle} />)
+    renderWithQueryClient(<TagPicker selectedIds={['tag-1']} onToggle={onToggle} />)
 
     expect(await screen.findByRole('button', { name: 'GCSE' })).toHaveAttribute('aria-pressed', 'true')
     await user.click(screen.getByRole('button', { name: 'Animals' }))

@@ -9,11 +9,13 @@ Where `DeckSort` is `'likes' | 'newest' | 'name'`, and `PublicDeck` is the row s
 
 **Behavior:**
 
-- `loading` is derived, not stored. The hook keeps the last completed fetch together with a `requestKey` built from the trimmed search, the joined tag ids and the sort. `loading` is simply "the last completed fetch's key does not match the current one", the same pattern as [useRandomFlashcard](./useRandomFlashcard.md). Changing a filter therefore needs no separate reset-to-loading call.
-- While loading, `decks` is `[]` and `error` is `null`, so callers never see the previous filter's results paired with the new filter's spinner.
-- A stale response (one superseded by a later filter change) is dropped by the `cancelled` flag in the effect cleanup.
+- Backed by React Query's `useQuery`. The query key is `['publicDecks', trimmedSearch, joinedTagIds, sort]`, so each filter combination is its own cache entry.
+- `loading` is `isLoading`. While a combination has no cached data, `decks` is `[]` and `error` is `null`, so callers never see the previous filter's results paired with the new filter's spinner.
+- Returning to a combination that was already fetched shows its cached rows immediately while a background refetch runs.
 - An empty search is sent as `undefined`, not `''`; an empty tag list is sent as `undefined`. Both let the RPC skip the filter.
 
-**`setDecks`:** Lets the caller apply an optimistic update to the current `decks`, used for the instant like and save toggles on [BrowseDecksPage](../components/BrowseDecksPage.md). It accepts the same value-or-updater form as a React state setter. It applies to the last completed result only; if no fetch has completed yet it does nothing. The hook does not roll back a failed mutation. The caller reverts its own optimistic change on error.
+**`setDecks`:** Lets the caller apply an optimistic update, used for the instant like and save toggles on [BrowseDecksPage](../components/BrowseDecksPage.md). It accepts the same value-or-updater form as a React state setter. It patches the cache entry for the current filter combination only, via `queryClient.setQueryData`. It does nothing if that entry has no data yet. A refetch of that combination replaces the patched rows. The hook does not roll back a failed mutation. The caller reverts its own optimistic change on error.
 
 **Used by:** [BrowseDecksPage](../components/BrowseDecksPage.md).
+
+**Tested by:** [docs/tests/usePublicDecks.md](../tests/usePublicDecks.md).

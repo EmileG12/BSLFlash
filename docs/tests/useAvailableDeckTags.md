@@ -11,4 +11,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `rpc` via an explicit factory, same style as [SubCategoryChips.test.tsx](./SubCategoryChips.md). Uses `renderHook`/`waitFor` from `@testing-library/react`.
+Mocks `../lib/supabase`'s `rpc` via an explicit factory, same style as [SubCategoryChips.test.tsx](./SubCategoryChips.md). Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), with `waitFor` from `@testing-library/react`.

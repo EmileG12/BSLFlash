@@ -11,4 +11,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `from` via an explicit factory. The mock dispatches on table name: `custom_decks` gets a `select().eq().single()` chain, while `custom_deck_words` and `custom_deck_tags` get a `select().eq()` chain that resolves directly. Uses `renderHook`/`waitFor` from `@testing-library/react`. The RLS behaviour the hook depends on is enforced in Postgres and is not exercised here.
+Mocks `../lib/supabase`'s `from` via an explicit factory. The mock dispatches on table name: `custom_decks` gets a `select().eq().single()` chain, while `custom_deck_words` and `custom_deck_tags` get a `select().eq()` chain that resolves directly. Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), with `waitFor` from `@testing-library/react`. The RLS behaviour the hook depends on is enforced in Postgres and is not exercised here.

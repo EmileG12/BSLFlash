@@ -10,7 +10,7 @@
 
 A deck being tagged for the first time needs every tag on offer, including a category with zero words that exists only as a tag. Neither of the other two sources can supply that.
 
-**Behavior:** On mount, selects `id, category_name` from `categories`, ordered by `category_name`, with no filter. Rows are readable under the categories select policy ([categories_select_authenticated](../rls-policies/categories/categories_select_authenticated.md)). Sets `loading` to `false` once the request settles, and `error` to the message if it fails. Guards against setting state after unmount with a `cancelled` flag.
+**Behavior:** Backed by React Query's `useQuery` under query key `['categories', 'all']`. The `queryFn` selects `id, category_name` from `categories`, ordered by `category_name`, with no filter. Rows are readable under the categories select policy ([categories_select_authenticated](../rls-policies/categories/categories_select_authenticated.md)). The hook maps `useQuery`'s `isLoading`/`error`/`data` back onto the original `loading`/`error`/`categories` shape, so callers are unaffected by the internal change. Requires a `QueryClientProvider` ancestor (wired once in `main.tsx`).
 
 **Used by:** [TagPicker](../components/TagPicker.md).
 

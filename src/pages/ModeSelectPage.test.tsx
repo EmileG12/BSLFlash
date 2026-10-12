@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { ModeSelectPage } from './ModeSelectPage'
 
 function PracticeLocationProbe() {
@@ -32,7 +33,7 @@ function mockSubcategories(data: { id: string; category_name: string }[]) {
 }
 
 function renderPage(initialEntry = '/flashcards/standard/cat-1') {
-  return render(
+  return renderWithQueryClient(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />
@@ -73,7 +74,7 @@ describe('ModeSelectPage', () => {
   })
 
   it('shows an error instead of mode buttons for an unrecognized deckType', () => {
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/flashcards/bogus/cat-1']}>
         <Routes>
           <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />
@@ -116,7 +117,7 @@ describe('ModeSelectPage', () => {
     mockSubcategories([{ id: 'sub-1', category_name: 'Colours' }])
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/flashcards/standard/cat-1']}>
         <Routes>
           <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />
@@ -135,7 +136,7 @@ describe('ModeSelectPage', () => {
     mockSubcategories([{ id: 'sub-1', category_name: 'Colours' }])
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/flashcards/standard/cat-1']}>
         <Routes>
           <Route path="/flashcards/:deckType/:categoryId" element={<ModeSelectPage />} />

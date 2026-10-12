@@ -13,4 +13,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `rpc` via an explicit factory. Uses `renderHook`/`act`/`waitFor` from `@testing-library/react`. The AND-semantics tag filter and the sort order are SQL behaviour of [`get_public_decks`](../rpc-functions/get_public_decks.md) and are not exercised here; this file asserts only the arguments the hook sends.
+Mocks `../lib/supabase`'s `rpc` via an explicit factory. Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), with `act`/`waitFor` from `@testing-library/react`. The AND-semantics tag filter and the sort order are SQL behaviour of [`get_public_decks`](../rpc-functions/get_public_decks.md) and are not exercised here; this file asserts only the arguments the hook sends.

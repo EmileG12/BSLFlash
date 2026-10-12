@@ -14,4 +14,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `from`, `rpc`, and `storage.from(...).getPublicUrl`. Renders inside a `MemoryRouter`/`Routes` with an initial entry matching `/flashcards/:deckType/:categoryId/practice` (its real route), since the page reads `deckType`/`categoryId` via `useParams`.
+Mocks `../lib/supabase`'s `from`, `rpc`, and `storage.from(...).getPublicUrl`. Renders inside a `MemoryRouter`/`Routes` with an initial entry matching `/flashcards/:deckType/:categoryId/practice` (its real route), since the page reads `deckType`/`categoryId` via `useParams`. Renders via [renderWithQueryClient](./renderWithQueryClient.md), since the page calls [useRandomFlashcard](../hooks/useRandomFlashcard.md) and [useWords](../hooks/useWords.md), which require a `QueryClientProvider` ancestor.

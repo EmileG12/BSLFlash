@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useCategoryInfo } from './useCategoryInfo'
 
 vi.mock('../lib/supabase', () => ({
@@ -23,7 +24,7 @@ describe('useCategoryInfo', () => {
   it('reports isVocabulary: true for a standard vocabulary category', async () => {
     mockFrom({ category_name: 'GCSE', is_vocabulary: true })
 
-    const { result } = renderHook(() => useCategoryInfo('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useCategoryInfo('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.categoryName).toBe('GCSE')
@@ -34,7 +35,7 @@ describe('useCategoryInfo', () => {
   it('reports isVocabulary: false for a standard topic category', async () => {
     mockFrom({ category_name: 'Colours', is_vocabulary: false })
 
-    const { result } = renderHook(() => useCategoryInfo('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useCategoryInfo('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.isVocabulary).toBe(false)
@@ -43,7 +44,7 @@ describe('useCategoryInfo', () => {
   it('always reports isVocabulary: false for a custom deck', async () => {
     mockFrom({ deck_name: 'My Deck' })
 
-    const { result } = renderHook(() => useCategoryInfo('deck-1', 'custom'))
+    const { result } = renderHookWithQueryClient(() => useCategoryInfo('deck-1', 'custom'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.categoryName).toBe('My Deck')

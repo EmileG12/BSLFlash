@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { EditDeckModal } from './EditDeckModal'
 
 vi.mock('../lib/supabase', () => ({
@@ -66,7 +67,7 @@ describe('EditDeckModal', () => {
       }),
     } as never)
 
-    render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
+    renderWithQueryClient(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
 
     expect(screen.getByText(/loading deck/i)).toBeInTheDocument()
   })
@@ -74,7 +75,7 @@ describe('EditDeckModal', () => {
   it('pre-fills the name, publish state, words, and tags from the deck detail', async () => {
     mockBackend()
 
-    render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
+    renderWithQueryClient(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
 
     expect(await screen.findByDisplayValue('My Animals')).toBeInTheDocument()
     expect(screen.getByRole('checkbox', { name: 'Published' })).not.toBeChecked()
@@ -86,7 +87,7 @@ describe('EditDeckModal', () => {
     mockBackend()
     const user = userEvent.setup()
 
-    render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
+    renderWithQueryClient(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
     await screen.findByDisplayValue('My Animals')
 
     await user.click(screen.getByRole('checkbox', { name: 'Published' }))
@@ -99,7 +100,7 @@ describe('EditDeckModal', () => {
     mockBackend()
     const user = userEvent.setup()
 
-    render(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
+    renderWithQueryClient(<EditDeckModal deckId="deck-1" onClose={vi.fn()} onSaved={vi.fn()} />)
     await screen.findByDisplayValue('My Animals')
 
     await user.click(await screen.findByRole('button', { name: /remove hello/i }))
@@ -114,7 +115,7 @@ describe('EditDeckModal', () => {
     const onClose = vi.fn()
     const user = userEvent.setup()
 
-    render(<EditDeckModal deckId="deck-1" onClose={onClose} onSaved={onSaved} />)
+    renderWithQueryClient(<EditDeckModal deckId="deck-1" onClose={onClose} onSaved={onSaved} />)
     await screen.findByDisplayValue('My Animals')
 
     const nameInput = screen.getByLabelText('Deck name')
@@ -141,7 +142,7 @@ describe('EditDeckModal', () => {
     const onClose = vi.fn()
     const user = userEvent.setup()
 
-    render(<EditDeckModal deckId="deck-1" onClose={onClose} onSaved={vi.fn()} />)
+    renderWithQueryClient(<EditDeckModal deckId="deck-1" onClose={onClose} onSaved={vi.fn()} />)
     await screen.findByDisplayValue('My Animals')
 
     await user.click(screen.getByRole('button', { name: 'Cancel' }))

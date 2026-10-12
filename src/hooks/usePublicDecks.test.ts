@@ -1,6 +1,7 @@
-import { act, renderHook, waitFor } from '@testing-library/react'
+import { act, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { usePublicDecks, type PublicDeck } from './usePublicDecks'
 
 vi.mock('../lib/supabase', () => ({
@@ -25,7 +26,7 @@ describe('usePublicDecks', () => {
   it('starts in a loading state', () => {
     vi.mocked(supabase.rpc).mockReturnValue(new Promise(() => {}) as never)
 
-    const { result } = renderHook(() => usePublicDecks('', [], 'likes'))
+    const { result } = renderHookWithQueryClient(() => usePublicDecks('', [], 'likes'))
 
     expect(result.current.loading).toBe(true)
     expect(result.current.decks).toEqual([])
@@ -34,7 +35,7 @@ describe('usePublicDecks', () => {
   it('fetches decks with trimmed search, tag ids, and sort', async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({ data: [DECK], error: null } as never)
 
-    const { result } = renderHook(() => usePublicDecks('  gcse  ', ['tag-1', 'tag-2'], 'newest'))
+    const { result } = renderHookWithQueryClient(() => usePublicDecks('  gcse  ', ['tag-1', 'tag-2'], 'newest'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(supabase.rpc).toHaveBeenCalledWith('get_public_decks', {
@@ -48,7 +49,7 @@ describe('usePublicDecks', () => {
   it('omits search and tag filters when empty', async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({ data: [], error: null } as never)
 
-    const { result } = renderHook(() => usePublicDecks('', [], 'likes'))
+    const { result } = renderHookWithQueryClient(() => usePublicDecks('', [], 'likes'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(supabase.rpc).toHaveBeenCalledWith('get_public_decks', {
@@ -61,7 +62,7 @@ describe('usePublicDecks', () => {
   it('sets an error message when the fetch fails', async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: { message: 'boom' } } as never)
 
-    const { result } = renderHook(() => usePublicDecks('', [], 'likes'))
+    const { result } = renderHookWithQueryClient(() => usePublicDecks('', [], 'likes'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('boom')
@@ -70,7 +71,7 @@ describe('usePublicDecks', () => {
   it('setDecks lets the caller apply an optimistic update', async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({ data: [DECK], error: null } as never)
 
-    const { result } = renderHook(() => usePublicDecks('', [], 'likes'))
+    const { result } = renderHookWithQueryClient(() => usePublicDecks('', [], 'likes'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
 
@@ -80,6 +81,8 @@ describe('usePublicDecks', () => {
       )
     })
 
-    expect(result.current.decks[0].liked_by_me).toBe(true)
+    // queryClient.setQueryData notifies observers via a batched microtask rather
+    // than synchronously, so the update isn't visible on the same tick as the call.
+    await waitFor(() => expect(result.current.decks[0].liked_by_me).toBe(true))
   })
 })

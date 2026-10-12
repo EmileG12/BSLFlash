@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface Flashcard {
@@ -19,77 +19,41 @@ interface RandomFlashcardState {
   next: () => void
 }
 
-interface Result {
-  requestKey: string
-  flashcard: Flashcard | null
-  error: string | null
-  empty: boolean
-}
-
 export function useRandomFlashcard(
   categoryId: string,
   deckType: DeckType,
   subcategoryId?: string | null,
 ): RandomFlashcardState {
-  const [refreshKey, setRefreshKey] = useState(0)
-  const [result, setResult] = useState<Result | null>(null)
-
-  const requestKey = `${deckType}:${categoryId}:${subcategoryId ?? ''}:${refreshKey}`
-  // Loading is derived, not stored: it's simply "the last completed fetch
-  // doesn't match what we're currently asking for" -- so there's no separate
-  // reset-to-loading setState call needed when categoryId/refreshKey change.
-  const loading = result?.requestKey !== requestKey
-
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .rpc('get_random_word_for_category', {
+  const { data, isFetching, error, refetch } = useQuery({
+    queryKey: ['randomFlashcard', categoryId, deckType, subcategoryId ?? null],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_random_word_for_category', {
         category_id: categoryId,
         is_custom: deckType === 'custom',
         ...(subcategoryId ? { subcategory_id: subcategoryId } : {}),
       })
-      .then(({ data, error }) => {
-        if (cancelled) return
+      if (error) throw new Error(error.message)
+      if (!data || data.length === 0) return { flashcard: null, empty: true }
 
-        if (error) {
-          setResult({ requestKey, flashcard: null, error: error.message, empty: false })
-        } else if (!data || data.length === 0) {
-          setResult({ requestKey, flashcard: null, error: null, empty: true })
-        } else {
-          const row = data[0]
-          const { data: publicUrlData } = supabase.storage
-            .from('sign-videos')
-            .getPublicUrl(row.storage_path)
-
-          setResult({
-            requestKey,
-            flashcard: {
-              wordId: row.word_id,
-              word: row.word,
-              definition: row.definition,
-              videoUrl: publicUrlData.publicUrl,
-            },
-            error: null,
-            empty: false,
-          })
-        }
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [categoryId, deckType, subcategoryId, requestKey])
-
-  function next() {
-    setRefreshKey((key) => key + 1)
-  }
+      const row = data[0]
+      const { data: publicUrlData } = supabase.storage.from('sign-videos').getPublicUrl(row.storage_path)
+      return {
+        flashcard: { wordId: row.word_id, word: row.word, definition: row.definition, videoUrl: publicUrlData.publicUrl },
+        empty: false,
+      }
+    },
+    // A random draw should only change via next() or a fresh mount, never
+    // silently behind the user's back from refocusing the tab mid-round.
+    refetchOnWindowFocus: false,
+  })
 
   return {
-    flashcard: loading ? null : (result?.flashcard ?? null),
-    loading,
-    error: loading ? null : (result?.error ?? null),
-    empty: loading ? false : (result?.empty ?? false),
-    next,
+    flashcard: data?.flashcard ?? null,
+    loading: isFetching,
+    error: error?.message ?? null,
+    empty: data?.empty ?? false,
+    next: () => {
+      void refetch()
+    },
   }
 }

@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { BrowseDecksPage } from './BrowseDecksPage'
 
 vi.mock('../lib/supabase', () => ({
@@ -44,7 +45,7 @@ function mockMutation() {
 }
 
 function renderPage() {
-  return render(
+  return renderWithQueryClient(
     <MemoryRouter initialEntries={['/browse-decks']}>
       <Routes>
         <Route path="/browse-decks" element={<BrowseDecksPage />} />

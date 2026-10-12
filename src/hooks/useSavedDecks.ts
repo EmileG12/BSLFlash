@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface SavedDeck {
@@ -15,31 +15,26 @@ interface SavedDecksState {
   setSavedDecks: React.Dispatch<React.SetStateAction<SavedDeck[]>>
 }
 
+const queryKey = ['savedDecks']
+
 /** Decks the current user has added to their library from the Browse directory. A dormant save (owner has since unpublished) is excluded here automatically -- see get_saved_decks. */
 export function useSavedDecks(): SavedDecksState {
-  const [savedDecks, setSavedDecks] = useState<SavedDeck[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    let cancelled = false
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_saved_decks')
+      if (error) throw new Error(error.message)
+      return data ?? []
+    },
+  })
 
-    supabase
-      .rpc('get_saved_decks')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setError(error.message)
-        } else {
-          setSavedDecks(data ?? [])
-        }
-        setLoading(false)
-      })
+  const setSavedDecks: React.Dispatch<React.SetStateAction<SavedDeck[]>> = (update) => {
+    queryClient.setQueryData<SavedDeck[]>(queryKey, (previous) =>
+      previous === undefined ? previous : typeof update === 'function' ? update(previous) : update,
+    )
+  }
 
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { savedDecks, loading, error, setSavedDecks }
+  return { savedDecks: data ?? [], loading: isLoading, error: error?.message ?? null, setSavedDecks }
 }

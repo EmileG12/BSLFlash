@@ -13,6 +13,6 @@
 
 ## Notes
 
-Mocks `../lib/supabase` via an explicit factory with both `from` and `auth.getUser`. A `mockUser` helper resolves `getUser` to a fixed user id, and `mockCustomDecks` chains `select().eq().order()` and returns the `eq` mock so the owner-filter case can assert its arguments. The no-user case overrides `getUser` to resolve with `user: null`.
+Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`). Mocks `../lib/supabase` via an explicit factory with both `from` and `auth.getUser`. A `mockUser` helper resolves `getUser` to a fixed user id, and `mockCustomDecks` chains `select().eq().order()` and returns the `eq` mock so the owner-filter case can assert its arguments. The no-user case overrides `getUser` to resolve with `user: null`.
 
 The RLS policies that also admit other users' published decks are enforced in Postgres and are not exercised by this file. The owner-id filter is the only client-side scoping under test.

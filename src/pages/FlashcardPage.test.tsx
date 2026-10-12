@@ -1,8 +1,9 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { FlashcardPage } from './FlashcardPage'
 
 vi.mock('../lib/supabase', () => ({
@@ -39,7 +40,7 @@ function mockBackend({ rpcData = [FLASHCARD_ROW] }: { rpcData?: unknown[] } = {}
 }
 
 function renderPage(initialEntry = '/flashcards/standard/cat-1/practice') {
-  return render(
+  return renderWithQueryClient(
     <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
         <Route path="/flashcards/:deckType/:categoryId/practice" element={<FlashcardPage />} />

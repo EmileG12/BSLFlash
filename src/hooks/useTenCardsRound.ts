@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import type { DeckType, Flashcard } from './useRandomFlashcard'
 
@@ -14,51 +14,32 @@ export function useTenCardsRound(
   deckType: DeckType,
   subcategoryId?: string | null,
 ): TenCardsRoundState {
-  const [cards, setCards] = useState<Flashcard[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
-  const [empty, setEmpty] = useState(false)
-
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .rpc('get_random_words_for_category', {
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['tenCardsRound', categoryId, deckType, subcategoryId ?? null],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_random_words_for_category', {
         category_id: categoryId,
         is_custom: deckType === 'custom',
         ...(subcategoryId ? { subcategory_id: subcategoryId } : {}),
       })
-      .then(({ data, error }) => {
-        if (cancelled) return
+      if (error) throw new Error(error.message)
+      if (data.length === 0) return { cards: [], empty: true }
 
-        if (error) {
-          setError(error.message)
-        } else if (data.length === 0) {
-          setEmpty(true)
-        } else {
-          const flashcards = data.map((row) => {
-            const { data: publicUrlData } = supabase.storage
-              .from('sign-videos')
-              .getPublicUrl(row.storage_path)
-
-            const flashcard: Flashcard = {
-              wordId: row.word_id,
-              word: row.word,
-              definition: row.definition,
-              videoUrl: publicUrlData.publicUrl,
-            }
-            return flashcard
-          })
-          setCards(flashcards)
-        }
-
-        setLoading(false)
+      const cards = data.map((row): Flashcard => {
+        const { data: publicUrlData } = supabase.storage.from('sign-videos').getPublicUrl(row.storage_path)
+        return { wordId: row.word_id, word: row.word, definition: row.definition, videoUrl: publicUrlData.publicUrl }
       })
+      return { cards, empty: false }
+    },
+    // The round should only change via a fresh mount, never silently behind
+    // the user's back from refocusing the tab mid-round.
+    refetchOnWindowFocus: false,
+  })
 
-    return () => {
-      cancelled = true
-    }
-  }, [categoryId, deckType, subcategoryId])
-
-  return { cards, loading, error, empty }
+  return {
+    cards: data?.cards ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
+    empty: data?.empty ?? false,
+  }
 }

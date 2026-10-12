@@ -1,8 +1,9 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { MyDecksPage } from './MyDecksPage'
 
 vi.mock('../lib/supabase', () => ({
@@ -54,7 +55,7 @@ function mockSavedDecks(
 }
 
 function renderPage() {
-  return render(
+  return renderWithQueryClient(
     <MemoryRouter initialEntries={['/my-decks']}>
       <Routes>
         <Route path="/my-decks" element={<MyDecksPage />} />

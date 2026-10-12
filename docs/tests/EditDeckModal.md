@@ -16,4 +16,4 @@ Not covered: the tag add/remove writes made on Save, and failure paths after the
 
 ## Notes
 
-Mocks `../lib/supabase` with both `from` and `rpc`. A `mockBackend` helper dispatches `from` by table name, covering `custom_decks` (`select().eq().single()`), `custom_deck_words` and `custom_deck_tags` (`select().eq()`), `categories` (`select().order()`), and the words list (`select().order()`). It also stubs `delete().eq().in()` and `insert()`. The Save case leaves the tag selection unchanged, so the tag write path does not run.
+Mocks `../lib/supabase` with both `from` and `rpc`. A `mockBackend` helper dispatches `from` by table name, covering `custom_decks` (`select().eq().single()`), `custom_deck_words` and `custom_deck_tags` (`select().eq()`), `categories` (`select().order()`), and the words list (`select().order()`). It also stubs `delete().eq().in()` and `insert()`. The Save case leaves the tag selection unchanged, so the tag write path does not run. Renders via [renderWithQueryClient](./renderWithQueryClient.md), since the modal's tag picker uses [useAllCategories](../hooks/useAllCategories.md), which requires a `QueryClientProvider` ancestor.

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './useAuth'
 
@@ -11,30 +11,24 @@ interface UserRolesState {
 /** Whether the signed-in user holds the admin and/or superadmin role, via the is_admin()/is_superadmin() RPCs. Gates the Admin nav entry and the AdminRoute/SuperadminRoute guards -- re-resolves whenever the session changes. */
 export function useUserRoles(): UserRolesState {
   const { session, loading: authLoading } = useAuth()
-  const [isAdmin, setIsAdmin] = useState(false)
-  const [isSuperadmin, setIsSuperadmin] = useState(false)
-  const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
-    if (authLoading) return
+  const { data, isPending } = useQuery({
+    queryKey: ['userRoles', session?.user.id ?? null],
+    queryFn: async () => {
+      if (!session) return { isAdmin: false, isSuperadmin: false }
+      const [adminResult, superadminResult] = await Promise.all([
+        supabase.rpc('is_admin'),
+        supabase.rpc('is_superadmin'),
+      ])
+      return { isAdmin: adminResult.data ?? false, isSuperadmin: superadminResult.data ?? false }
+    },
+    enabled: !authLoading,
+  })
 
-    let cancelled = false
-
-    const rolesPromise = session
-      ? Promise.all([supabase.rpc('is_admin'), supabase.rpc('is_superadmin')])
-      : Promise.resolve([{ data: false }, { data: false }] as const)
-
-    rolesPromise.then(([adminResult, superadminResult]) => {
-      if (cancelled) return
-      setIsAdmin(adminResult.data ?? false)
-      setIsSuperadmin(superadminResult.data ?? false)
-      setLoading(false)
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [session, authLoading])
-
-  return { isAdmin, isSuperadmin, loading }
+  return {
+    isAdmin: data?.isAdmin ?? false,
+    isSuperadmin: data?.isSuperadmin ?? false,
+    // isPending stays true while the query is disabled (authLoading), since it never settles.
+    loading: authLoading || isPending,
+  }
 }

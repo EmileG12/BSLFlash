@@ -1,7 +1,8 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { TagFilterChips } from './TagFilterChips'
 
 vi.mock('../lib/supabase', () => ({
@@ -18,7 +19,7 @@ describe('TagFilterChips', () => {
   it('renders nothing when there are no tags in use', async () => {
     mockTags([])
 
-    const { container } = render(<TagFilterChips selectedIds={[]} onToggle={vi.fn()} />)
+    const { container } = renderWithQueryClient(<TagFilterChips selectedIds={[]} onToggle={vi.fn()} />)
 
     await waitFor(() => expect(container).toBeEmptyDOMElement())
   })
@@ -31,7 +32,7 @@ describe('TagFilterChips', () => {
     const onToggle = vi.fn()
     const user = userEvent.setup()
 
-    render(<TagFilterChips selectedIds={['tag-1']} onToggle={onToggle} />)
+    renderWithQueryClient(<TagFilterChips selectedIds={['tag-1']} onToggle={onToggle} />)
 
     const gcse = await screen.findByRole('button', { name: 'GCSE' })
     expect(gcse).toHaveAttribute('aria-pressed', 'true')
@@ -44,7 +45,7 @@ describe('TagFilterChips', () => {
   it('shows a directory-specific fallback message on a fetch error', async () => {
     vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: { message: 'boom' } } as never)
 
-    render(<TagFilterChips selectedIds={[]} onToggle={vi.fn()} />)
+    renderWithQueryClient(<TagFilterChips selectedIds={[]} onToggle={vi.fn()} />)
 
     expect(await screen.findByText('Tags unavailable — showing all decks')).toBeInTheDocument()
   })

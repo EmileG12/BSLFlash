@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface Category {
@@ -14,29 +14,14 @@ interface CategoriesState {
 }
 
 export function useCategories(vocabulary: boolean): CategoriesState {
-  const [categories, setCategories] = useState<Category[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['categories', 'withWords', vocabulary],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_categories_with_words', { p_is_vocabulary: vocabulary })
+      if (error) throw new Error(error.message)
+      return data
+    },
+  })
 
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .rpc('get_categories_with_words', { p_is_vocabulary: vocabulary })
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setError(error.message)
-        } else {
-          setCategories(data)
-        }
-        setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [vocabulary])
-
-  return { categories, loading, error }
+  return { categories: data ?? [], loading: isLoading, error: error?.message ?? null }
 }

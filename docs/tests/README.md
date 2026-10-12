@@ -58,11 +58,15 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [useStreakScore](./useStreakScore.md) | `src/hooks/useStreakScore.test.ts` | [useStreakScore](../hooks/useStreakScore.md) |
 | [useRoundProgress](./useRoundProgress.md) | `src/hooks/useRoundProgress.test.ts` | [useRoundProgress](../hooks/useRoundProgress.md) |
 | [useSavedDecks](./useSavedDecks.md) | `src/hooks/useSavedDecks.test.ts` | [useSavedDecks](../hooks/useSavedDecks.md) |
+| [useManagedCategories](./useManagedCategories.md) | `src/hooks/useManagedCategories.test.ts` | [useManagedCategories](../hooks/useManagedCategories.md) |
+| [useUsersWithRoles](./useUsersWithRoles.md) | `src/hooks/useUsersWithRoles.test.ts` | [useUsersWithRoles](../hooks/useUsersWithRoles.md) |
+| [useWordVariants](./useWordVariants.md) | `src/hooks/useWordVariants.test.ts` | [useWordVariants](../hooks/useWordVariants.md) |
 | [ScorePill](./ScorePill.md) | `src/components/ScorePill.test.tsx` | [ScorePill](../components/ScorePill.md) |
 | [SubCategoryChips](./SubCategoryChips.md) | `src/components/SubCategoryChips.test.tsx` | [SubCategoryChips](../components/SubCategoryChips.md) |
 | [useCategoryInfo](./useCategoryInfo.md) | `src/hooks/useCategoryInfo.test.ts` | [useCategoryInfo](../hooks/useCategoryInfo.md) |
 | [useUserRoles](./useUserRoles.md) | `src/hooks/useUserRoles.test.ts` | [useUserRoles](../hooks/useUserRoles.md) |
 | [userStatus](./userStatus.md) | `src/lib/userStatus.test.ts` | [userStatus](../utils/userStatus.md) |
+| [auth](./auth.md) | `src/lib/auth.test.ts` | [auth](../utils/auth.md) |
 | [TableCard](./TableCard.md) | `src/components/TableCard.test.tsx` | [TableCard](../components/TableCard.md) |
 
 ## Shared helpers
@@ -70,3 +74,5 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | Helper | Path | Purpose |
 |---|---|---|
 | [mockCategories](./mockCategories.md) | `src/test/mockCategories.ts` | Stubs the `get_categories_with_words` RPC behind `useCategories`. |
+| [renderHookWithQueryClient](./renderHookWithQueryClient.md) | `src/test/renderHookWithQueryClient.tsx` | Renders a hook that uses React Query inside a fresh `QueryClientProvider`. |
+| [renderWithQueryClient](./renderWithQueryClient.md) | `src/test/renderWithQueryClient.tsx` | Renders a component that uses React Query inside a fresh `QueryClientProvider`. |

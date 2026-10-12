@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useTenCardsRound } from './useTenCardsRound'
 
 vi.mock('../lib/supabase', () => ({
@@ -24,7 +25,7 @@ describe('useTenCardsRound', () => {
   it('starts in a loading state', () => {
     vi.mocked(supabase.rpc).mockReturnValue(new Promise(() => {}) as never)
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard'))
 
     expect(result.current.loading).toBe(true)
     expect(result.current.cards).toEqual([])
@@ -52,7 +53,7 @@ describe('useTenCardsRound', () => {
     })
     mockPublicUrl('https://example.test/video.mp4')
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.cards).toEqual([
@@ -64,7 +65,7 @@ describe('useTenCardsRound', () => {
   it('sets empty when the category has no eligible words', async () => {
     mockRpc({ data: [], error: null })
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.empty).toBe(true)
@@ -74,7 +75,7 @@ describe('useTenCardsRound', () => {
   it('sets an error message when the RPC call fails', async () => {
     mockRpc({ data: null, error: { message: 'boom' } })
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('boom')
@@ -95,7 +96,7 @@ describe('useTenCardsRound', () => {
     })
     mockPublicUrl('https://example.test/hello.mp4')
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.cards).toHaveLength(1)
@@ -105,7 +106,7 @@ describe('useTenCardsRound', () => {
   it('passes is_custom: true for a custom deck', async () => {
     mockRpc({ data: [], error: null })
 
-    const { result } = renderHook(() => useTenCardsRound('deck-1', 'custom'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('deck-1', 'custom'))
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(supabase.rpc).toHaveBeenCalledWith('get_random_words_for_category', {
@@ -117,7 +118,7 @@ describe('useTenCardsRound', () => {
   it('omits subcategory_id when none is given', async () => {
     mockRpc({ data: [], error: null })
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard'))
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(supabase.rpc).toHaveBeenCalledWith('get_random_words_for_category', {
@@ -129,7 +130,7 @@ describe('useTenCardsRound', () => {
   it('passes subcategory_id when given', async () => {
     mockRpc({ data: [], error: null })
 
-    const { result } = renderHook(() => useTenCardsRound('cat-1', 'standard', 'sub-1'))
+    const { result } = renderHookWithQueryClient(() => useTenCardsRound('cat-1', 'standard', 'sub-1'))
     await waitFor(() => expect(result.current.loading).toBe(false))
 
     expect(supabase.rpc).toHaveBeenCalledWith('get_random_words_for_category', {
@@ -142,7 +143,7 @@ describe('useTenCardsRound', () => {
   it('refetches when subcategoryId changes', async () => {
     mockRpc({ data: [], error: null })
 
-    const { rerender } = renderHook(
+    const { rerender } = renderHookWithQueryClient(
       ({ subcategoryId }: { subcategoryId: string | null }) =>
         useTenCardsRound('cat-1', 'standard', subcategoryId),
       { initialProps: { subcategoryId: null as string | null } },

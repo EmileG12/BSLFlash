@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useAuth } from './useAuth'
 import { useUserRoles } from './useUserRoles'
 
@@ -26,7 +27,7 @@ describe('useUserRoles', () => {
   it('stays loading while auth itself is still loading', () => {
     vi.mocked(useAuth).mockReturnValue({ session: null, loading: true })
 
-    const { result } = renderHook(() => useUserRoles())
+    const { result } = renderHookWithQueryClient(() => useUserRoles())
 
     expect(result.current.loading).toBe(true)
     expect(result.current.isAdmin).toBe(false)
@@ -36,7 +37,7 @@ describe('useUserRoles', () => {
   it('resolves to no roles without calling the RPCs when there is no session', async () => {
     vi.mocked(useAuth).mockReturnValue({ session: null, loading: false })
 
-    const { result } = renderHook(() => useUserRoles())
+    const { result } = renderHookWithQueryClient(() => useUserRoles())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.isAdmin).toBe(false)
@@ -48,7 +49,7 @@ describe('useUserRoles', () => {
     vi.mocked(useAuth).mockReturnValue({ session: { user: { id: 'u1' } } as never, loading: false })
     mockRoles(true, false)
 
-    const { result } = renderHook(() => useUserRoles())
+    const { result } = renderHookWithQueryClient(() => useUserRoles())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.isAdmin).toBe(true)
@@ -59,7 +60,7 @@ describe('useUserRoles', () => {
     vi.mocked(useAuth).mockReturnValue({ session: { user: { id: 'u1' } } as never, loading: false })
     mockRoles(false, true)
 
-    const { result } = renderHook(() => useUserRoles())
+    const { result } = renderHookWithQueryClient(() => useUserRoles())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.isAdmin).toBe(false)

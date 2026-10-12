@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { useUserRoles } from '../hooks/useUserRoles'
 import { mockCategories } from '../test/mockCategories'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { MobileNavSheet } from './MobileNavSheet'
 
 vi.mock('../lib/supabase', () => ({
@@ -29,7 +30,7 @@ describe('MobileNavSheet', () => {
     mockCategories({ data: [], error: null })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={vi.fn()} />
       </MemoryRouter>,
@@ -50,7 +51,7 @@ describe('MobileNavSheet', () => {
     })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<MobileNavSheet onSignOut={vi.fn()} />} />
@@ -75,7 +76,7 @@ describe('MobileNavSheet', () => {
     mockCategories({ data: [], error: null })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={vi.fn()} />
       </MemoryRouter>,
@@ -92,7 +93,7 @@ describe('MobileNavSheet', () => {
     const onSignOut = vi.fn()
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={onSignOut} />
       </MemoryRouter>,
@@ -108,7 +109,7 @@ describe('MobileNavSheet', () => {
     mockCategories({ data: [], error: null })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={vi.fn()} />
       </MemoryRouter>,
@@ -124,7 +125,7 @@ describe('MobileNavSheet', () => {
     mockCategories({ data: [], error: null })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={vi.fn()} />
       </MemoryRouter>,
@@ -140,7 +141,7 @@ describe('MobileNavSheet', () => {
     vi.mocked(useUserRoles).mockReturnValue({ isAdmin: true, isSuperadmin: false, loading: false })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={vi.fn()} />
       </MemoryRouter>,
@@ -156,7 +157,7 @@ describe('MobileNavSheet', () => {
     vi.mocked(useUserRoles).mockReturnValue({ isAdmin: false, isSuperadmin: true, loading: false })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <MobileNavSheet onSignOut={vi.fn()} />
       </MemoryRouter>,

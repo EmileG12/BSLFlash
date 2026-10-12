@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface DeckTag {
@@ -14,29 +14,14 @@ interface AvailableDeckTagsState {
 
 /** Tags currently in use on at least one public deck, for the Browse directory's filter chips. */
 export function useAvailableDeckTags(): AvailableDeckTagsState {
-  const [tags, setTags] = useState<DeckTag[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const { data, isLoading, error } = useQuery({
+    queryKey: ['availableDeckTags'],
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_available_deck_tags')
+      if (error) throw new Error(error.message)
+      return data ?? []
+    },
+  })
 
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .rpc('get_available_deck_tags')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setError(error.message)
-        } else {
-          setTags(data ?? [])
-        }
-        setLoading(false)
-      })
-
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { tags, loading, error }
+  return { tags: data ?? [], loading: isLoading, error: error?.message ?? null }
 }

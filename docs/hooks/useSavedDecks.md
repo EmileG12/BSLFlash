@@ -5,11 +5,11 @@
 
 **Purpose:** Fetches the decks the signed-in user has added to their library from the Browse directory, for the "Saved Decks" section of [MyDecksPage](../components/MyDecksPage.md).
 
-**Behavior:** Calls [`get_saved_decks`](../rpc-functions/get_saved_decks.md) once on mount (empty dependency array) and never refetches. A `cancelled` flag in the effect cleanup discards a response that arrives after unmount. On error, `error` is set to the message and `savedDecks` stays empty; on success, `savedDecks` is the RPC result (or `[]`).
+**Behavior:** Backed by React Query's `useQuery` under query key `['savedDecks']`. The `queryFn` calls [`get_saved_decks`](../rpc-functions/get_saved_decks.md) and throws on error. The hook maps `isLoading`/`error`/`data` onto `loading`/`error`/`savedDecks`. Requires a `QueryClientProvider` ancestor (wired once in `main.tsx`).
 
 `id` is the `custom_decks` id, which is also the `saved_decks.custom_deck_id` the row is keyed by. The page uses it both to navigate and to unsave.
 
-**Local removal:** `setSavedDecks` is returned so [MyDecksPage](../components/MyDecksPage.md) can drop a deck from the list after it deletes the `saved_decks` row, without a refetch. The hook itself never removes anything.
+**Local removal:** `setSavedDecks` is returned so [MyDecksPage](../components/MyDecksPage.md) can drop a deck from the list after it deletes the `saved_decks` row, without a refetch. It is a state-style setter implemented with `queryClient.setQueryData` on the same key. It does nothing before the first fetch has resolved. The hook itself never removes anything.
 
 **Filtering:** The hook does no filtering of its own. A save whose deck the owner has unpublished never reaches it, because [`get_saved_decks`](../rpc-functions/get_saved_decks.md) omits it.
 

@@ -12,4 +12,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase` (`supabase.from`) the same way as [SelectDeckCard.test.tsx](./SelectDeckCard.md), chaining mocked `select`/`order` calls. Uses `renderHook` + `waitFor` from `@testing-library/react` to test the hook directly without a wrapping component — `result.current` is the hook's live return value.
+Mocks `../lib/supabase` (`supabase.from`) the same way as [SelectDeckCard.test.tsx](./SelectDeckCard.md), chaining mocked `select`/`order` calls. Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), with `waitFor` from `@testing-library/react`. `result.current` is the hook's live return value.

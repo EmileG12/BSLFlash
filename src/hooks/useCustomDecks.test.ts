@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useCustomDecks } from './useCustomDecks'
 
 vi.mock('../lib/supabase', () => ({
@@ -36,7 +37,7 @@ describe('useCustomDecks', () => {
       }),
     } as never)
 
-    const { result } = renderHook(() => useCustomDecks())
+    const { result } = renderHookWithQueryClient(() => useCustomDecks())
 
     expect(result.current.loading).toBe(true)
     expect(result.current.customDecks).toEqual([])
@@ -48,7 +49,7 @@ describe('useCustomDecks', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useCustomDecks())
+    const { result } = renderHookWithQueryClient(() => useCustomDecks())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.customDecks).toEqual([{ id: '1', deck_name: 'My Animals' }])
@@ -58,7 +59,7 @@ describe('useCustomDecks', () => {
   it('sets an error message when the fetch fails', async () => {
     mockCustomDecks({ data: null, error: { message: 'network error' } })
 
-    const { result } = renderHook(() => useCustomDecks())
+    const { result } = renderHookWithQueryClient(() => useCustomDecks())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('network error')
@@ -67,7 +68,7 @@ describe('useCustomDecks', () => {
   it('returns an empty list when the user has no custom decks', async () => {
     mockCustomDecks({ data: [], error: null })
 
-    const { result } = renderHook(() => useCustomDecks())
+    const { result } = renderHookWithQueryClient(() => useCustomDecks())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.customDecks).toEqual([])
@@ -76,7 +77,7 @@ describe('useCustomDecks', () => {
   it('returns an empty list when there is no signed-in user', async () => {
     vi.mocked(supabase.auth.getUser).mockResolvedValue({ data: { user: null } } as never)
 
-    const { result } = renderHook(() => useCustomDecks())
+    const { result } = renderHookWithQueryClient(() => useCustomDecks())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.customDecks).toEqual([])

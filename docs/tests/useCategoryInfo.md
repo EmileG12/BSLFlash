@@ -11,4 +11,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `from` via an explicit factory replicating the `select().eq().maybeSingle()` chain. Uses `renderHook`/`waitFor` from `@testing-library/react`.
+Mocks `../lib/supabase`'s `from` via an explicit factory replicating the `select().eq().maybeSingle()` chain. Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`), with `waitFor` from `@testing-library/react`.

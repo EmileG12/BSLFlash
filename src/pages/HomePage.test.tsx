@@ -1,7 +1,8 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { HomePage } from './HomePage'
 
 vi.mock('../lib/supabase', () => ({
@@ -24,7 +25,7 @@ describe('HomePage', () => {
   it('renders the topic deck picker above the vocabulary deck picker, each with its own categories', async () => {
     mockCategoriesByVocabulary()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <HomePage />
       </MemoryRouter>,

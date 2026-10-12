@@ -1,9 +1,10 @@
-import { render, screen } from '@testing-library/react'
+import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
 import { mockCategories, mockCategoriesPending } from '../test/mockCategories'
+import { renderWithQueryClient } from '../test/renderWithQueryClient'
 import { SelectDeckCard } from './SelectDeckCard'
 
 vi.mock('../lib/supabase', () => ({
@@ -16,7 +17,7 @@ describe('SelectDeckCard', () => {
   it('shows a loading state before the categories resolve', () => {
     mockCategoriesPending()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
@@ -34,7 +35,7 @@ describe('SelectDeckCard', () => {
       error: null,
     })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
@@ -47,7 +48,7 @@ describe('SelectDeckCard', () => {
   it('filters by the vocabulary prop', async () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <SelectDeckCard vocabulary={true} />
       </MemoryRouter>,
@@ -60,7 +61,7 @@ describe('SelectDeckCard', () => {
   it('shows an error message when the fetch fails', async () => {
     mockCategories({ data: null, error: { message: 'network error' } })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
@@ -72,7 +73,7 @@ describe('SelectDeckCard', () => {
   it('shows an empty state when there are no categories', async () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <SelectDeckCard vocabulary={false} />
       </MemoryRouter>,
@@ -84,7 +85,7 @@ describe('SelectDeckCard', () => {
   it('renders a custom title when given one', async () => {
     mockCategories({ data: [], error: null })
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter>
         <SelectDeckCard vocabulary={true} title="Select a vocabulary list" />
       </MemoryRouter>,
@@ -100,7 +101,7 @@ describe('SelectDeckCard', () => {
     })
     const user = userEvent.setup()
 
-    render(
+    renderWithQueryClient(
       <MemoryRouter initialEntries={['/']}>
         <Routes>
           <Route path="/" element={<SelectDeckCard vocabulary={false} />} />

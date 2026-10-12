@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export type DeckSort = 'likes' | 'newest' | 'name'
@@ -23,58 +23,36 @@ interface PublicDecksState {
   setDecks: React.Dispatch<React.SetStateAction<PublicDeck[]>>
 }
 
-interface Result {
-  requestKey: string
-  decks: PublicDeck[]
-  error: string | null
-}
-
 /** Backs the Browse decks directory: search by name, AND-filter by tag ids, sorted per get_public_decks. */
 export function usePublicDecks(search: string, tagIds: string[], sort: DeckSort): PublicDecksState {
-  const [result, setResult] = useState<Result | null>(null)
+  const queryClient = useQueryClient()
   const trimmedSearch = search.trim()
   const tagIdsKey = tagIds.join(',')
-  const requestKey = `${trimmedSearch}\u0000${tagIdsKey}\u0000${sort}`
-  // Loading is derived, not stored -- same pattern as useRandomFlashcard: it's
-  // just "the last completed fetch doesn't match what's currently asked for".
-  const loading = result?.requestKey !== requestKey
+  const queryKey = ['publicDecks', trimmedSearch, tagIdsKey, sort]
 
-  useEffect(() => {
-    let cancelled = false
-
-    supabase
-      .rpc('get_public_decks', {
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const { data, error } = await supabase.rpc('get_public_decks', {
         p_search: trimmedSearch === '' ? undefined : trimmedSearch,
         p_tag_ids: tagIdsKey === '' ? undefined : tagIdsKey.split(','),
         p_sort: sort,
       })
-      .then(({ data, error }) => {
-        if (cancelled) return
-        setResult({ requestKey, decks: data ?? [], error: error?.message ?? null })
-      })
+      if (error) throw new Error(error.message)
+      return data ?? []
+    },
+  })
 
-    return () => {
-      cancelled = true
-    }
-  }, [trimmedSearch, tagIdsKey, sort, requestKey])
-
-  const decks = useMemo(() => (loading ? [] : result?.decks ?? []), [loading, result])
-
-  function setDecks(update: React.SetStateAction<PublicDeck[]>) {
-    setResult((previous) =>
-      previous
-        ? {
-            ...previous,
-            decks: typeof update === 'function' ? update(previous.decks) : update,
-          }
-        : previous,
+  const setDecks: React.Dispatch<React.SetStateAction<PublicDeck[]>> = (update) => {
+    queryClient.setQueryData<PublicDeck[]>(queryKey, (previous) =>
+      previous === undefined ? previous : typeof update === 'function' ? update(previous) : update,
     )
   }
 
   return {
-    decks,
-    loading,
-    error: loading ? null : (result?.error ?? null),
+    decks: data ?? [],
+    loading: isLoading,
+    error: error?.message ?? null,
     setDecks,
   }
 }

@@ -22,4 +22,4 @@ Custom React hooks, one doc file per hook.
 | [useSavedDecks](./useSavedDecks.md) | `src/hooks/useSavedDecks.ts` | Fetches the decks the signed-in user has saved from the Browse directory, with a local setter for removing one after an unsave. |
 | [useStreakScore](./useStreakScore.md) | `src/hooks/useStreakScore.ts` | Tracks a consecutive-correct streak, resetting to 0 on a wrong result. |
 | [useTenCardsRound](./useTenCardsRound.md) | `src/hooks/useTenCardsRound.ts` | Fetches up to 10 distinct random words + videos for a category or custom deck, for the "10 Cards" mode. |
-| [useWords](./useWords.md) | `src/hooks/useWords.ts` | Fetches all words, for the flashcard guess combobox. |
+| [useWords](./useWords.md) | `src/hooks/useWords.ts` | Fetches every word, for the guess combobox and the word lists in deck building, the Edit deck modal and the superadmin/admin word pages. |

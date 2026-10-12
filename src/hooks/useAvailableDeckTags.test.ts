@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useAvailableDeckTags } from './useAvailableDeckTags'
 
 vi.mock('../lib/supabase', () => ({
@@ -13,7 +14,7 @@ describe('useAvailableDeckTags', () => {
   it('starts in a loading state', () => {
     vi.mocked(supabase.rpc).mockReturnValue(new Promise(() => {}) as never)
 
-    const { result } = renderHook(() => useAvailableDeckTags())
+    const { result } = renderHookWithQueryClient(() => useAvailableDeckTags())
 
     expect(result.current.loading).toBe(true)
     expect(result.current.tags).toEqual([])
@@ -25,7 +26,7 @@ describe('useAvailableDeckTags', () => {
       error: null,
     } as never)
 
-    const { result } = renderHook(() => useAvailableDeckTags())
+    const { result } = renderHookWithQueryClient(() => useAvailableDeckTags())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.tags).toEqual([{ id: '1', category_name: 'GCSE' }])
@@ -37,7 +38,7 @@ describe('useAvailableDeckTags', () => {
       error: { message: 'network error' },
     } as never)
 
-    const { result } = renderHook(() => useAvailableDeckTags())
+    const { result } = renderHookWithQueryClient(() => useAvailableDeckTags())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('network error')

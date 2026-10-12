@@ -17,4 +17,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `from`, `rpc`, and `storage.from(...).getPublicUrl`. Renders inside a `MemoryRouter`/`Routes` with an initial entry matching `/flashcards/:deckType/:categoryId/ten-cards`, plus a stub `/flashcards/:deckType/:categoryId` route to assert the "Back to modes" navigation against. Only the page-level scoring/advancing logic is exercised here — the underlying guess/reveal mechanics are covered by [FlashcardRound.test.tsx](./FlashcardRound.md).
+Mocks `../lib/supabase`'s `from`, `rpc`, and `storage.from(...).getPublicUrl`. Renders inside a `MemoryRouter`/`Routes` with an initial entry matching `/flashcards/:deckType/:categoryId/ten-cards`, plus a stub `/flashcards/:deckType/:categoryId` route to assert the "Back to modes" navigation against. Only the page-level scoring/advancing logic is exercised here — the underlying guess/reveal mechanics are covered by [FlashcardRound.test.tsx](./FlashcardRound.md). Renders via [renderWithQueryClient](./renderWithQueryClient.md), since the page calls [useTenCardsRound](../hooks/useTenCardsRound.md) and [useWords](../hooks/useWords.md), which require a `QueryClientProvider` ancestor.

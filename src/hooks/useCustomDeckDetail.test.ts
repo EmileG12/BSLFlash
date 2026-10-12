@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useCustomDeckDetail } from './useCustomDeckDetail'
 
 vi.mock('../lib/supabase', () => ({
@@ -40,7 +41,7 @@ describe('useCustomDeckDetail', () => {
       }),
     } as never)
 
-    const { result } = renderHook(() => useCustomDeckDetail('deck-1'))
+    const { result } = renderHookWithQueryClient(() => useCustomDeckDetail('deck-1'))
 
     expect(result.current.loading).toBe(true)
     expect(result.current.detail).toBeNull()
@@ -49,7 +50,7 @@ describe('useCustomDeckDetail', () => {
   it('combines the deck, words, and tags into one detail object', async () => {
     mockDetail()
 
-    const { result } = renderHook(() => useCustomDeckDetail('deck-1'))
+    const { result } = renderHookWithQueryClient(() => useCustomDeckDetail('deck-1'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.detail).toEqual({
@@ -63,7 +64,7 @@ describe('useCustomDeckDetail', () => {
   it('sets an error message when the deck fetch fails', async () => {
     mockDetail({ deck: { data: null, error: { message: 'not found' } } })
 
-    const { result } = renderHook(() => useCustomDeckDetail('deck-1'))
+    const { result } = renderHookWithQueryClient(() => useCustomDeckDetail('deck-1'))
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('not found')

@@ -13,6 +13,6 @@
 
 ## Notes
 
-Mocks `./useAuth` directly with a `vi.mock` factory, so the session and loading state are set per test with `mockReturnValue` rather than through a real auth provider. Mocks `../lib/supabase` with a bare `rpc: vi.fn()`; a `mockRoles` helper sets a `mockImplementation` keyed on the RPC name, because the two calls need different return values within the same test. Any other RPC name throws, so an unexpected call fails loudly.
+Renders via the shared [`renderHookWithQueryClient`](../../src/test/renderHookWithQueryClient.tsx) helper (fresh `QueryClientProvider` with retries disabled, since the hook uses `useQuery`). Mocks `./useAuth` directly with a `vi.mock` factory, so the session and loading state are set per test with `mockReturnValue` rather than through a real auth provider. Mocks `../lib/supabase` with a bare `rpc: vi.fn()`; a `mockRoles` helper sets a `mockImplementation` keyed on the RPC name, because the two calls need different return values within the same test. Any other RPC name throws, so an unexpected call fails loudly.
 
 The no-session test asserts `supabase.rpc` was never called, which pins the no-session short-circuit described in [useUserRoles](../hooks/useUserRoles.md).

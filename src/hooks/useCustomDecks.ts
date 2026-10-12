@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface CustomDeck {
@@ -13,6 +13,8 @@ interface CustomDecksState {
   setCustomDecks: React.Dispatch<React.SetStateAction<CustomDeck[]>>
 }
 
+const queryKey = ['customDecks']
+
 /**
  * Lists only the caller's OWN custom decks for "My Decks". An explicit
  * user_id filter is required here, not just RLS: custom_decks now also has
@@ -24,41 +26,29 @@ interface CustomDecksState {
  * standing between a user and someone else's deck.
  */
 export function useCustomDecks(): CustomDecksState {
-  const [customDecks, setCustomDecks] = useState<CustomDeck[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    let cancelled = false
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) return []
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (cancelled) return
-      if (!user) {
-        setCustomDecks([])
-        setLoading(false)
-        return
-      }
-
-      supabase
+      const { data, error } = await supabase
         .from('custom_decks')
         .select('id, deck_name')
         .eq('user_id', user.id)
         .order('deck_name')
-        .then(({ data, error }) => {
-          if (cancelled) return
-          if (error) {
-            setError(error.message)
-          } else {
-            setCustomDecks(data)
-          }
-          setLoading(false)
-        })
-    })
+      if (error) throw new Error(error.message)
+      return data
+    },
+  })
 
-    return () => {
-      cancelled = true
-    }
-  }, [])
+  const setCustomDecks: React.Dispatch<React.SetStateAction<CustomDeck[]>> = (update) => {
+    queryClient.setQueryData<CustomDeck[]>(queryKey, (previous) =>
+      previous === undefined ? previous : typeof update === 'function' ? update(previous) : update,
+    )
+  }
 
-  return { customDecks, loading, error, setCustomDecks }
+  return { customDecks: data ?? [], loading: isLoading, error: error?.message ?? null, setCustomDecks }
 }

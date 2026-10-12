@@ -11,4 +11,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase`'s `rpc` directly (the hook `useAvailableDeckTags` calls it under the hood), so the component is tested without a real Supabase call. Renders the component directly, no router needed. The chip markup itself is tested in [TagChipList.test.tsx](./TagChipList.md), since [TagFilterChips](../components/TagFilterChips.md) delegates to it.
+Mocks `../lib/supabase`'s `rpc` directly (the hook `useAvailableDeckTags` calls it under the hood), so the component is tested without a real Supabase call. Renders via [renderWithQueryClient](./renderWithQueryClient.md), since `TagFilterChips` calls [useAvailableDeckTags](../hooks/useAvailableDeckTags.md), which requires a `QueryClientProvider` ancestor. No router needed. The chip markup itself is tested in [TagChipList.test.tsx](./TagChipList.md), since [TagFilterChips](../components/TagFilterChips.md) delegates to it.

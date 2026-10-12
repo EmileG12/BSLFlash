@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useWords } from './useWords'
 
 vi.mock('../lib/supabase', () => ({
@@ -25,7 +26,7 @@ describe('useWords', () => {
       }),
     } as never)
 
-    const { result } = renderHook(() => useWords())
+    const { result } = renderHookWithQueryClient(() => useWords())
 
     expect(result.current.loading).toBe(true)
     expect(result.current.words).toEqual([])
@@ -37,7 +38,7 @@ describe('useWords', () => {
       error: null,
     })
 
-    const { result } = renderHook(() => useWords())
+    const { result } = renderHookWithQueryClient(() => useWords())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.words).toEqual([{ id: '1', word: 'Hello', definition: 'A greeting.' }])
@@ -46,7 +47,7 @@ describe('useWords', () => {
   it('sets an error message when the fetch fails', async () => {
     mockWords({ data: null, error: { message: 'network error' } })
 
-    const { result } = renderHook(() => useWords())
+    const { result } = renderHookWithQueryClient(() => useWords())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('network error')
@@ -55,7 +56,7 @@ describe('useWords', () => {
   it('returns an empty list when there are no words', async () => {
     mockWords({ data: [], error: null })
 
-    const { result } = renderHook(() => useWords())
+    const { result } = renderHookWithQueryClient(() => useWords())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.words).toEqual([])

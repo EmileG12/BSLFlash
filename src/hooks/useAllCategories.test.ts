@@ -1,6 +1,7 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
+import { renderHookWithQueryClient } from '../test/renderHookWithQueryClient'
 import { useAllCategories } from './useAllCategories'
 
 vi.mock('../lib/supabase', () => ({
@@ -21,7 +22,7 @@ describe('useAllCategories', () => {
       select: vi.fn().mockReturnValue({ order: vi.fn().mockReturnValue(new Promise(() => {})) }),
     } as never)
 
-    const { result } = renderHook(() => useAllCategories())
+    const { result } = renderHookWithQueryClient(() => useAllCategories())
 
     expect(result.current.loading).toBe(true)
     expect(result.current.categories).toEqual([])
@@ -30,7 +31,7 @@ describe('useAllCategories', () => {
   it('returns the fetched categories', async () => {
     mockCategories({ data: [{ id: '1', category_name: 'GCSE' }], error: null })
 
-    const { result } = renderHook(() => useAllCategories())
+    const { result } = renderHookWithQueryClient(() => useAllCategories())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.categories).toEqual([{ id: '1', category_name: 'GCSE' }])
@@ -39,7 +40,7 @@ describe('useAllCategories', () => {
   it('sets an error message when the fetch fails', async () => {
     mockCategories({ data: null, error: { message: 'network error' } })
 
-    const { result } = renderHook(() => useAllCategories())
+    const { result } = renderHookWithQueryClient(() => useAllCategories())
 
     await waitFor(() => expect(result.current.loading).toBe(false))
     expect(result.current.error).toBe('network error')

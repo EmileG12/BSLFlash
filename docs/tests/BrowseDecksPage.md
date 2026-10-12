@@ -15,4 +15,4 @@
 
 ## Notes
 
-Mocks `../lib/supabase` with `rpc` (for `get_public_decks` and `get_available_deck_tags`, via the hooks), and `from` (for the like and save writes) via an explicit factory. Renders inside a `MemoryRouter`/`Routes` with a stub `/browse-decks` route. Navigation is asserted by checking the rendered route rather than mocking `useNavigate`, same convention as [NavBar.test.tsx](./NavBar.md).
+Mocks `../lib/supabase` with `rpc` (for `get_public_decks` and `get_available_deck_tags`, via the hooks), and `from` (for the like and save writes) via an explicit factory. Renders inside a `MemoryRouter`/`Routes` with a stub `/browse-decks` route. Navigation is asserted by checking the rendered route rather than mocking `useNavigate`, same convention as [NavBar.test.tsx](./NavBar.md). Renders via [renderWithQueryClient](./renderWithQueryClient.md), since the page calls [usePublicDecks](../hooks/usePublicDecks.md) and renders [TagFilterChips](../components/TagFilterChips.md), which calls [useAvailableDeckTags](../hooks/useAvailableDeckTags.md); all three need a `QueryClientProvider` ancestor.

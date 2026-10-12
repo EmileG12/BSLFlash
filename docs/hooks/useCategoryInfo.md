@@ -7,8 +7,12 @@
 
 `deckType: DeckType` (`'standard' | 'custom'`, imported from [useRandomFlashcard](./useRandomFlashcard.md) rather than redeclared) selects whether `categoryId` is looked up in `public.categories` or a user-owned `custom_decks` deck, same convention as [useRandomFlashcard](./useRandomFlashcard.md)/[useTenCardsRound](./useTenCardsRound.md).
 
-**Behavior:** For `'standard'`, selects `category_name, is_vocabulary` from `categories`; for `'custom'`, selects just `deck_name` from `custom_decks`. Custom decks have no `is_vocabulary` column, so `isVocabulary` always reports `false` for `deckType: 'custom'` regardless of what (if anything) comes back from the query — it isn't read off the response at all in that branch.
+**Behavior:** Backed by React Query's `useQuery` under query key `['categoryInfo', categoryId, deckType]`. For `'standard'`, the `queryFn` selects `category_name, is_vocabulary` from `categories`; for `'custom'`, it selects just `deck_name` from `custom_decks`. Both use `.eq('id', categoryId).maybeSingle()`. `loading` is `isLoading`.
 
-This hook and the category-name display it powers are both new as of the subcategory-filtering feature — `ModeSelectPage` previously had a static title with no category lookup at all. The vocabulary flag is folded into this one hook's query rather than split into a second hook/query, so showing the name and deciding whether to render [SubCategoryChips](../components/SubCategoryChips.md) only ever costs one round-trip, not two.
+Custom decks have no `is_vocabulary` column, so `isVocabulary` always reports `false` for `deckType: 'custom'` regardless of what (if anything) comes back from the query. It isn't read off the response at all in that branch.
+
+The query's `error` is not read. A failed lookup resolves to `categoryName: null` and `isVocabulary: false`, and the hook has no `error` field.
+
+The vocabulary flag is folded into this one query rather than split into a second hook, so showing the name and deciding whether to render [SubCategoryChips](../components/SubCategoryChips.md) costs one round-trip, not two. Requires a `QueryClientProvider` ancestor (wired once in `main.tsx`).
 
 **Used by:** [ModeSelectPage](../components/ModeSelectPage.md).

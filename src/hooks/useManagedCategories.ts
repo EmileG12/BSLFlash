@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { supabase } from '../lib/supabase'
 
 export interface ManagedCategory {
@@ -15,33 +15,29 @@ interface ManagedCategoriesState {
   setCategories: React.Dispatch<React.SetStateAction<ManagedCategory[]>>
 }
 
+const queryKey = ['categories', 'managed']
+
 /** Every category (including disabled ones), for the superadmin Manage Categories page -- unlike useCategories/useAllCategories, which only ever need active categories for end-user browsing/tagging. */
 export function useManagedCategories(): ManagedCategoriesState {
-  const [categories, setCategories] = useState<ManagedCategory[]>([])
-  const [loading, setLoading] = useState(true)
-  const [error, setError] = useState<string | null>(null)
+  const queryClient = useQueryClient()
 
-  useEffect(() => {
-    let cancelled = false
+  const { data, isLoading, error } = useQuery({
+    queryKey,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from('categories')
+        .select('id, category_name, is_vocabulary, is_active')
+        .order('category_name')
+      if (error) throw new Error(error.message)
+      return data
+    },
+  })
 
-    supabase
-      .from('categories')
-      .select('id, category_name, is_vocabulary, is_active')
-      .order('category_name')
-      .then(({ data, error }) => {
-        if (cancelled) return
-        if (error) {
-          setError(error.message)
-        } else {
-          setCategories(data)
-        }
-        setLoading(false)
-      })
+  const setCategories: React.Dispatch<React.SetStateAction<ManagedCategory[]>> = (update) => {
+    queryClient.setQueryData<ManagedCategory[]>(queryKey, (previous) =>
+      previous === undefined ? previous : typeof update === 'function' ? update(previous) : update,
+    )
+  }
 
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
-  return { categories, loading, error, setCategories }
+  return { categories: data ?? [], loading: isLoading, error: error?.message ?? null, setCategories }
 }
