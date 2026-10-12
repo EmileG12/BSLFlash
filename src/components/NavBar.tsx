@@ -1,6 +1,7 @@
 import { NavLink, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronDown, LogOut, Shield } from 'lucide-react'
 import { signOut } from '../lib/auth'
+import { ADMIN_NAV_GROUPS } from '../lib/adminNav'
 import { useUserRoles } from '../hooks/useUserRoles'
 import { useHoverDropdownMenu } from '../hooks/useHoverDropdownMenu'
 import { CategoryMenu } from './CategoryMenu'
@@ -60,23 +61,16 @@ function AdminNavEntry() {
           sideOffset={10}
           {...contentProps}
         >
-          <DropdownMenuItem className="admin-menu-item" asChild>
-            <NavLink to="/admin">Add & tag words</NavLink>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="admin-menu-item" asChild>
-            <NavLink to="/superadmin/categories">Manage categories</NavLink>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="admin-menu-item" asChild>
-            <NavLink to="/superadmin/words">Manage words</NavLink>
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem className="admin-menu-item" asChild>
-            <NavLink to="/superadmin/roles">Manage roles</NavLink>
-          </DropdownMenuItem>
-          <DropdownMenuItem className="admin-menu-item" asChild>
-            <NavLink to="/superadmin/accounts">Manage accounts</NavLink>
-          </DropdownMenuItem>
+          {ADMIN_NAV_GROUPS.map((group, groupIndex) => (
+            <div key={group[0].to}>
+              {groupIndex > 0 && <DropdownMenuSeparator />}
+              {group.map((item) => (
+                <DropdownMenuItem key={item.to} className="admin-menu-item" asChild>
+                  <NavLink to={item.to}>{item.label}</NavLink>
+                </DropdownMenuItem>
+              ))}
+            </div>
+          ))}
         </DropdownMenuContent>
       </div>
     </DropdownMenu>

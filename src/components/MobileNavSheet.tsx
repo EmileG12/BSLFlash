@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { ChevronDown, LogOut, Menu, Shield } from 'lucide-react'
+import { ADMIN_NAV_ITEMS } from '../lib/adminNav'
 import { useCategories } from '../hooks/useCategories'
 import { useUserRoles } from '../hooks/useUserRoles'
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from './ui/sheet'
@@ -37,31 +38,13 @@ function AdminDisclosure({ onNavigate }: AdminDisclosureProps) {
       </button>
       {open && (
         <ul id={listId} className="mobile-nav-disclosure-list">
-          <li>
-            <NavLink to="/admin" className="mobile-nav-disclosure-item" onClick={onNavigate}>
-              Add & tag words
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/superadmin/categories" className="mobile-nav-disclosure-item" onClick={onNavigate}>
-              Manage categories
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/superadmin/words" className="mobile-nav-disclosure-item" onClick={onNavigate}>
-              Manage words
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/superadmin/roles" className="mobile-nav-disclosure-item" onClick={onNavigate}>
-              Manage roles
-            </NavLink>
-          </li>
-          <li>
-            <NavLink to="/superadmin/accounts" className="mobile-nav-disclosure-item" onClick={onNavigate}>
-              Manage accounts
-            </NavLink>
-          </li>
+          {ADMIN_NAV_ITEMS.map((item) => (
+            <li key={item.to}>
+              <NavLink to={item.to} className="mobile-nav-disclosure-item" onClick={onNavigate}>
+                {item.label}
+              </NavLink>
+            </li>
+          ))}
         </ul>
       )}
     </div>
