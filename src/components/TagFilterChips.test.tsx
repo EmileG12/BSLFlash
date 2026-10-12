@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
@@ -20,8 +20,7 @@ describe('TagFilterChips', () => {
 
     const { container } = render(<TagFilterChips selectedIds={[]} onToggle={vi.fn()} />)
 
-    await new Promise((resolve) => setTimeout(resolve, 0))
-    expect(container).toBeEmptyDOMElement()
+    await waitFor(() => expect(container).toBeEmptyDOMElement())
   })
 
   it('marks selected tags as pressed and calls onToggle with the tag id', async () => {
