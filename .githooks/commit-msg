@@ -1,0 +1,8 @@
+#!/bin/sh
+# Backstop for CLAUDE.md's "never add AI attribution" rule. Agents are told to omit
+# Co-Authored-By: Claude / "Generated with Claude Code" lines, but the harness also
+# injects a default attribution reminder each session that can override that in
+# practice -- this strips any such line from the message before it's recorded, so a
+# slip doesn't end up in history.
+
+node .claude/hooks/strip-ai-attribution.mjs "$1"

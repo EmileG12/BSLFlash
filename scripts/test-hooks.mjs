@@ -66,6 +66,11 @@ describe('wiring (the silent failure modes)', () => {
     configured ? `core.hooksPath=${hooksPath.out.trim()} but that path is missing` : '',
   )
   check('.githooks/pre-commit exists', existsSync('.githooks/pre-commit'))
+  check('.githooks/commit-msg exists', existsSync('.githooks/commit-msg'))
+  check(
+    '.claude/hooks/strip-ai-attribution.mjs exists',
+    existsSync('.claude/hooks/strip-ai-attribution.mjs'),
+  )
   check('.claude/hooks/check-docs.mjs exists', existsSync('.claude/hooks/check-docs.mjs'))
   check(
     '.claude/hooks/require-test-redirect.mjs exists',
@@ -130,6 +135,34 @@ describe('docs gate: vendored and test files are exempt', () => {
     (result) => {
       check('exits zero', result.ok, 'a false positive here trains everyone to ignore the gate')
     },
+  )
+})
+
+describe('AI-attribution strip gate', () => {
+  const probePath = '.test-logs/commit-msg-probe.txt'
+
+  function strip(message) {
+    mkdirSync(dirname(probePath), { recursive: true })
+    writeFileSync(probePath, message)
+    run('node', ['.claude/hooks/strip-ai-attribution.mjs', probePath])
+    const result = run('node', ['-e', `process.stdout.write(require('fs').readFileSync(${JSON.stringify(probePath)}, 'utf8'))`]).out
+    rmSync(probePath, { force: true })
+    return result
+  }
+
+  check(
+    'strips a Co-Authored-By: Claude trailer',
+    !strip('Fix the thing\n\nCo-Authored-By: Claude Sonnet 5 <noreply@anthropic.com>\n').includes('Co-Authored-By'),
+  )
+  check(
+    'strips a "Generated with Claude Code" line',
+    !strip('Fix the thing\n\n🤖 Generated with [Claude Code](https://claude.com/claude-code)\n').includes(
+      'Generated with',
+    ),
+  )
+  check(
+    'leaves an unrelated message untouched',
+    strip('Fix the thing\n\nCo-Authored-By: Jane Doe <jane@example.com>\n').includes('Jane Doe'),
   )
 })
 
