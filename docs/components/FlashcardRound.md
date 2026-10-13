@@ -12,7 +12,7 @@
 | `advanceLabel` | `string` | Text for the button shown after reveal (e.g. `"Next sign"` for Practice, `"Next card"`/`"See results"` for 10 Cards). |
 | `onAdvance` | `(result: { wordId: string; correct: boolean }) => void` | Called when the advance button is clicked, after a guess has been revealed. |
 
-**Key behavior:** Owns a `phase: 'guessing' | 'revealed'` state machine, `guessedWordId`, and `videoError` — identical to what `FlashcardPage` used to own directly. Renders the sign video (`key={flashcard.videoUrl}` forces a remount on card change, since browsers don't reliably reload a `<video>` on an in-place `src` change) and, depending on `phase`, either [WordGuessCombobox](./WordGuessCombobox.md) or the reveal message + advance button.
+**Key behavior:** Owns a `phase: 'guessing' | 'revealed'` state machine, `guessedWordId`, and `videoError`. Renders the sign video (`key={flashcard.videoUrl}` forces a remount on card change, since browsers don't reliably reload a `<video>` on an in-place `src` change) and, depending on `phase`, either [WordGuessCombobox](./WordGuessCombobox.md) or the reveal message + advance button.
 
 The whole round (video, combobox, reveal state) renders inside a `Card`/`CardContent` (`.flashcard-round-card`, `w-full max-w-3xl shadow-lg` — same visual treatment as [SelectDeckCard](./SelectDeckCard.md)'s card), rather than being rendered bare into the page. `max-w-3xl` gives the word/definition line room to stay on one line.
 

@@ -4,7 +4,7 @@
   @apply mx-auto flex max-w-3xl flex-col items-center gap-6 p-4;
 }
 
-/* Wider than .flashcard-page: leaves room beside the (max-w-3xl) card for the score pill. */
+/* Wider than .flashcard-page: leaves room beside the (max-w-3xl) card for TenCardsPage's score pill. */
 .flashcard-round-page {
   @apply mx-auto flex max-w-4xl flex-col items-center gap-6 p-4;
 }

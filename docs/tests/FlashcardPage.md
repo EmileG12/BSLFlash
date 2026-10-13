@@ -10,7 +10,7 @@
 - Shows an empty-state message when the category has no eligible words.
 - Renders [FlashcardRound](../components/FlashcardRound.md) once loaded, and advancing draws a new word (re-triggers the RPC call) regardless of whether the guess was correct — the correctness/reveal mechanics themselves are covered by [FlashcardRound.test.tsx](./FlashcardRound.md), not duplicated here.
 - Forwards a `?subcategory=` query param through to [useRandomFlashcard](../hooks/useRandomFlashcard.md)'s RPC call as `subcategory_id`.
-- The [ScorePill](../components/ScorePill.md) showing `streak` starts at 0, increments to 1 after a correct guess is advanced past, and resets back to 0 after a subsequent wrong guess — exercising [useStreakScore](../hooks/useStreakScore.md) through the page rather than mocking it.
+- Renders no `.flashcard-score-badge` ([ScorePill](../components/ScorePill.md)) in Practice mode, once the first word has loaded.
 
 ## Notes
 
