@@ -74,6 +74,10 @@
 
   --brand-contrast: oklch(1 0 0);
 
+  --brand-emphasis: oklch(0.5 0.14 75);
+
+  --brand-emphasis-strong: oklch(0.42 0.14 75);
+
   --ring-on-brand: var(--foreground);
 
   --input: oklch(0.922 0 0);
@@ -168,6 +172,8 @@ code {
   --color-brand-strong: var(--brand-strong);
   --color-brand-muted: var(--brand-muted);
   --color-brand-contrast: var(--brand-contrast);
+  --color-brand-emphasis: var(--brand-emphasis);
+  --color-brand-emphasis-strong: var(--brand-emphasis-strong);
   --color-ring-on-brand: var(--ring-on-brand);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
@@ -204,6 +210,8 @@ code {
   --brand-strong: oklch(0.81 0.154 80.7);
   --brand-muted: oklch(0.26 0.04 75);
   --brand-contrast: oklch(1 0 0);
+  --brand-emphasis: oklch(0.5 0.14 75);
+  --brand-emphasis-strong: oklch(0.42 0.14 75);
   --ring-on-brand: var(--foreground);
   --background: oklch(0.145 0 0);
   --foreground: oklch(0.985 0 0);

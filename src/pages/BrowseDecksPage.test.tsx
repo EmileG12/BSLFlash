@@ -74,7 +74,18 @@ describe('BrowseDecksPage', () => {
     expect(screen.getByText(/by alice.*Animals/)).toBeInTheDocument()
   })
 
-  it('navigates to the deck on click', async () => {
+  it('navigates to the deck when Play is clicked', async () => {
+    mockRpc([DECK])
+    const user = userEvent.setup()
+
+    renderPage()
+
+    await user.click(await screen.findByRole('button', { name: 'Play My Animals' }))
+
+    expect(await screen.findByText('Mode select page')).toBeInTheDocument()
+  })
+
+  it('does not navigate when the deck name is clicked', async () => {
     mockRpc([DECK])
     const user = userEvent.setup()
 
@@ -82,7 +93,7 @@ describe('BrowseDecksPage', () => {
 
     await user.click(await screen.findByText('My Animals'))
 
-    expect(await screen.findByText('Mode select page')).toBeInTheDocument()
+    expect(screen.queryByText('Mode select page')).not.toBeInTheDocument()
   })
 
   it('re-fetches with the typed search term', async () => {
@@ -145,9 +156,14 @@ describe('BrowseDecksPage', () => {
     renderPage()
     await screen.findByText('My Animals')
 
-    await user.click(screen.getByRole('button', { name: 'Add My Animals to My Decks' }))
+    const saveButton = screen.getByRole('button', { name: 'Add My Animals to My Decks' })
+    expect(saveButton.querySelector('svg')).not.toHaveClass('text-success')
 
-    expect(screen.getByRole('button', { name: 'Remove My Animals from My Decks' })).toBeInTheDocument()
+    await user.click(saveButton)
+
+    const savedButton = screen.getByRole('button', { name: 'Remove My Animals from My Decks' })
+    expect(savedButton).toBeInTheDocument()
+    expect(savedButton.querySelector('svg')).toHaveClass('fill-current', 'text-success')
     expect(insert).toHaveBeenCalledWith({ custom_deck_id: 'deck-1' })
   })
 })

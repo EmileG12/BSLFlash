@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Bookmark, BookmarkCheck, CircleAlert, Heart, Inbox } from 'lucide-react'
+import { Bookmark, CircleAlert, Heart, Inbox, Play } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { usePublicDecks, type DeckSort } from '../hooks/usePublicDecks'
 import { TagFilterChips } from '../components/TagFilterChips'
@@ -124,18 +124,24 @@ export function BrowseDecksPage() {
                   key={deck.id}
                   className="flex flex-col gap-2 rounded-lg border border-border bg-card p-3 sm:flex-row sm:items-center sm:justify-between"
                 >
-                  <button
-                    type="button"
-                    className="flex flex-1 flex-col items-start gap-1 text-left"
-                    onClick={() => navigate(`/flashcards/custom/${deck.id}`)}
-                  >
+                  <div className="flex flex-1 flex-col items-start gap-1 text-left">
                     <span className="font-medium text-foreground">{deck.deck_name}</span>
                     <span className="text-xs text-muted-foreground">
                       by {deck.owner_name ?? 'Anonymous'}
                       {deck.tag_names.length > 0 && <> · {deck.tag_names.join(', ')}</>}
                     </span>
-                  </button>
-                  <div className="flex items-center gap-1">
+                  </div>
+                  <div className="flex items-center gap-1 sm:gap-2">
+                    <Button
+                      variant="default"
+                      size="sm"
+                      aria-label={`Play ${deck.deck_name}`}
+                      onClick={() => navigate(`/flashcards/custom/${deck.id}`)}
+                      className="gap-1.5 bg-brand-emphasis text-brand-contrast hover:bg-brand-emphasis-strong"
+                    >
+                      <Play className="size-4" />
+                      Play
+                    </Button>
                     <Button
                       variant="ghost"
                       size="sm"
@@ -158,7 +164,7 @@ export function BrowseDecksPage() {
                       }
                       onClick={() => toggleSave(deck.id, deck.saved_by_me)}
                     >
-                      {deck.saved_by_me ? <BookmarkCheck /> : <Bookmark />}
+                      <Bookmark className={cn('size-4', deck.saved_by_me && 'fill-current text-success')} />
                     </Button>
                   </div>
                 </li>
