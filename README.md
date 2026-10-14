@@ -1,75 +1,88 @@
-# React + TypeScript + Vite
+# SignStack
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react&logoColor=black)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.x-3178C6?logo=typescript&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-Postgres%20%7C%20Auth%20%7C%20RLS-3FCF8E?logo=supabase&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-blue)
 
-Currently, two official plugins are available:
+A flashcard web app for learning British Sign Language (BSL): pick a topic, watch a short video of the sign, and guess the word.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+My mother is deaf and works as a BSL teacher, which is what gave me the idea for this project. It's also been my vehicle for learning React/Vite properly and for experimenting with disciplined, agentic development workflows (more on that below).
 
-## React Compiler
+![Deck selection screen](readme-assets/deck-selection.png)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## Features
 
-## Expanding the ESLint configuration
+- **Flashcard practice** — two modes on the same video/guess UI: untimed **Practice**, and a scored **10 Cards** round
+- **Built-in vocabulary** — everyday topics (colours, greetings, time) and exam-linked lists (e.g. GCSE), with subcategory filtering
+- **Custom decks** — build a deck from the existing word bank, edit it, and play it exactly like a built-in category
+- **Publishing & discovery** — publish a deck publicly, browse/filter the directory by tag, like decks, and save others' decks to your own library
+- **Role-gated admin** — a two-tier `admin`/`superadmin` system for managing words, sign videos, categories, and user roles/bans
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+![In-progress flashcard round](readme-assets/flashcard-round.png)
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+![Browse decks directory](readme-assets/browse-decks.png)
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Engineering highlights
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- **RLS as the actual security boundary.** Every table is covered by Postgres Row-Level Security policies; client-side role checks are UX-only and are re-verified server-side in RLS/RPC, not trusted on their own.
+- **Atomic multi-row writes via Postgres RPC.** Operations like creating or updating a custom deck write a header row plus its word/tag junction rows in a single transactional function, instead of multiple round-trips that could leave partial state.
+- **Two-tier test suite.** A fast Vitest project running in jsdom for most unit/component tests, and a separate project driving real Chromium (via Playwright) for layout- and pointer-dependent cases — routed automatically by filename convention.
+- **A workflow built to keep AI-assisted changes disciplined.** This repo is also a testbed for agentic development: a git-hook-enforced workflow (lint, targeted tests, and a docs-sync check) blocks any commit that doesn't keep source and documentation in lockstep — a deliberate answer to "how do you keep Claude-assisted changes from drifting," reasoned through (including rejected alternatives) in [`docs/workflow-automation.md`](./docs/workflow-automation.md).
 
-```
+See [`/docs`](./docs/README.md) for the full hand-maintained wiki — architecture, every RLS policy and RPC function with its live SQL, component/hook reference, and the documentation/testing conventions above.
 
-You can also install [eslint-plugin-react-x](https://npmx.dev/package/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://npmx.dev/package/eslint-plugin-react-dom) for React-specific lint rules:
+## Stack
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+- **Frontend:** React 19 + TypeScript + Vite
+- **Backend:** Supabase (Postgres, Auth, RLS, RPC/Postgres functions, Storage) — run locally via Docker during development
+- **Package manager:** npm
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+## Getting started
 
-```
+Runs locally only for now — there's no hosted deployment.
+
+1. Install dependencies:
+   ```
+   npm install
+   ```
+2. Start the local Supabase stack (Docker must be running):
+   ```
+   npx supabase start
+   ```
+   This prints a local API URL and anon key. Create `.env.local` with:
+   ```
+   VITE_SUPABASE_URL=<local API URL>
+   VITE_SUPABASE_ANON_KEY=<local anon key>
+   ```
+   (see `src/vite-env.d.ts` for the expected shape)
+3. Apply migrations and seed sample data (including sign videos):
+   ```
+   npm run db:reset:seeded
+   ```
+4. Start the dev server:
+   ```
+   npm run dev
+   ```
+
+## Scripts
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Start the Vite dev server |
+| `npm run build` | Type-check and build for production |
+| `npm run lint` | Run ESLint |
+| `npm run test` | Run the unit test suite (Vitest) |
+| `npm run preview` | Preview the production build locally |
+| `npm run db:reset:seeded` | Reset the local Supabase DB and seed sample data/videos |
+| `npm run setup-hooks` | Point git at the repo's `.githooks` directory |
+| `npm run test-hooks` | Verify git hook enforcement is wired up correctly |
+
+## Database
+
+`supabase/migrations/` is the source of truth for schema, RLS policies, and RPC functions.
+
+## License
+
+[MIT](./LICENSE)
