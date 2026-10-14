@@ -14,13 +14,12 @@ Re-checks [`is_superadmin()`](./is_superadmin.md) itself.
 
 ## Current definition
 
-*Derived from the migration; to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
-CREATE OR REPLACE FUNCTION public.unban_user(p_user_id uuid)
-RETURNS void
-    LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO 'public'
+CREATE OR REPLACE FUNCTION "public"."unban_user"("p_user_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
     AS $$
 begin
   if not public.is_superadmin() then
@@ -31,9 +30,9 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION public.unban_user(uuid) IS 'Superadmin-only: lifts a ban by clearing auth.users.banned_until.';
+COMMENT ON FUNCTION "public"."unban_user"("p_user_id" "uuid") IS 'Superadmin-only: lifts a ban by clearing auth.users.banned_until.';
 
-REVOKE ALL ON FUNCTION public.unban_user(uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.unban_user(uuid) FROM anon;
-GRANT EXECUTE ON FUNCTION public.unban_user(uuid) TO authenticated;
+REVOKE ALL ON FUNCTION "public"."unban_user"("p_user_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."unban_user"("p_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."unban_user"("p_user_id" "uuid") TO "service_role";
 ```

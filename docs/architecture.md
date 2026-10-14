@@ -19,6 +19,7 @@ Client-side routing via `react-router-dom`, defined in `src/App.tsx`:
 | `/` | [HomePage](./components/HomePage.md) | Authenticated ([ProtectedRoute](./components/ProtectedRoute.md) redirects to `/login` if signed out) |
 | `/create-decks` | [CreateDeckPage](./components/CreateDeckPage.md) | Authenticated |
 | `/my-decks` | [MyDecksPage](./components/MyDecksPage.md) | Authenticated |
+| `/browse-decks` | [BrowseDecksPage](./components/BrowseDecksPage.md) | Authenticated |
 | `/flashcards/:deckType/:categoryId` | [ModeSelectPage](./components/ModeSelectPage.md) | Authenticated |
 | `/flashcards/:deckType/:categoryId/practice` | [FlashcardPage](./components/FlashcardPage.md) | Authenticated |
 | `/flashcards/:deckType/:categoryId/ten-cards` | [TenCardsPage](./components/TenCardsPage.md) | Authenticated |

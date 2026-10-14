@@ -31,7 +31,8 @@ Three principles follow:
 | Pre-action | `PreToolUse` on Bash (`.claude/hooks/require-test-redirect.mjs`) | Denies an unredirected test run, handing over the corrected command | only when triggered |
 | Pre-action | `PreToolUse` on Bash, `agent_type === 'ui-designer'` only (`.claude/hooks/block-ui-designer-writes.mjs`) | Denies any Bash command that would write a file by another means (redirects, `sed -i`, `cp`/`mv`/`tee`/`rm`, or a write-capable script flag) | only when triggered |
 | Pre-action | `PreToolUse` on Skill (`.claude/hooks/block-vendored-design-skills.mjs`) | Denies the main session (or any non-`ui-designer` agent) invoking a vendored design-intelligence skill directly, routing it through `build-ui` instead | only when triggered |
-| Boundary | `.githooks/pre-commit` | Runs the docs mapping check (`.claude/hooks/check-docs.mjs`), lint, and `--changed`; **blocks** | once per commit |
+| Boundary | `.githooks/pre-commit` | Only when a staged path is under `src/` or `supabase/`: runs the docs mapping check (`.claude/hooks/check-docs.mjs`), lint, and `--changed`; **blocks**. The block message names `git commit --no-verify` as the deliberate bypass. Separately, prints an advisory (never blocks) when the staged diff exceeds 300 changed lines | once per commit |
+| Boundary | `.githooks/commit-msg` | Runs `.claude/hooks/strip-ai-attribution.mjs` on the commit message, removing `Co-Authored-By: … Claude …` and "Generated with … Claude Code" lines; rewrites the message, never blocks. A backstop for CLAUDE.md's no-AI-attribution rule, since the harness's default attribution reminder can override that rule in practice | once per commit |
 
 Two wiring mechanisms are in play here, each for a different tool:
 
@@ -53,7 +54,7 @@ Deleted instead. `.githooks/pre-commit` was never affected by this bug — it bl
 
 ## Verifying the enforcement: `npm run test-hooks`
 
-The hooks are deterministic scripts, so they don't need a behavioural test — they need a **wiring** test, because every way they break is silent. `scripts/test-hooks.mjs` asserts observable behaviour (not config values) across 26 checks: that `core.hooksPath` is set and points somewhere real, that the docs gate rejects a staged source file with no matching doc and names the right one, that `src/pages/*` maps into `docs/components/` and not a `docs/pages/`, that vendored `src/components/ui/**` and test files are exempt, that the test-output gate denies an unredirected run and hands over a usable replacement, and that it leaves the working tree exactly as it found it.
+The hooks are deterministic scripts, so they don't need a behavioural test — they need a **wiring** test, because every way they break is silent. `scripts/test-hooks.mjs` asserts observable behaviour (not config values) across 26 checks: that `core.hooksPath` is set and points somewhere real, that the hook scripts it depends on exist (`.githooks/pre-commit`, `.githooks/commit-msg`, `strip-ai-attribution.mjs`, `check-docs.mjs`, `require-test-redirect.mjs`), that the docs gate rejects a staged source file with no matching doc and names the right one, that `src/pages/*` maps into `docs/components/` and not a `docs/pages/`, that vendored `src/components/ui/**` and test files are exempt, that the attribution strip removes Claude attribution lines and leaves an unrelated trailer alone, that the test-output gate denies an unredirected run and hands over a usable replacement, and that it leaves the working tree exactly as it found it.
 
 Proven to fail when it should: unsetting `core.hooksPath` makes it exit 1 with the recovery command in the message, and `npm run setup-hooks` restores a clean run.
 

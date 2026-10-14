@@ -18,13 +18,12 @@ Roles are aggregated with `array_agg ... filter (where role_name is not null)`, 
 
 ## Current definition
 
-*Derived from the migration; to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
-CREATE OR REPLACE FUNCTION public.list_users_with_roles()
-RETURNS TABLE (user_id uuid, email text, user_name text, banned_until timestamptz, roles text[])
-    LANGUAGE plpgsql STABLE SECURITY DEFINER
-    SET search_path TO 'public'
+CREATE OR REPLACE FUNCTION "public"."list_users_with_roles"() RETURNS TABLE("user_id" "uuid", "email" "text", "user_name" "text", "banned_until" timestamp with time zone, "roles" "text"[])
+    LANGUAGE "plpgsql" STABLE SECURITY DEFINER
+    SET "search_path" TO 'public'
     AS $$
 begin
   if not public.is_superadmin() then
@@ -47,9 +46,9 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION public.list_users_with_roles() IS 'Superadmin-only: every user with their email, display name, ban status, and role names. Backs the Roles Management and Account Management pages, which otherwise have no client-side access to auth.users.';
+COMMENT ON FUNCTION "public"."list_users_with_roles"() IS 'Superadmin-only: every user with their email, display name, ban status, and role names. Backs the Roles Management and Account Management pages, which otherwise have no client-side access to auth.users.';
 
-REVOKE ALL ON FUNCTION public.list_users_with_roles() FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.list_users_with_roles() FROM anon;
-GRANT EXECUTE ON FUNCTION public.list_users_with_roles() TO authenticated;
+REVOKE ALL ON FUNCTION "public"."list_users_with_roles"() FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."list_users_with_roles"() TO "authenticated";
+GRANT ALL ON FUNCTION "public"."list_users_with_roles"() TO "service_role";
 ```

@@ -18,13 +18,12 @@
 
 ## Current definition
 
-*Derived from the migration; to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
-CREATE OR REPLACE FUNCTION public.set_primary_sign(p_sign_id uuid)
-RETURNS void
-    LANGUAGE plpgsql
-    SET search_path TO 'public'
+CREATE OR REPLACE FUNCTION "public"."set_primary_sign"("p_sign_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql"
+    SET "search_path" TO 'public'
     AS $$
 declare
   v_word_id uuid;
@@ -45,9 +44,9 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION public.set_primary_sign(uuid) IS 'Superadmin-only: makes the given sign the primary variant for its word, un-setting any other primary variant of that word in the same transaction.';
+COMMENT ON FUNCTION "public"."set_primary_sign"("p_sign_id" "uuid") IS 'Superadmin-only: makes the given sign the primary variant for its word, un-setting any other primary variant of that word in the same transaction.';
 
-REVOKE ALL ON FUNCTION public.set_primary_sign(uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.set_primary_sign(uuid) FROM anon;
-GRANT EXECUTE ON FUNCTION public.set_primary_sign(uuid) TO authenticated;
+REVOKE ALL ON FUNCTION "public"."set_primary_sign"("p_sign_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."set_primary_sign"("p_sign_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."set_primary_sign"("p_sign_id" "uuid") TO "service_role";
 ```

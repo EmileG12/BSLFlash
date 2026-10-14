@@ -23,7 +23,7 @@ Not `SECURITY DEFINER` and not `STABLE`, for the same reasons as `get_random_wor
 
 ## Current definition
 
-*Derived from the migrations (`20261011193933_rewrite_random_word_functions_for_sign_level_primary.sql`); to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
 CREATE OR REPLACE FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer DEFAULT 10, "is_custom" boolean DEFAULT false, "subcategory_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("word_id" "uuid", "word" "text", "definition" "text", "storage_path" "text", "format" "text")
@@ -58,7 +58,7 @@ ORDER BY random()
 LIMIT get_random_words_for_category.card_count;
 $$;
 
-COMMENT ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") IS 'Returns up to card_count distinct random words (each with a random video from its primary sign variant) in the given category or custom deck (is_custom selects which), optionally also restricted to subcategory_id via word_categories, for the 10 Cards game mode. Never repeats a word within one call; returns fewer rows if fewer than card_count are eligible.';
+COMMENT ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") IS 'Returns up to card_count distinct random words (each with a random video from its primary sign variant) in the given category or custom deck (is_custom selects which), optionally restricted to subcategory_id, for the 10 Cards game mode. Never repeats a word within one call; returns fewer rows if fewer than card_count are eligible.';
 
 REVOKE ALL ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."get_random_words_for_category"("category_id" "uuid", "card_count" integer, "is_custom" boolean, "subcategory_id" "uuid") FROM "anon";

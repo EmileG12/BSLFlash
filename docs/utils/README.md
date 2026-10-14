@@ -12,3 +12,4 @@ Non-hook, non-component modules, one doc file per module.
 | [signVideoUpload](./signVideoUpload.md) | `src/lib/signVideoUpload.ts` | Uploads a sign video to the `sign-videos` bucket and inserts its `sign_videos` row, reading duration and dimensions in the browser. |
 | [userStatus](./userStatus.md) | `src/lib/userStatus.ts` | `isBanned()`: whether an account is currently banned, including the indefinite `'infinity'` sentinel. |
 | [adminNav](./adminNav.md) | `src/lib/adminNav.ts` | Shared list of the five superadmin destinations, grouped for the desktop dropdown and flattened for the mobile list. |
+| [utils](./utils.md) | `src/lib/utils.ts` | Re-exports the `cn` class-name merge helper, imported by the UI kit and by several components. |

@@ -7,7 +7,7 @@
 
 ## Current definition
 
-*Derived from the migrations (`20261011193831_allow_admin_insert_on_word_content_tables.sql`); to be confirmed against `npx supabase db dump --local --schema public`:*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
 CREATE POLICY "word_categories_delete_admin_or_superadmin" ON "public"."word_categories" FOR DELETE TO "authenticated" USING (("public"."is_superadmin"() OR "public"."is_admin"()));

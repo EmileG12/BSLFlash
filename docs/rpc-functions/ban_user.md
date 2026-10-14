@@ -22,13 +22,12 @@ Re-checks [`is_superadmin()`](./is_superadmin.md) itself.
 
 ## Current definition
 
-*Derived from the migration; to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
-CREATE OR REPLACE FUNCTION public.ban_user(p_user_id uuid)
-RETURNS void
-    LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO 'public'
+CREATE OR REPLACE FUNCTION "public"."ban_user"("p_user_id" "uuid") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
     AS $$
 declare
   v_remaining_active_superadmins integer;
@@ -60,9 +59,9 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION public.ban_user(uuid) IS 'Superadmin-only: bans an account indefinitely (auth.users.banned_until = infinity), blocking sign-in and token refresh immediately. Blocks banning the last remaining active superadmin. Reversible via unban_user.';
+COMMENT ON FUNCTION "public"."ban_user"("p_user_id" "uuid") IS 'Superadmin-only: bans an account indefinitely (auth.users.banned_until = infinity), blocking sign-in and token refresh immediately. Blocks banning the last remaining active superadmin. Reversible via unban_user.';
 
-REVOKE ALL ON FUNCTION public.ban_user(uuid) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.ban_user(uuid) FROM anon;
-GRANT EXECUTE ON FUNCTION public.ban_user(uuid) TO authenticated;
+REVOKE ALL ON FUNCTION "public"."ban_user"("p_user_id" "uuid") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."ban_user"("p_user_id" "uuid") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."ban_user"("p_user_id" "uuid") TO "service_role";
 ```

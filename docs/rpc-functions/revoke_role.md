@@ -16,13 +16,12 @@ Only `admin` and `superadmin` are accepted (same restriction as [`assign_role`](
 
 ## Current definition
 
-*Derived from the migration; to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
-CREATE OR REPLACE FUNCTION public.revoke_role(p_user_id uuid, p_role_name text)
-RETURNS void
-    LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO 'public'
+CREATE OR REPLACE FUNCTION "public"."revoke_role"("p_user_id" "uuid", "p_role_name" "text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
     AS $$
 declare
   v_role_id uuid;
@@ -58,9 +57,9 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION public.revoke_role(uuid, text) IS 'Superadmin-only: removes the admin or superadmin role from a user. Blocks removing the superadmin role from the last remaining active (non-banned) superadmin.';
+COMMENT ON FUNCTION "public"."revoke_role"("p_user_id" "uuid", "p_role_name" "text") IS 'Superadmin-only: removes the admin or superadmin role from a user. Blocks removing the superadmin role from the last remaining active (non-banned) superadmin.';
 
-REVOKE ALL ON FUNCTION public.revoke_role(uuid, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.revoke_role(uuid, text) FROM anon;
-GRANT EXECUTE ON FUNCTION public.revoke_role(uuid, text) TO authenticated;
+REVOKE ALL ON FUNCTION "public"."revoke_role"("p_user_id" "uuid", "p_role_name" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."revoke_role"("p_user_id" "uuid", "p_role_name" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."revoke_role"("p_user_id" "uuid", "p_role_name" "text") TO "service_role";
 ```

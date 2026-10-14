@@ -16,13 +16,12 @@ Re-checks [`is_superadmin()`](./is_superadmin.md) itself, same reasoning as [`li
 
 ## Current definition
 
-*Derived from the migration; to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
-CREATE OR REPLACE FUNCTION public.assign_role(p_user_id uuid, p_role_name text)
-RETURNS void
-    LANGUAGE plpgsql SECURITY DEFINER
-    SET search_path TO 'public'
+CREATE OR REPLACE FUNCTION "public"."assign_role"("p_user_id" "uuid", "p_role_name" "text") RETURNS "void"
+    LANGUAGE "plpgsql" SECURITY DEFINER
+    SET "search_path" TO 'public'
     AS $$
 declare
   v_role_id uuid;
@@ -46,9 +45,9 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION public.assign_role(uuid, text) IS 'Superadmin-only: grants the admin or superadmin role to a user. Idempotent -- already holding the role is not an error.';
+COMMENT ON FUNCTION "public"."assign_role"("p_user_id" "uuid", "p_role_name" "text") IS 'Superadmin-only: grants the admin or superadmin role to a user. Idempotent -- already holding the role is not an error.';
 
-REVOKE ALL ON FUNCTION public.assign_role(uuid, text) FROM PUBLIC;
-REVOKE ALL ON FUNCTION public.assign_role(uuid, text) FROM anon;
-GRANT EXECUTE ON FUNCTION public.assign_role(uuid, text) TO authenticated;
+REVOKE ALL ON FUNCTION "public"."assign_role"("p_user_id" "uuid", "p_role_name" "text") FROM PUBLIC;
+GRANT ALL ON FUNCTION "public"."assign_role"("p_user_id" "uuid", "p_role_name" "text") TO "authenticated";
+GRANT ALL ON FUNCTION "public"."assign_role"("p_user_id" "uuid", "p_role_name" "text") TO "service_role";
 ```

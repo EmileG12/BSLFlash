@@ -29,7 +29,7 @@ Not `STABLE`: it calls `random()`, which is genuinely volatile (different result
 
 ## Current definition
 
-*Derived from the migrations (`20261011193933_rewrite_random_word_functions_for_sign_level_primary.sql`); to be confirmed against `npx supabase db dump --local --schema public`.*
+*From `npx supabase db dump --local --schema public`:*
 
 ```sql
 CREATE OR REPLACE FUNCTION "public"."get_random_word_for_category"("category_id" "uuid", "is_custom" boolean DEFAULT false, "subcategory_id" "uuid" DEFAULT NULL::"uuid") RETURNS TABLE("word_id" "uuid", "word" "text", "definition" "text", "storage_path" "text", "format" "text")

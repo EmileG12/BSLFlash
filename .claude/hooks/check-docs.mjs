@@ -4,7 +4,7 @@
 
 import { execFileSync } from 'node:child_process'
 
-// Depth-1 only, which is what excludes the 8 vendored shadcn files in src/components/ui/
+// Depth-1 only, which is what excludes the 16 vendored shadcn files in src/components/ui/
 // without needing a denylist. Pages map into docs/components/, not a docs/pages/ dir.
 const MAPPINGS = [
   { dir: 'src/components', ext: '.tsx', docDir: 'docs/components' },
