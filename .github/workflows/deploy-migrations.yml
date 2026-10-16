@@ -7,12 +7,25 @@ name: Deploy migrations
 # protection rule on the "production" environment so this pauses for manual
 # approval before it ever touches the live database; staging has no such
 # rule and deploys automatically.
+#
+# Uses --db-url (a direct Postgres connection string), not `supabase link`:
+# link authenticates to Supabase's Management API via SUPABASE_ACCESS_TOKEN
+# and needs that token scoped with Read on Project Settings/API
+# Keys/API Key Secrets, which is unnecessary complexity for a job that only
+# ever pushes migrations. --db-url skips the Management API entirely.
+#
+# SUPABASE_DB_URL must be the *pooler* connection string (Project Settings ->
+# Database -> Connection string -> "Connection pooling" tab, Session mode),
+# not the direct db.<ref>.supabase.co host -- the direct host only resolves
+# over IPv6 on free-tier projects, and GitHub-hosted runners have no IPv6
+# connectivity, so it would time out here even though it works locally.
 
 on:
   push:
     branches: [staging, main]
     paths:
       - "supabase/migrations/**"
+  workflow_dispatch: {}
 
 jobs:
   deploy-staging:
@@ -28,11 +41,9 @@ jobs:
 
       - name: Push migrations to staging
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase db push
+          supabase db push --db-url "$SUPABASE_DB_URL"
 
   deploy-production:
     if: github.ref == 'refs/heads/main'
@@ -47,8 +58,6 @@ jobs:
 
       - name: Push migrations to production
         env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+          SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
         run: |
-          supabase link --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
-          supabase db push
+          supabase db push --db-url "$SUPABASE_DB_URL"
