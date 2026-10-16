@@ -67,6 +67,7 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [userStatus](./userStatus.md) | `src/lib/userStatus.test.ts` | [userStatus](../utils/userStatus.md) |
 | [auth](./auth.md) | `src/lib/auth.test.ts` | [auth](../utils/auth.md) |
 | [TableCard](./TableCard.md) | `src/components/TableCard.test.tsx` | [TableCard](../components/TableCard.md) |
+| [SuperadminAccountsPage](./SuperadminAccountsPage.md) | `src/pages/SuperadminAccountsPage.test.tsx` | [SuperadminAccountsPage](../components/SuperadminAccountsPage.md) |
 
 ## Shared helpers
 

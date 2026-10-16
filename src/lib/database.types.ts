@@ -388,6 +388,7 @@ export type Database = {
         Args: { p_name: string; p_word_ids: string[] }
         Returns: string
       }
+      delete_user: { Args: { p_user_id: string }; Returns: undefined }
       get_available_deck_tags: {
         Args: never
         Returns: {

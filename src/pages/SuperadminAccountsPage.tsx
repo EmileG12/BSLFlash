@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Ban } from 'lucide-react'
+import { Ban, Trash2 } from 'lucide-react'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,9 @@ export function SuperadminAccountsPage() {
   const [banError, setBanError] = useState<string | null>(null)
   const [unbanningUserId, setUnbanningUserId] = useState<string | null>(null)
   const [unbanError, setUnbanError] = useState<string | null>(null)
+  const [deleteTarget, setDeleteTarget] = useState<UserWithRoles | null>(null)
+  const [deleting, setDeleting] = useState(false)
+  const [deleteError, setDeleteError] = useState<string | null>(null)
 
   const filtered = users.filter((user) => {
     const haystack = `${user.email ?? ''} ${user.user_name ?? ''}`.toLowerCase()
@@ -61,6 +64,20 @@ export function SuperadminAccountsPage() {
     setUsers((previous) =>
       previous.map((item) => (item.user_id === user.user_id ? { ...item, banned_until: null } : item)),
     )
+  }
+
+  async function handleDeleteConfirm() {
+    if (!deleteTarget) return
+    setDeleting(true)
+    setDeleteError(null)
+    const { error } = await supabase.rpc('delete_user', { p_user_id: deleteTarget.user_id })
+    setDeleting(false)
+    if (error) {
+      setDeleteError(error.message)
+      return
+    }
+    setUsers((previous) => previous.filter((item) => item.user_id !== deleteTarget.user_id))
+    setDeleteTarget(null)
   }
 
   return (
@@ -117,21 +134,27 @@ export function SuperadminAccountsPage() {
                       )}
                     </TableCell>
                     <TableCell>
-                      {banned ? (
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => handleUnban(user)}
-                          disabled={unbanningUserId === user.user_id}
-                        >
-                          {unbanningUserId === user.user_id ? 'Unbanning…' : 'Unban'}
+                      <div className="flex gap-2">
+                        {banned ? (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => handleUnban(user)}
+                            disabled={unbanningUserId === user.user_id}
+                          >
+                            {unbanningUserId === user.user_id ? 'Unbanning…' : 'Unban'}
+                          </Button>
+                        ) : (
+                          <Button size="sm" variant="outline" onClick={() => setBanTarget(user)}>
+                            <Ban aria-hidden="true" className="size-3.5" />
+                            Ban
+                          </Button>
+                        )}
+                        <Button size="sm" variant="destructive" onClick={() => setDeleteTarget(user)}>
+                          <Trash2 aria-hidden="true" className="size-3.5" />
+                          Delete
                         </Button>
-                      ) : (
-                        <Button size="sm" variant="destructive" onClick={() => setBanTarget(user)}>
-                          <Ban aria-hidden="true" className="size-3.5" />
-                          Ban
-                        </Button>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 )
@@ -158,8 +181,33 @@ export function SuperadminAccountsPage() {
             <Button variant="outline" onClick={() => setBanTarget(null)} disabled={banning}>
               Cancel
             </Button>
-            <Button variant="destructive" onClick={handleBanConfirm} disabled={banning}>
+            <Button variant="default" onClick={handleBanConfirm} disabled={banning}>
               {banning ? 'Banning…' : 'Ban'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={deleteTarget !== null} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Permanently delete {deleteTarget?.email}?</DialogTitle>
+            <DialogDescription>
+              This removes their account and all their data (custom decks, saved decks, likes) for
+              good. This cannot be undone — if you want a reversible option, use Ban instead.
+            </DialogDescription>
+          </DialogHeader>
+          {deleteError && (
+            <p role="alert" className="text-sm text-destructive">
+              {deleteError}
+            </p>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setDeleteTarget(null)} disabled={deleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteConfirm} disabled={deleting}>
+              {deleting ? 'Deleting…' : 'Delete permanently'}
             </Button>
           </DialogFooter>
         </DialogContent>

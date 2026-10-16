@@ -8,4 +8,4 @@ A changed RPC parameter list (e.g. adding an optional argument) regenerates as a
 
 See [supabase-client](./supabase-client.md) for how this type is wired into the app (`createClient<Database>(...)`).
 
-Mirrors the full current live schema: every table, column, and RLS-visible relationship under `docs/db-schema/`, and every RPC function's argument/return shape under `docs/rpc-functions/`. It has no independent content beyond the schema it's generated from — those index docs are the source of truth for what currently exists, not this file.
+Mirrors the full current live schema: every table, column, and RLS-visible relationship under `docs/db-schema/`, and every RPC function's argument/return shape under `docs/rpc-functions/`. It has no independent content beyond the schema it's generated from — those index docs, not this file, are the source of truth for what currently exists.
