@@ -1,7 +1,7 @@
 # roles
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011193815_add_admin_role_and_is_admin_function.sql`](../../supabase/migrations/20261011193815_add_admin_role_and_is_admin_function.sql)
+**Last touched by migration:** [`20261016162515_seed_user_and_superadmin_roles.sql`](../../supabase/migrations/20261016162515_seed_user_and_superadmin_roles.sql)
 
 **Purpose:** Lookup table of the roles available in the app's role-based access control system (`superadmin`, `admin`, and `user`). `admin` is a separate role from `superadmin`, not a superset of it in the data — see [`is_admin()`](../rpc-functions/is_admin.md). Referenced by [`user_roles`](./user_roles.md) to assign a role to a specific auth user.
 
@@ -22,7 +22,7 @@
 
 RLS is enabled. See [rls-policies/roles/](../rls-policies/roles/README.md): any authenticated user can read all rows; only `superadmin` can insert/update/delete.
 
-Seeded rows are `superadmin`, `user`, and `admin` (the `admin` row is inserted by the migration with `on conflict (role_name) do nothing`).
+Seeded rows are `superadmin`, `user`, and `admin`, each inserted by its own migration with `on conflict (role_name) do nothing`: `admin` by [`20261011193815_add_admin_role_and_is_admin_function.sql`](../../supabase/migrations/20261011193815_add_admin_role_and_is_admin_function.sql), `superadmin`/`user` by [`20261016162515_seed_user_and_superadmin_roles.sql`](../../supabase/migrations/20261016162515_seed_user_and_superadmin_roles.sql). Until the latter, `superadmin`/`user` only ever existed via `supabase/seed.sql` (local-only), so `handle_new_user` failed on any real signup against a hosted environment.
 
 ## Current DDL
 
