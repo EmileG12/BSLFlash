@@ -23,5 +23,6 @@ Postgres functions exposed via Supabase RPC, one doc file per function.
 | [get_saved_decks](./get_saved_decks.md) | `get_saved_decks() RETURNS TABLE(id uuid, deck_name text, owner_user_id uuid, owner_name text)` | Lists the caller's saved decks joined to their current `custom_decks` row; a deck the owner has unpublished is omitted, and reappears on republish. |
 | [create_custom_deck](./create_custom_deck.md) | `create_custom_deck(p_name text, p_word_ids uuid[]) RETURNS uuid` | Creates a custom deck (header row + word links) owned by the calling user, atomically. |
 | [update_custom_deck](./update_custom_deck.md) | `update_custom_deck(p_deck_id uuid, p_name text, p_word_ids uuid[], p_is_public boolean) RETURNS void` | Renames a custom deck, replaces its word list, and sets its publish flag in one transaction. Refuses an empty word list. Owner-only via RLS. |
+| [keepalive_ping](./keepalive_ping.md) | `keepalive_ping() RETURNS timestamptz` | Anonymous-callable: a trivial system-catalog read used by a scheduled GitHub Actions workflow to prevent free-tier project auto-pause. Not used by the frontend. |
 
 See the `migrations` skill for the workflow.

@@ -1,0 +1,48 @@
+name: Keep-alive ping
+
+# Prevents the free-tier Supabase projects (staging and production) from
+# auto-pausing after 7 days of inactivity, by calling keepalive_ping(), a
+# trivial RPC that performs a genuine DB read rather than a bare
+# health-check GET (bare pings have been reported not to reliably prevent
+# the pause). Runs every 3 days, comfortably under the 7-day threshold so a
+# missed run or two isn't a problem. A failed run fails this workflow,
+# which GitHub emails to the repo owner by default -- no extra alerting.
+#
+# Uses plain repository secrets rather than the staging/production
+# Environments: the anon key and project URL aren't sensitive (the anon
+# key already ships in the frontend bundle), and the production
+# Environment carries a required-reviewer gate for the migrations
+# deploy -- referencing it here would block every scheduled run on manual
+# approval.
+
+on:
+  schedule:
+    - cron: "0 0 */3 * *"
+  workflow_dispatch: {}
+
+jobs:
+  ping-staging:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping staging project
+        env:
+          SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.STAGING_SUPABASE_ANON_KEY }}
+        run: |
+          curl -sf -X POST "$SUPABASE_URL/rest/v1/rpc/keepalive_ping" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json"
+
+  ping-production:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping production project
+        env:
+          SUPABASE_URL: ${{ secrets.PRODUCTION_SUPABASE_URL }}
+          SUPABASE_ANON_KEY: ${{ secrets.PRODUCTION_SUPABASE_ANON_KEY }}
+        run: |
+          curl -sf -X POST "$SUPABASE_URL/rest/v1/rpc/keepalive_ping" \
+            -H "apikey: $SUPABASE_ANON_KEY" \
+            -H "Authorization: Bearer $SUPABASE_ANON_KEY" \
+            -H "Content-Type: application/json"

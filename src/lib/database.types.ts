@@ -465,6 +465,7 @@ export type Database = {
       }
       is_admin: { Args: never; Returns: boolean }
       is_superadmin: { Args: never; Returns: boolean }
+      keepalive_ping: { Args: never; Returns: string }
       list_users_with_roles: {
         Args: never
         Returns: {
