@@ -19,6 +19,7 @@ This folder is a plain markdown tree, so it works two ways:
 - [rpc-functions/](./rpc-functions/README.md) — Postgres functions exposed via Supabase RPC.
 - [storage/](./storage/README.md) — Supabase Storage buckets.
 - [tests/](./tests/README.md) — what the test suite covers, kept separate from the component/hook/utility docs so test docs don't flood the docs for the actual codebase; each entry links back to the doc of the thing it tests.
+- [deployment/](./deployment/README.md) — how the app is hosted and deployed: branches, GitHub Environments/secrets, CI/CD workflows, Supabase projects, Vercel.
 
 ## How this is used
 
