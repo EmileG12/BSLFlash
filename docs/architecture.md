@@ -82,3 +82,7 @@ Both game modes play a custom deck exactly like a standard category: the URL car
 ## Testing
 
 Vitest + React Testing Library — see [tests/](./tests/README.md) for what's covered and the mocking conventions used throughout.
+
+## Deployment
+
+`main`/`staging` branches map to separate hosted Supabase projects and separate Vercel environments (Production/Preview), with migrations deployed via GitHub Actions rather than any manual step. See [deployment/](./deployment/README.md).
