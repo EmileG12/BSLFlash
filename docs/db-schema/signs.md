@@ -1,7 +1,7 @@
 # signs
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011193904_move_primary_flag_from_sign_videos_to_signs.sql`](../../supabase/migrations/20261011193904_move_primary_flag_from_sign_videos_to_signs.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** BSL sign variants for a [word](./words.md) — a word can have more than one sign (e.g. different regional variants). Each sign has zero or more videos demonstrating it ([`sign_videos`](./sign_videos.md)).
 
@@ -28,6 +28,22 @@
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/signs/](../rls-policies/signs/README.md): any authenticated user can read all rows; `admin` or `superadmin` can insert; only `superadmin` can update/delete.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/signs/](../rls-policies/signs/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."signs" TO "anon";
+GRANT ALL ON TABLE "public"."signs" TO "authenticated";
+GRANT ALL ON TABLE "public"."signs" TO "service_role";
+```
 
 ## Current DDL
 

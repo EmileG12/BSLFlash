@@ -1,7 +1,7 @@
 # saved_decks
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011162529_create_saved_decks_table.sql`](../../supabase/migrations/20261011162529_create_saved_decks_table.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Records that a user has added a public deck to their library from the [BrowseDecksPage](../components/BrowseDecksPage.md) directory. "Add to library" is a live reference by id to the original [`custom_decks`](./custom_decks.md) row, not a copy of the deck. The row is never cleaned up when the owner unpublishes. The select policy on `custom_decks` (`is_public OR owner`) is what hides the deck while it is unpublished, and it reappears without any action from the saving user if the owner republishes.
 
@@ -25,6 +25,22 @@ Kept separate from [`deck_likes`](./deck_likes.md): saving adds a deck to your l
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/saved_decks/](../rls-policies/saved_decks/README.md). Fully private to the saving user: no other user can read whose library a deck is in.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/saved_decks/](../rls-policies/saved_decks/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."saved_decks" TO "anon";
+GRANT ALL ON TABLE "public"."saved_decks" TO "authenticated";
+GRANT ALL ON TABLE "public"."saved_decks" TO "service_role";
+```
 
 ## Current DDL
 

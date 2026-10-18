@@ -1,7 +1,7 @@
 # categories
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011193851_add_is_active_to_categories.sql`](../../supabase/migrations/20261011193851_add_is_active_to_categories.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Vocabulary categories/topics for the flashcard feature (e.g. Animals, Greetings, Colours, Time). Linked to [`words`](./words.md) via the [`word_categories`](./word_categories.md) many-to-many join table.
 
@@ -30,6 +30,22 @@ A `categories` row can also exist purely as a tag for public custom decks, via [
 RLS is enabled. See [rls-policies/categories/](../rls-policies/categories/README.md): any authenticated user can read all rows; only `superadmin` can insert/update/delete. Admins have no write access to `categories` — they can only tag words into existing categories via [`word_categories`](./word_categories.md).
 
 `is_active` hides a category from browsing without deleting it or its `word_categories` links, and leaves the words themselves visible. [`get_categories_with_words`](../rpc-functions/get_categories_with_words.md) (used by [`useCategories`](../hooks/useCategories.md)) and [`get_available_subcategories_for_category`](../rpc-functions/get_available_subcategories_for_category.md) both filter on `is_active`. Deliberately not filtered: direct single-category lookups ([`useCategoryInfo`](../hooks/useCategoryInfo.md)) and the full-categories list used for deck/word tagging ([`useAllCategories`](../hooks/useAllCategories.md), the `get_public_decks` `custom_deck_tags` flow) — disabling only hides a category from browsing, it doesn't revoke an in-progress session or stop it being tagged. The superadmin Categories page reads every row, disabled ones included, via [`useManagedCategories`](../hooks/useManagedCategories.md).
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/categories/](../rls-policies/categories/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."categories" TO "anon";
+GRANT ALL ON TABLE "public"."categories" TO "authenticated";
+GRANT ALL ON TABLE "public"."categories" TO "service_role";
+```
 
 ## Current DDL
 

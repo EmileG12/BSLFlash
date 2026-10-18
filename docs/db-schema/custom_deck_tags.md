@@ -1,7 +1,7 @@
 # custom_deck_tags
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011162527_create_custom_deck_tags_table.sql`](../../supabase/migrations/20261011162527_create_custom_deck_tags_table.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Many-to-many join tagging a [`custom_decks`](./custom_decks.md) row with rows from [`categories`](./categories.md), so the public deck directory can filter by tag. Tags reuse the `categories` table rather than a dedicated tags table: one table of labels serves both word grouping ([`word_categories`](./word_categories.md)) and deck tagging. A label that should never apply to a word (for example, an organisation-partnership label) can be a `categories` row with no `word_categories` links; [`get_categories_with_words`](../rpc-functions/get_categories_with_words.md) keeps such rows out of the standard deck-selection menus.
 
@@ -22,6 +22,22 @@
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/custom_deck_tags/](../rls-policies/custom_deck_tags/README.md). Select follows whatever `custom_decks` rows the caller can see (their own, or any public deck). Insert and delete are owner-only. There is no update policy: a tag link either exists or does not.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/custom_deck_tags/](../rls-policies/custom_deck_tags/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."custom_deck_tags" TO "anon";
+GRANT ALL ON TABLE "public"."custom_deck_tags" TO "authenticated";
+GRANT ALL ON TABLE "public"."custom_deck_tags" TO "service_role";
+```
 
 ## Current DDL
 

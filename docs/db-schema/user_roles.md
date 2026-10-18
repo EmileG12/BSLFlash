@@ -1,7 +1,7 @@
 # user_roles
 
 **Schema:** `public`
-**Last touched by migration:** [`20260917005233_create_rbac_tables.sql`](../../supabase/migrations/20260917005233_create_rbac_tables.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Junction table assigning roles (from [`roles`](./roles.md)) to auth users.
 
@@ -24,6 +24,22 @@
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/user_roles/](../rls-policies/user_roles/README.md): a user can read their own role assignment(s); `superadmin` can read all; only `superadmin` can insert/update/delete.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/user_roles/](../rls-policies/user_roles/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."user_roles" TO "anon";
+GRANT ALL ON TABLE "public"."user_roles" TO "authenticated";
+GRANT ALL ON TABLE "public"."user_roles" TO "service_role";
+```
 
 ## Current DDL
 
