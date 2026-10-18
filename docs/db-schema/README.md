@@ -18,4 +18,6 @@ Tables, one doc file per table.
 | [saved_decks](./saved_decks.md) | Public decks a user has added to their library (live reference, not a copy). |
 | [deck_likes](./deck_likes.md) | One row per user-like on a public deck. |
 
+Every table here grants `SELECT`/`INSERT`/`UPDATE`/`DELETE` to `anon` and `authenticated` (see each table's own "Grants" section) — a table-level prerequisite Postgres checks before RLS runs, not a substitute for it. [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql) also sets `ALTER DEFAULT PRIVILEGES` for the `public` schema, so any future table created by a later migration gets these same grants automatically — a new table's own doc should still record them explicitly (per the above), but there is no need to write another grants migration for it.
+
 See the `migrations` skill for the workflow that keeps this in sync with `supabase/migrations/`.

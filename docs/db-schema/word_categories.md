@@ -1,7 +1,7 @@
 # word_categories
 
 **Schema:** `public`
-**Last touched by migration:** [`20260918101738_create_flashcard_content_tables.sql`](../../supabase/migrations/20260918101738_create_flashcard_content_tables.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Many-to-many join between [`words`](./words.md) and [`categories`](./categories.md) — a word can belong to more than one category (e.g. "Cat" could sit in both "Animals" and "BSL Level 1 Vocabulary"). Deleting a word or a category only removes the association row, not the other side.
 
@@ -22,6 +22,22 @@
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/word_categories/](../rls-policies/word_categories/README.md): any authenticated user can read all rows; only `superadmin` can insert/update/delete.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/word_categories/](../rls-policies/word_categories/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."word_categories" TO "anon";
+GRANT ALL ON TABLE "public"."word_categories" TO "authenticated";
+GRANT ALL ON TABLE "public"."word_categories" TO "service_role";
+```
 
 ## Current DDL
 

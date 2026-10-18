@@ -1,7 +1,7 @@
 # custom_deck_words
 
 **Schema:** `public`
-**Last touched by migration:** [`20261012105608_rename_custom_category_constraints_to_custom_deck.sql`](../../supabase/migrations/20261012105608_rename_custom_category_constraints_to_custom_deck.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Many-to-many join between [`custom_decks`](./custom_decks.md) and [`words`](./words.md) — same shape as [`word_categories`](./word_categories.md), but for user-created decks. Deleting a deck or a word only removes the association row, not the other side.
 
@@ -24,6 +24,22 @@ Constraint names match the table (`custom_deck_words_pkey`, `custom_deck_words_c
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/custom_deck_words/](../rls-policies/custom_deck_words/README.md). Owner-scoped read/write is gated via the parent deck (an `exists` subquery against `custom_decks`), not an `on` this table directly — there's no `user_id` column here to check. A second, additive select policy lets any authenticated user read links belonging to a public deck. No update policy: a row either links a word to a deck or it doesn't, there's nothing on the row itself to update.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/custom_deck_words/](../rls-policies/custom_deck_words/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."custom_deck_words" TO "anon";
+GRANT ALL ON TABLE "public"."custom_deck_words" TO "authenticated";
+GRANT ALL ON TABLE "public"."custom_deck_words" TO "service_role";
+```
 
 ## Current DDL
 

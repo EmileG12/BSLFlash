@@ -1,7 +1,7 @@
 # custom_decks
 
 **Schema:** `public`
-**Last touched by migration:** [`20261012105608_rename_custom_category_constraints_to_custom_deck.sql`](../../supabase/migrations/20261012105608_rename_custom_category_constraints_to_custom_deck.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** User-created decks assembled from [`words`](./words.md) — the "custom decks" counterpart to [`categories`](./categories.md), but owned by the user who built it rather than superadmin-curated reference data. These never appear in the standard category menus ([CategoryMenu](../components/CategoryMenu.md), [SelectDeckCard](../components/SelectDeckCard.md)'s standard listing), since those only query `categories`; a user's own decks are listed by [MyDecksPage](../components/MyDecksPage.md) via [useCustomDecks](../hooks/useCustomDecks.md).
 
@@ -30,6 +30,22 @@ Constraint names match the table (`custom_decks_pkey`, `custom_decks_user_id_fke
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/custom_decks/](../rls-policies/custom_decks/README.md). Owners get full read/write on their own rows (`user_id = auth.uid()`). Any authenticated user can additionally read rows where `is_public` is `true`; these are OR-ed with the owner policy, so a deck is readable if either holds. There is no superadmin override, unlike `categories`' "everyone reads, only superadmin writes" shape.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/custom_decks/](../rls-policies/custom_decks/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."custom_decks" TO "anon";
+GRANT ALL ON TABLE "public"."custom_decks" TO "authenticated";
+GRANT ALL ON TABLE "public"."custom_decks" TO "service_role";
+```
 
 ## Current DDL
 

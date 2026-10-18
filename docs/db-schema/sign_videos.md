@@ -1,7 +1,7 @@
 # sign_videos
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011193904_move_primary_flag_from_sign_videos_to_signs.sql`](../../supabase/migrations/20261011193904_move_primary_flag_from_sign_videos_to_signs.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** Video files demonstrating a [sign](./signs.md), stored in the [`sign-videos`](../storage/sign-videos.md) Storage bucket. A sign may have several videos (reshoots, different angles). No video is pinned: quizzing picks one at random from the pool of its word's primary sign (see [`signs.is_primary`](./signs.md)).
 
@@ -30,6 +30,22 @@
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/sign_videos/](../rls-policies/sign_videos/README.md): any authenticated user can read all rows; `admin` or `superadmin` can insert; only `superadmin` can update/delete. See [storage/sign-videos.md](../storage/sign-videos.md) for the matching Storage bucket policies.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/sign_videos/](../rls-policies/sign_videos/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."sign_videos" TO "anon";
+GRANT ALL ON TABLE "public"."sign_videos" TO "authenticated";
+GRANT ALL ON TABLE "public"."sign_videos" TO "service_role";
+```
 
 ## Current DDL
 

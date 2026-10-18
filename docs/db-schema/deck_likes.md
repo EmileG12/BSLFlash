@@ -1,7 +1,7 @@
 # deck_likes
 
 **Schema:** `public`
-**Last touched by migration:** [`20261011162530_create_deck_likes_table.sql`](../../supabase/migrations/20261011162530_create_deck_likes_table.sql)
+**Last touched by migration:** [`20261018221104_grant_table_privileges_to_anon_and_authenticated.sql`](../../supabase/migrations/20261018221104_grant_table_privileges_to_anon_and_authenticated.sql)
 
 **Purpose:** One row per user-like on a public [`custom_decks`](./custom_decks.md) row. Likes are a lightweight quality signal, separate from saving ([`saved_decks`](./saved_decks.md)): liking does not add the deck to your library, and saving does not like it. The directory sorts by like count, so likes are public. The like count and `liked_by_me` flag are computed by [`get_public_decks`](../rpc-functions/get_public_decks.md).
 
@@ -23,6 +23,22 @@
 ## Row Level Security
 
 RLS is enabled. See [rls-policies/deck_likes/](../rls-policies/deck_likes/README.md). Readable by any authenticated user for decks they can already see, since the directory displays counts for public decks. Insert and delete are own-row-only.
+
+## Grants
+
+- `SELECT`, `INSERT`, `UPDATE`, `DELETE` granted to `anon` and `authenticated`; `service_role` already had broader access.
+- This is the table-level prerequisite Postgres checks before RLS runs. RLS remains the per-row, per-operation restriction: see [rls-policies/deck_likes/](../rls-policies/deck_likes/README.md).
+- Granted explicitly because the table was created by a raw SQL migration, not the Table Editor, which normally adds these grants on a hosted project.
+
+## Current grants
+
+*From `npx supabase db dump --local --schema public`:*
+
+```sql
+GRANT ALL ON TABLE "public"."deck_likes" TO "anon";
+GRANT ALL ON TABLE "public"."deck_likes" TO "authenticated";
+GRANT ALL ON TABLE "public"."deck_likes" TO "service_role";
+```
 
 ## Current DDL
 
