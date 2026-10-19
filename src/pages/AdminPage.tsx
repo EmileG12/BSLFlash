@@ -9,7 +9,7 @@ import { TableCard } from '../components/TableCard'
 import { TagPicker } from '../components/TagPicker'
 import { useWords, type WordOption } from '../hooks/useWords'
 import { supabase } from '../lib/supabase'
-import { uploadSignVideo } from '../lib/signVideoUpload'
+import { deleteSignVideoFile, uploadSignVideoFile } from '../lib/signVideoUpload'
 
 function AddWordForm() {
   const [word, setWord] = useState('')
@@ -38,37 +38,50 @@ function AddWordForm() {
 
     setSubmitting(true)
     setFormError(null)
+
+    const signId = crypto.randomUUID()
+    let uploaded: Awaited<ReturnType<typeof uploadSignVideoFile>>
     try {
-      const { data: newWord, error: wordError } = await supabase
-        .from('words')
-        .insert({ word: trimmedWord, definition: trimmedDefinition })
-        .select('id')
-        .single()
-      if (wordError) throw wordError
+      uploaded = await uploadSignVideoFile(signId, videoFile)
+    } catch (uploadError) {
+      setFormError(
+        `Video upload failed: ${uploadError instanceof Error ? uploadError.message : 'unknown error'}. No changes were saved.`,
+      )
+      setSubmitting(false)
+      return
+    }
 
-      const { data: newSign, error: signError } = await supabase
-        .from('signs')
-        .insert({ word_id: newWord.id, variant_name: 'Standard', is_primary: true })
-        .select('id')
-        .single()
-      if (signError) throw signError
-
-      await uploadSignVideo(newSign.id, videoFile)
-
-      if (categoryIds.length > 0) {
-        const { error: tagError } = await supabase
-          .from('word_categories')
-          .insert(categoryIds.map((categoryId) => ({ word_id: newWord.id, category_id: categoryId })))
-        if (tagError) throw tagError
-      }
+    try {
+      const { error } = await supabase.rpc('add_word_with_video', {
+        p_word: trimmedWord,
+        p_definition: trimmedDefinition,
+        p_sign_id: signId,
+        p_storage_path: uploaded.storagePath,
+        p_format: uploaded.format,
+        p_duration_ms: uploaded.metadata.durationMs,
+        p_width: uploaded.metadata.width,
+        p_height: uploaded.metadata.height,
+        p_file_size: videoFile.size,
+        p_category_ids: categoryIds,
+      })
+      if (error) throw error
 
       setSuccessMessage(`Added "${trimmedWord}".`)
       setWord('')
       setDefinition('')
       setVideoFile(null)
       setCategoryIds([])
-    } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Failed to add word.')
+    } catch (writeError) {
+      const cleanedUp = await deleteSignVideoFile(uploaded.storagePath).then(
+        () => true,
+        () => false,
+      )
+      const message = (writeError as { message?: string } | null)?.message ?? 'unknown error'
+      setFormError(
+        cleanedUp
+          ? `Failed to add word: ${message}. No changes were saved.`
+          : `Failed to add word: ${message}. No changes were saved, but the uploaded video file could not be removed and may need manual cleanup (path: ${uploaded.storagePath}).`,
+      )
     } finally {
       setSubmitting(false)
     }
@@ -88,6 +101,7 @@ function AddWordForm() {
         />
         <Input
           type="file"
+          aria-label="Video file"
           accept="video/mp4,video/webm"
           onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)}
         />

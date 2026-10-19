@@ -123,10 +123,12 @@ file_size_limit = "50MiB"
 # allowed_mime_types = ["image/png", "image/jpeg"]
 # objects_path = "./images"
 
-[storage.buckets.sign-videos]
-public = true
-file_size_limit = "50MiB"
-allowed_mime_types = ["video/mp4", "video/webm"]
+# sign-videos is created by supabase/migrations/20261018234005_create_sign_videos_bucket.sql,
+# not declared here -- this block is only applied by `supabase start`/`stop`
+# locally, never by `supabase db push` against the hosted staging/production
+# projects, which was the root cause of "Bucket not found" there. The
+# migration is the single source of truth for local, staging, and
+# production alike.
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]

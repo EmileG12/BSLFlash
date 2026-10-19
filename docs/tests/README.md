@@ -68,6 +68,9 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [auth](./auth.md) | `src/lib/auth.test.ts` | [auth](../utils/auth.md) |
 | [TableCard](./TableCard.md) | `src/components/TableCard.test.tsx` | [TableCard](../components/TableCard.md) |
 | [SuperadminAccountsPage](./SuperadminAccountsPage.md) | `src/pages/SuperadminAccountsPage.test.tsx` | [SuperadminAccountsPage](../components/SuperadminAccountsPage.md) |
+| [AdminPage](./AdminPage.md) | `src/pages/AdminPage.test.tsx` | [AdminPage](../components/AdminPage.md) — add-word upload and error paths |
+| [SuperadminWordEditPage](./SuperadminWordEditPage.md) | `src/pages/SuperadminWordEditPage.test.tsx` | [SuperadminWordEditPage](../components/SuperadminWordEditPage.md) — add video and add variant upload and error paths |
+| [signVideoUpload](./signVideoUpload.md) | `src/lib/signVideoUpload.test.ts` | [signVideoUpload](../utils/signVideoUpload.md) |
 
 ## Shared helpers
 

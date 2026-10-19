@@ -379,6 +379,72 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      add_variant_with_video: {
+        Args: {
+          p_duration_ms: number
+          p_file_size: number
+          p_format: string
+          p_height: number
+          p_region: string
+          p_sign_id: string
+          p_storage_path: string
+          p_variant_name: string
+          p_width: number
+          p_word_id: string
+        }
+        Returns: {
+          id: string
+          is_primary: boolean
+          region: string
+          variant_name: string
+          video_duration_ms: number
+          video_file_size: number
+          video_format: string
+          video_height: number
+          video_id: string
+          video_storage_path: string
+          video_width: number
+        }[]
+      }
+      add_video_to_sign: {
+        Args: {
+          p_duration_ms: number
+          p_file_size: number
+          p_format: string
+          p_height: number
+          p_sign_id: string
+          p_storage_path: string
+          p_width: number
+        }
+        Returns: {
+          duration_ms: number
+          file_size: number
+          format: string
+          height: number
+          id: string
+          storage_path: string
+          width: number
+        }[]
+      }
+      add_word_with_video: {
+        Args: {
+          p_category_ids?: string[]
+          p_definition: string
+          p_duration_ms: number
+          p_file_size: number
+          p_format: string
+          p_height: number
+          p_sign_id: string
+          p_storage_path: string
+          p_width: number
+          p_word: string
+        }
+        Returns: {
+          sign_id: string
+          sign_video_id: string
+          word_id: string
+        }[]
+      }
       assign_role: {
         Args: { p_role_name: string; p_user_id: string }
         Returns: undefined

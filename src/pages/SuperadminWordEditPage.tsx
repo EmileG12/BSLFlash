@@ -18,7 +18,7 @@ import {
 import { cn } from '@/lib/utils'
 import { useWordVariants, type WordVariant } from '../hooks/useWordVariants'
 import { supabase } from '../lib/supabase'
-import { uploadSignVideo } from '../lib/signVideoUpload'
+import { deleteSignVideoFile, uploadSignVideoFile } from '../lib/signVideoUpload'
 
 function formatDuration(durationMs: number): string {
   const totalSeconds = Math.round(durationMs / 1000)
@@ -46,13 +46,46 @@ function AddVideoDialog({
     if (!file) return
     setSaving(true)
     setError(null)
+
+    let uploaded: Awaited<ReturnType<typeof uploadSignVideoFile>>
     try {
-      const video = await uploadSignVideo(variant.id, file)
-      onAdded(video)
+      uploaded = await uploadSignVideoFile(variant.id, file)
+    } catch (uploadError) {
+      setError(
+        `Video upload failed: ${uploadError instanceof Error ? uploadError.message : 'unknown error'}. No changes were saved.`,
+      )
+      setSaving(false)
+      return
+    }
+
+    try {
+      const { data, error: rpcError } = await supabase
+        .rpc('add_video_to_sign', {
+          p_sign_id: variant.id,
+          p_storage_path: uploaded.storagePath,
+          p_format: uploaded.format,
+          p_duration_ms: uploaded.metadata.durationMs,
+          p_width: uploaded.metadata.width,
+          p_height: uploaded.metadata.height,
+          p_file_size: file.size,
+        })
+        .single()
+      if (rpcError) throw rpcError
+
+      onAdded(data)
       setFile(null)
       onOpenChange(false)
-    } catch (uploadError) {
-      setError(uploadError instanceof Error ? uploadError.message : 'Failed to add video.')
+    } catch (writeError) {
+      const cleanedUp = await deleteSignVideoFile(uploaded.storagePath).then(
+        () => true,
+        () => false,
+      )
+      const message = (writeError as { message?: string } | null)?.message ?? 'unknown error'
+      setError(
+        cleanedUp
+          ? `Failed to add video: ${message}. No changes were saved.`
+          : `Failed to add video: ${message}. No changes were saved, but the uploaded video file could not be removed and may need manual cleanup (path: ${uploaded.storagePath}).`,
+      )
     } finally {
       setSaving(false)
     }
@@ -67,6 +100,7 @@ function AddVideoDialog({
         </DialogHeader>
         <Input
           type="file"
+          aria-label="Video file"
           accept="video/mp4,video/webm"
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
         />
@@ -110,22 +144,68 @@ function AddVariantDialog({
     if (trimmedName === '' || !file) return
     setSaving(true)
     setError(null)
-    try {
-      const { data: newSign, error: signError } = await supabase
-        .from('signs')
-        .insert({ word_id: wordId, variant_name: trimmedName, region: region.trim() || null })
-        .select('id, variant_name, region, is_primary')
-        .single()
-      if (signError) throw signError
 
-      const video = await uploadSignVideo(newSign.id, file)
-      onAdded({ ...newSign, sign_videos: [video] })
+    const signId = crypto.randomUUID()
+    let uploaded: Awaited<ReturnType<typeof uploadSignVideoFile>>
+    try {
+      uploaded = await uploadSignVideoFile(signId, file)
+    } catch (uploadError) {
+      setError(
+        `Video upload failed: ${uploadError instanceof Error ? uploadError.message : 'unknown error'}. No changes were saved.`,
+      )
+      setSaving(false)
+      return
+    }
+
+    try {
+      const { data, error: rpcError } = await supabase
+        .rpc('add_variant_with_video', {
+          p_word_id: wordId,
+          p_sign_id: signId,
+          p_variant_name: trimmedName,
+          p_region: region.trim(),
+          p_storage_path: uploaded.storagePath,
+          p_format: uploaded.format,
+          p_duration_ms: uploaded.metadata.durationMs,
+          p_width: uploaded.metadata.width,
+          p_height: uploaded.metadata.height,
+          p_file_size: file.size,
+        })
+        .single()
+      if (rpcError) throw rpcError
+
+      onAdded({
+        id: data.id,
+        variant_name: data.variant_name,
+        region: data.region,
+        is_primary: data.is_primary,
+        sign_videos: [
+          {
+            id: data.video_id,
+            storage_path: data.video_storage_path,
+            format: data.video_format,
+            duration_ms: data.video_duration_ms,
+            width: data.video_width,
+            height: data.video_height,
+            file_size: data.video_file_size,
+          },
+        ],
+      })
       setVariantName('')
       setRegion('')
       setFile(null)
       onOpenChange(false)
-    } catch (submitError) {
-      setError(submitError instanceof Error ? submitError.message : 'Failed to add variant.')
+    } catch (writeError) {
+      const cleanedUp = await deleteSignVideoFile(uploaded.storagePath).then(
+        () => true,
+        () => false,
+      )
+      const message = (writeError as { message?: string } | null)?.message ?? 'unknown error'
+      setError(
+        cleanedUp
+          ? `Failed to add variant: ${message}. No changes were saved.`
+          : `Failed to add variant: ${message}. No changes were saved, but the uploaded video file could not be removed and may need manual cleanup (path: ${uploaded.storagePath}).`,
+      )
     } finally {
       setSaving(false)
     }
@@ -150,6 +230,7 @@ function AddVariantDialog({
         />
         <Input
           type="file"
+          aria-label="Video file"
           accept="video/mp4,video/webm"
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
         />

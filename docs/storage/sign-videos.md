@@ -1,22 +1,31 @@
 # sign-videos
 
-**Declared in:** [`supabase/config.toml`](../../supabase/config.toml) `[storage.buckets.sign-videos]`
+**Created by migration:** [`20261018234005_create_sign_videos_bucket.sql`](../../supabase/migrations/20261018234005_create_sign_videos_bucket.sql)
 **Policies added by migration:** [`20260918115717_create_sign_videos_storage_policies.sql`](../../supabase/migrations/20260918115717_create_sign_videos_storage_policies.sql)
 
 **Purpose:** Stores the video files demonstrating each [sign](../db-schema/signs.md), referenced by [`sign_videos.storage_path`](../db-schema/sign_videos.md). This is the first Storage bucket in the project.
 
-## Configuration
+## Definition
 
-```toml
-[storage.buckets.sign-videos]
-public = true
-file_size_limit = "50MiB"
-allowed_mime_types = ["video/mp4", "video/webm"]
+The bucket row is inserted by its migration, so `supabase db reset` (local) and `supabase db push` (staging and production) both create it.
+
+```sql
+insert into storage.buckets (id, name, public, file_size_limit, allowed_mime_types)
+values ('sign-videos', 'sign-videos', true, 52428800, array['video/mp4', 'video/webm'])
+on conflict (id) do nothing;
 ```
 
+*Actual row, from `select * from storage.buckets where id = 'sign-videos'` on the local stack (the `storage` schema isn't covered by `supabase db dump --schema public`, so this is a direct query rather than a dump excerpt):*
+
+| id | name | public | file_size_limit | allowed_mime_types |
+|---|---|---|---|---|
+| `sign-videos` | `sign-videos` | `t` | `52428800` | `{video/mp4,video/webm}` |
+
+- **Why a migration, not `supabase/config.toml`:** a `[storage.buckets.*]` block in `config.toml` is applied only by `npx supabase start`/`stop`, on the local stack. The deploy pipeline runs `supabase db push` against the hosted staging and production projects, which never creates buckets from `config.toml`. A config-only declaration therefore left the bucket missing on those projects, and every upload there failed with "Bucket not found". The migration is the single declaration for all three environments.
 - **Public:** yes. Sign videos aren't sensitive, so the client builds a playable URL directly from `storage_path` (`<API_URL>/storage/v1/object/public/sign-videos/<storage_path>`) with no signed-URL logic needed. A public bucket only affects *reads* — reads are served without going through RLS at all. Writes always go through `storage.objects` RLS regardless of bucket visibility, so this does not loosen upload access (see policies below).
 - **`allowed_mime_types`:** restricted to `video/mp4`/`video/webm`, matching the [`sign_videos.format`](../db-schema/sign_videos.md) check constraint — a non-video upload is rejected by the Storage API itself (`415 invalid_mime_type`), not just by the database.
-- **Path convention:** `<word>/<variant>.<ext>`, e.g. `hello/standard.mp4`. Not enforced by the database — purely a convention followed by `scripts/seed-sign-videos.mjs` and expected of anything uploaded later.
+- **`file_size_limit`:** 50 MiB (`52428800` bytes).
+- **Path convention:** the app uploads to `<sign_id>/<uuid>.<ext>` (see [signVideoUpload](../utils/signVideoUpload.md)), so the object's folder is the sign it belongs to. The seed script uses `<word>/<variant>.<ext>`, e.g. `hello/standard.mp4`. Neither is enforced by the database; both are conventions.
 
 ## Row Level Security (`storage.objects`, scoped to this bucket)
 
