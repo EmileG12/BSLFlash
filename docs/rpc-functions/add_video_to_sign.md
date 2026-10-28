@@ -2,7 +2,7 @@
 
 **Signature:** `public.add_video_to_sign(p_sign_id uuid, p_storage_path text, p_format text, p_duration_ms integer, p_width integer, p_height integer, p_file_size bigint) RETURNS TABLE(id uuid, storage_path text, format text, duration_ms integer, width integer, height integer, file_size bigint)`
 **Language:** PL/pgSQL, `SET search_path = public` (not `SECURITY DEFINER`)
-**Created by migration:** [`20261018234007_create_atomic_add_word_video_functions.sql`](../../supabase/migrations/20261018234007_create_atomic_add_word_video_functions.sql)
+**Created by migration:** [`20261018234007_create_atomic_add_word_video_functions.sql`](../../supabase/migrations/20261018234007_create_atomic_add_word_video_functions.sql), fixed by [`20261028183304_fix_ambiguous_id_in_video_rpcs.sql`](../../supabase/migrations/20261028183304_fix_ambiguous_id_in_video_rpcs.sql)
 
 **Purpose:** Adds one more `sign_videos` row to an existing sign variant, for a video that has already been uploaded to [Storage](../storage/sign-videos.md). Called from the "Add video" dialog on [SuperadminWordEditPage](../components/SuperadminWordEditPage.md).
 
@@ -13,6 +13,8 @@
 **Why not `SECURITY DEFINER`:** the function runs as the caller, so the `sign_videos_insert_admin_or_superadmin` policy applies to the insert as if the client had issued it directly. See [sign_videos_insert_admin_or_superadmin](../rls-policies/sign_videos/sign_videos_insert_admin_or_superadmin.md).
 
 **Client-side compensation:** if this call fails, the caller deletes the already-uploaded object via [deleteSignVideoFile](../utils/signVideoUpload.md).
+
+**Why the insert is aliased (`insert into public.sign_videos as sv ... returning sv.id`):** `RETURNS TABLE(id uuid, ...)` implicitly declares a plpgsql variable named `id` in the function's scope. A bare `returning id into v_video_id` was ambiguous between that variable and the `sign_videos.id` column -- caught only by actually running this against Postgres, since the mocked unit tests never execute real SQL. See [add_variant_with_video](./add_variant_with_video.md), which hit the identical bug for the same reason.
 
 ## Grants
 
@@ -30,9 +32,9 @@ CREATE OR REPLACE FUNCTION "public"."add_video_to_sign"("p_sign_id" "uuid", "p_s
 declare
   v_video_id uuid;
 begin
-  insert into public.sign_videos (sign_id, storage_path, format, duration_ms, width, height, file_size)
+  insert into public.sign_videos as sv (sign_id, storage_path, format, duration_ms, width, height, file_size)
   values (p_sign_id, p_storage_path, p_format, p_duration_ms, p_width, p_height, p_file_size)
-  returning id into v_video_id;
+  returning sv.id into v_video_id;
 
   return query select v_video_id, p_storage_path, p_format, p_duration_ms, p_width, p_height, p_file_size;
 end;
