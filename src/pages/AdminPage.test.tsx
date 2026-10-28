@@ -24,12 +24,15 @@ const UPLOADED: UploadedSignVideoFile = {
   metadata: { durationMs: 1800, width: 320, height: 240 },
 }
 
-function mockListEndpoints() {
+function mockListEndpoints(wordsData: unknown[] = []) {
   vi.mocked(supabase.from).mockImplementation(
     ((table: string) =>
       table === 'categories'
         ? { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [], error: null }) }) }
-        : { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [], error: null }) }) }) as never,
+        // Spreads into a fresh array each call, as a real fetch would -- resolving
+        // the SAME array reference every time would let React bail out of
+        // re-rendering since nothing "changed" by reference, masking a refetch.
+        : { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [...wordsData], error: null }) }) }) as never,
   )
 }
 
@@ -104,5 +107,23 @@ describe('AdminPage - AddWordForm', () => {
         p_height: 240,
       }),
     )
+  })
+
+  it('refetches the words list after a successful add, so the new word appears without a manual refresh', async () => {
+    const wordsData: { id: string; word: string; definition: string }[] = []
+    mockListEndpoints(wordsData)
+    vi.mocked(uploadSignVideoFile).mockResolvedValue(UPLOADED)
+    vi.mocked(supabase.rpc).mockResolvedValue({ data: [{ word_id: 'w1', sign_id: 's1', sign_video_id: 'v1' }], error: null } as never)
+    const user = userEvent.setup()
+
+    renderWithQueryClient(<AdminPage />)
+    expect(await screen.findByText('No words match.')).toBeInTheDocument()
+
+    // Simulate the RPC having created the row server-side: the next fetch of
+    // 'words' (triggered by invalidateQueries after the RPC resolves) sees it.
+    wordsData.push({ id: 'w1', word: 'Hello', definition: 'A greeting.' })
+    await fillAndSubmit(user)
+
+    expect(await screen.findByRole('cell', { name: 'Hello' })).toBeInTheDocument()
   })
 })

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { Pencil, Plus } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -12,6 +13,7 @@ import { supabase } from '../lib/supabase'
 import { deleteSignVideoFile, uploadSignVideoFile } from '../lib/signVideoUpload'
 
 function AddWordForm() {
+  const queryClient = useQueryClient()
   const [word, setWord] = useState('')
   const [definition, setDefinition] = useState('')
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -66,6 +68,7 @@ function AddWordForm() {
       })
       if (error) throw error
 
+      queryClient.invalidateQueries({ queryKey: ['words'] })
       setSuccessMessage(`Added "${trimmedWord}".`)
       setWord('')
       setDefinition('')

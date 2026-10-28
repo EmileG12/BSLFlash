@@ -12,6 +12,7 @@
 - **Admin is insert-only on content.** The page never edits or deletes a word, sign or video. Its one removal is on `word_categories`, to untag a category from a word. Those permissions come from the `*_admin_or_superadmin` policies (see [words](../rls-policies/words/README.md), [word_categories](../rls-policies/word_categories/README.md)).
 - **Category editing** uses a per-row expandable [TagPicker](./TagPicker.md). The first expand loads that word's current links; each toggle then inserts or deletes one `word_categories` row immediately, without a save button.
 - **Word list** is the shared [`useWords`](../hooks/useWords.md) result, filtered client-side by a case-insensitive substring match on the word. The search `Input` carries an explicit `bg-card dark:bg-card` so it reads as a solid control against the toolbar's gradient background — see [TableCard](./TableCard.md).
+- **Adding a word refetches that list.** The add-word form calls `supabase.rpc` directly rather than through a `useMutation`, so on success it explicitly invalidates `useWords`' `['words']` query key — without that, React Query has no way to know the table it's rendering just went stale, and the new word wouldn't appear until the next full page load.
 
 **Depends on:** [TagPicker](./TagPicker.md), [useWords](../hooks/useWords.md), [signVideoUpload](../utils/signVideoUpload.md), [`add_word_with_video`](../rpc-functions/add_word_with_video.md), [TableCard](./TableCard.md), `Card`/`Input`/`Textarea`/`Table`/`Button` from `src/components/ui/`.
 
