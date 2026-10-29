@@ -2,15 +2,15 @@
 
 **Signature:** `public.set_word_categories(p_word_id uuid, p_category_ids uuid[]) RETURNS void`
 **Language:** PL/pgSQL, `SET search_path = public` (not `SECURITY DEFINER`)
-**Created by migration:** [`20261029161052_set_word_categories_atomically.sql`](../../supabase/migrations/20261029161052_set_word_categories_atomically.sql)
+**Created by migration:** [`20261029161052_set_word_categories_atomically.sql`](../../supabase/migrations/20261029161052_set_word_categories_atomically.sql), guard added by [`20261029170052_add_null_guard_to_set_word_categories.sql`](../../supabase/migrations/20261029170052_add_null_guard_to_set_word_categories.sql)
 
 **Purpose:** Replaces the full set of category tags on a word with `p_category_ids`, in one transaction. Called by [AdminPage](../components/AdminPage.md)'s "Save edit" button in the "Edit categories" panel.
 
 **Why it exists:** the client previously computed the add/remove delta itself and sent it as two separate requests -- a `delete()` then an `insert()` on `word_categories`. If the delete committed and the insert then failed, the database ended up with fewer categories than before while the client's "last saved" state still believed the deleted category was present -- a real partial-failure data-loss path, not a contrived one. This function moves the delta computation and both statements inside a single Postgres function body, so either the whole replacement applies or an exception rolls back everything and nothing changes.
 
-**Delta computation:** deletes any existing `word_categories` row for `p_word_id` whose `category_id` is not in `p_category_ids`, then inserts any id in `p_category_ids` not already present (post-delete) -- `select distinct` guards against the caller passing duplicate ids in the array. `p_category_ids` may be `'{}'` (untag every category) but not `NULL`.
+**Delta computation:** deletes any existing `word_categories` row for `p_word_id` whose `category_id` is not in `p_category_ids`, then inserts any id in `p_category_ids` not already present (post-delete) -- `select distinct` guards against the caller passing duplicate ids in the array. `p_category_ids` may be `'{}'` (untag every category) but not `NULL`, and must not contain a `NULL` element.
 
-**Error granularity:** raises an explicit `'set_word_categories: word % does not exist'` (naming the word id) if `p_word_id` doesn't match any row in `words`, rather than letting an invalid id fall through to a less specific foreign-key-violation error from the insert.
+**Error granularity:** raises an explicit `'set_word_categories: word % does not exist'` (naming the word id) if `p_word_id` doesn't match any row in `words`, rather than letting an invalid id fall through to a less specific foreign-key-violation error from the insert. Also explicitly raises `'set_word_categories: p_category_ids must not contain null elements'` before either statement runs -- without this guard, a `NULL` array element would make the delete's `NOT IN` evaluate to `NULL` (not `TRUE`) under three-valued logic, silently skipping rows that should have been removed, while the insert branch would instead hit a `NOT NULL`/FK violation; the guard turns that inconsistent, easy-to-miss failure into one loud, specific error raised up front. Flagged by diff review on 2026-10-29; unreachable from the current caller ([AdminPage](../components/AdminPage.md) only ever builds the array from real category ids already in the database) but added as defense-in-depth for any future caller.
 
 **Why not `SECURITY DEFINER`:** the function runs as the caller, so the existing `word_categories_insert_admin_or_superadmin` / `word_categories_delete_admin_or_superadmin` policies apply to each statement exactly as if the client had issued them directly. See [word_categories](../rls-policies/word_categories/README.md).
 
@@ -34,6 +34,10 @@ begin
     raise exception 'set_word_categories: word % does not exist', p_word_id;
   end if;
 
+  if exists (select 1 from unnest(p_category_ids) as category_id where category_id is null) then
+    raise exception 'set_word_categories: p_category_ids must not contain null elements';
+  end if;
+
   delete from public.word_categories
   where word_id = p_word_id
     and category_id not in (select unnest(p_category_ids));
@@ -47,7 +51,7 @@ begin
 end;
 $$;
 
-COMMENT ON FUNCTION "public"."set_word_categories"("p_word_id" "uuid", "p_category_ids" "uuid"[]) IS 'Admin/superadmin-only (enforced by RLS on each insert/delete): replaces the full set of category tags on a word with p_category_ids in one transaction, computing the add/remove delta itself so a partial failure cannot leave the word with a category set the caller never asked for. p_category_ids may be empty (untag every category) but not null.';
+COMMENT ON FUNCTION "public"."set_word_categories"("p_word_id" "uuid", "p_category_ids" "uuid"[]) IS 'Admin/superadmin-only (enforced by RLS on each insert/delete): replaces the full set of category tags on a word with p_category_ids in one transaction, computing the add/remove delta itself so a partial failure cannot leave the word with a category set the caller never asked for. p_category_ids may be empty (untag every category) but must not be null or contain null elements.';
 
 REVOKE ALL ON FUNCTION "public"."set_word_categories"("p_word_id" "uuid", "p_category_ids" "uuid"[]) FROM PUBLIC;
 REVOKE ALL ON FUNCTION "public"."set_word_categories"("p_word_id" "uuid", "p_category_ids" "uuid"[]) FROM "anon";
