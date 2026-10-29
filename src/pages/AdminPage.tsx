@@ -187,34 +187,16 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
     setTagError(null)
     setSaving(true)
 
-    const toInsert = draftCategoryIds.filter((id) => !savedCategoryIds.includes(id))
-    const toDelete = savedCategoryIds.filter((id) => !draftCategoryIds.includes(id))
-
-    if (toDelete.length > 0) {
-      const { error } = await supabase
-        .from('word_categories')
-        .delete()
-        .eq('word_id', word.id)
-        .in('category_id', toDelete)
-      if (error) {
-        setTagError(error.message)
-        setSaving(false)
-        return
-      }
-    }
-
-    if (toInsert.length > 0) {
-      const { error } = await supabase
-        .from('word_categories')
-        .insert(toInsert.map((categoryId) => ({ word_id: word.id, category_id: categoryId })))
-      if (error) {
-        setTagError(error.message)
-        setSaving(false)
-        return
-      }
-    }
-
+    const { error } = await supabase.rpc('set_word_categories', {
+      p_word_id: word.id,
+      p_category_ids: draftCategoryIds,
+    })
     setSaving(false)
+    if (error) {
+      setTagError(error.message)
+      return
+    }
+
     setSavedCategoryIds(draftCategoryIds)
   }
 

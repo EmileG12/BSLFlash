@@ -14,10 +14,10 @@ Covers the "Add a new word" form (`AddWordForm`):
 
 Covers category editing (`EditWordCategoriesRow`), draft/commit behavior:
 
-- Toggling a tag chip updates its pressed state but calls neither `insert` nor `delete` on `word_categories`.
+- Toggling a tag chip updates its pressed state but makes no `supabase.rpc` call.
 - **Revert changes** restores the saved selection, makes no database call, and both action buttons are disabled once the draft matches the saved copy again.
-- **Save edit** sends only the categories added/removed since the saved copy (one `delete().eq().in()` call, one `insert()` call), then the draft becomes the new saved copy and **Save edit** is disabled again.
-- When the save fails, the error from the `insert`/`delete` call is shown in an alert and the draft (and enabled **Save edit** button) is left untouched.
+- **Save edit** sends the entire draft to [`set_word_categories`](../rpc-functions/set_word_categories.md) in a single `supabase.rpc` call, then the draft becomes the new saved copy and **Save edit** is disabled again.
+- When the RPC call fails, the error is shown in an alert and the draft (and enabled **Save edit** button, and the still-selected tags) are left untouched.
 
 ## Notes
 

@@ -135,10 +135,10 @@ describe('AdminPage - EditWordCategoriesRow', () => {
   ]
   const WORDS = [{ id: 'w1', word: 'Hello', definition: 'A greeting.' }]
 
-  function mockTables({ initialSelectedIds = [] as string[] } = {}) {
-    const deleteMock = vi.fn().mockResolvedValue({ data: null, error: null })
-    const insertMock = vi.fn().mockResolvedValue({ data: null, error: null })
-
+  function mockTables({
+    initialSelectedIds = [] as string[],
+    rpcError = null as { message: string } | null,
+  } = {}) {
     vi.mocked(supabase.from).mockImplementation(
       ((table: string) => {
         if (table === 'categories') {
@@ -152,17 +152,12 @@ describe('AdminPage - EditWordCategoriesRow', () => {
                 error: null,
               }),
             }),
-            delete: vi.fn().mockReturnValue({
-              eq: vi.fn().mockReturnValue({ in: deleteMock }),
-            }),
-            insert: insertMock,
           }
         }
         return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [...WORDS], error: null }) }) }
       }) as never,
     )
-
-    return { deleteMock, insertMock }
+    vi.mocked(supabase.rpc).mockResolvedValue({ data: null, error: rpcError } as never)
   }
 
   async function expandRow(user: ReturnType<typeof userEvent.setup>) {
@@ -174,20 +169,19 @@ describe('AdminPage - EditWordCategoriesRow', () => {
     return within(table)
   }
 
-  it('toggling a tag updates the UI but makes no database call until Save edit is clicked', async () => {
-    const { deleteMock, insertMock } = mockTables({ initialSelectedIds: ['c1'] })
+  it('toggling a tag updates the UI but makes no RPC call until Save edit is clicked', async () => {
+    mockTables({ initialSelectedIds: ['c1'] })
     const user = userEvent.setup()
 
     const table = await expandRow(user)
     await user.click(table.getByRole('button', { name: 'Colors' }))
 
     expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
-    expect(insertMock).not.toHaveBeenCalled()
-    expect(deleteMock).not.toHaveBeenCalled()
+    expect(supabase.rpc).not.toHaveBeenCalled()
   })
 
   it('revert changes restores the saved selection without calling the database', async () => {
-    const { deleteMock, insertMock } = mockTables({ initialSelectedIds: ['c1'] })
+    mockTables({ initialSelectedIds: ['c1'] })
     const user = userEvent.setup()
 
     const table = await expandRow(user)
@@ -197,14 +191,13 @@ describe('AdminPage - EditWordCategoriesRow', () => {
 
     expect(table.getByRole('button', { name: 'Animals' })).toHaveAttribute('aria-pressed', 'true')
     expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'false')
-    expect(insertMock).not.toHaveBeenCalled()
-    expect(deleteMock).not.toHaveBeenCalled()
+    expect(supabase.rpc).not.toHaveBeenCalled()
     expect(table.getByRole('button', { name: 'Save edit' })).toBeDisabled()
     expect(table.getByRole('button', { name: 'Revert changes' })).toBeDisabled()
   })
 
-  it('save edit sends only the added/removed tags to the database and then matches the saved state', async () => {
-    const { deleteMock, insertMock } = mockTables({ initialSelectedIds: ['c1'] })
+  it('save edit sends the whole draft to set_word_categories in one atomic call, then matches the saved state', async () => {
+    mockTables({ initialSelectedIds: ['c1'] })
     const user = userEvent.setup()
 
     const table = await expandRow(user)
@@ -213,32 +206,14 @@ describe('AdminPage - EditWordCategoriesRow', () => {
     await user.click(table.getByRole('button', { name: 'Save edit' }))
 
     expect(await table.findByRole('button', { name: 'Save edit' })).toBeDisabled()
-    expect(insertMock).toHaveBeenCalledWith([{ word_id: 'w1', category_id: 'c2' }])
-    expect(deleteMock).toHaveBeenCalledWith('category_id', ['c1'])
+    expect(supabase.rpc).toHaveBeenCalledTimes(1)
+    expect(supabase.rpc).toHaveBeenCalledWith('set_word_categories', { p_word_id: 'w1', p_category_ids: ['c2'] })
     expect(table.getByRole('button', { name: 'Animals' })).toHaveAttribute('aria-pressed', 'false')
     expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
   })
 
   it('shows an error and keeps the draft when saving fails', async () => {
-    const deleteMock = vi.fn().mockResolvedValue({ data: null, error: null })
-    const insertMock = vi.fn().mockResolvedValue({ data: null, error: { message: 'write denied' } })
-    vi.mocked(supabase.from).mockImplementation(
-      ((table: string) => {
-        if (table === 'categories') {
-          return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: CATEGORIES, error: null }) }) }
-        }
-        if (table === 'word_categories') {
-          return {
-            select: vi.fn().mockReturnValue({
-              eq: vi.fn().mockResolvedValue({ data: [], error: null }),
-            }),
-            delete: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ in: deleteMock }) }),
-            insert: insertMock,
-          }
-        }
-        return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [...WORDS], error: null }) }) }
-      }) as never,
-    )
+    mockTables({ initialSelectedIds: ['c1'], rpcError: { message: 'write denied' } })
     const user = userEvent.setup()
 
     const table = await expandRow(user)
@@ -247,6 +222,7 @@ describe('AdminPage - EditWordCategoriesRow', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('write denied')
     expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
+    expect(table.getByRole('button', { name: 'Animals' })).toHaveAttribute('aria-pressed', 'true')
     expect(table.getByRole('button', { name: 'Save edit' })).not.toBeDisabled()
   })
 })

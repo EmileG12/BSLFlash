@@ -547,6 +547,10 @@ export type Database = {
         Returns: undefined
       }
       set_primary_sign: { Args: { p_sign_id: string }; Returns: undefined }
+      set_word_categories: {
+        Args: { p_category_ids: string[]; p_word_id: string }
+        Returns: undefined
+      }
       unban_user: { Args: { p_user_id: string }; Returns: undefined }
       update_custom_deck: {
         Args: {
