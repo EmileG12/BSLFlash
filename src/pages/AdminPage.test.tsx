@@ -1,4 +1,4 @@
-import { screen } from '@testing-library/react'
+import { screen, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, it, vi } from 'vitest'
 import { supabase } from '../lib/supabase'
@@ -125,5 +125,128 @@ describe('AdminPage - AddWordForm', () => {
     await fillAndSubmit(user)
 
     expect(await screen.findByRole('cell', { name: 'Hello' })).toBeInTheDocument()
+  })
+})
+
+describe('AdminPage - EditWordCategoriesRow', () => {
+  const CATEGORIES = [
+    { id: 'c1', category_name: 'Animals' },
+    { id: 'c2', category_name: 'Colors' },
+  ]
+  const WORDS = [{ id: 'w1', word: 'Hello', definition: 'A greeting.' }]
+
+  function mockTables({ initialSelectedIds = [] as string[] } = {}) {
+    const deleteMock = vi.fn().mockResolvedValue({ data: null, error: null })
+    const insertMock = vi.fn().mockResolvedValue({ data: null, error: null })
+
+    vi.mocked(supabase.from).mockImplementation(
+      ((table: string) => {
+        if (table === 'categories') {
+          return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: CATEGORIES, error: null }) }) }
+        }
+        if (table === 'word_categories') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({
+                data: initialSelectedIds.map((category_id) => ({ category_id })),
+                error: null,
+              }),
+            }),
+            delete: vi.fn().mockReturnValue({
+              eq: vi.fn().mockReturnValue({ in: deleteMock }),
+            }),
+            insert: insertMock,
+          }
+        }
+        return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [...WORDS], error: null }) }) }
+      }) as never,
+    )
+
+    return { deleteMock, insertMock }
+  }
+
+  async function expandRow(user: ReturnType<typeof userEvent.setup>) {
+    renderWithQueryClient(<AdminPage />)
+    const table = await screen.findByRole('table')
+    const row = (await within(table).findByRole('cell', { name: 'Hello' })).closest('tr')!
+    await user.click(within(row).getByRole('button', { name: 'Edit categories' }))
+    await within(table).findByRole('group', { name: 'Tags' })
+    return within(table)
+  }
+
+  it('toggling a tag updates the UI but makes no database call until Save edit is clicked', async () => {
+    const { deleteMock, insertMock } = mockTables({ initialSelectedIds: ['c1'] })
+    const user = userEvent.setup()
+
+    const table = await expandRow(user)
+    await user.click(table.getByRole('button', { name: 'Colors' }))
+
+    expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
+    expect(insertMock).not.toHaveBeenCalled()
+    expect(deleteMock).not.toHaveBeenCalled()
+  })
+
+  it('revert changes restores the saved selection without calling the database', async () => {
+    const { deleteMock, insertMock } = mockTables({ initialSelectedIds: ['c1'] })
+    const user = userEvent.setup()
+
+    const table = await expandRow(user)
+    await user.click(table.getByRole('button', { name: 'Colors' }))
+    await user.click(table.getByRole('button', { name: 'Animals' }))
+    await user.click(table.getByRole('button', { name: 'Revert changes' }))
+
+    expect(table.getByRole('button', { name: 'Animals' })).toHaveAttribute('aria-pressed', 'true')
+    expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'false')
+    expect(insertMock).not.toHaveBeenCalled()
+    expect(deleteMock).not.toHaveBeenCalled()
+    expect(table.getByRole('button', { name: 'Save edit' })).toBeDisabled()
+    expect(table.getByRole('button', { name: 'Revert changes' })).toBeDisabled()
+  })
+
+  it('save edit sends only the added/removed tags to the database and then matches the saved state', async () => {
+    const { deleteMock, insertMock } = mockTables({ initialSelectedIds: ['c1'] })
+    const user = userEvent.setup()
+
+    const table = await expandRow(user)
+    await user.click(table.getByRole('button', { name: 'Animals' }))
+    await user.click(table.getByRole('button', { name: 'Colors' }))
+    await user.click(table.getByRole('button', { name: 'Save edit' }))
+
+    expect(await table.findByRole('button', { name: 'Save edit' })).toBeDisabled()
+    expect(insertMock).toHaveBeenCalledWith([{ word_id: 'w1', category_id: 'c2' }])
+    expect(deleteMock).toHaveBeenCalledWith('category_id', ['c1'])
+    expect(table.getByRole('button', { name: 'Animals' })).toHaveAttribute('aria-pressed', 'false')
+    expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
+  })
+
+  it('shows an error and keeps the draft when saving fails', async () => {
+    const deleteMock = vi.fn().mockResolvedValue({ data: null, error: null })
+    const insertMock = vi.fn().mockResolvedValue({ data: null, error: { message: 'write denied' } })
+    vi.mocked(supabase.from).mockImplementation(
+      ((table: string) => {
+        if (table === 'categories') {
+          return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: CATEGORIES, error: null }) }) }
+        }
+        if (table === 'word_categories') {
+          return {
+            select: vi.fn().mockReturnValue({
+              eq: vi.fn().mockResolvedValue({ data: [], error: null }),
+            }),
+            delete: vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ in: deleteMock }) }),
+            insert: insertMock,
+          }
+        }
+        return { select: vi.fn().mockReturnValue({ order: vi.fn().mockResolvedValue({ data: [...WORDS], error: null }) }) }
+      }) as never,
+    )
+    const user = userEvent.setup()
+
+    const table = await expandRow(user)
+    await user.click(table.getByRole('button', { name: 'Colors' }))
+    await user.click(table.getByRole('button', { name: 'Save edit' }))
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('write denied')
+    expect(table.getByRole('button', { name: 'Colors' })).toHaveAttribute('aria-pressed', 'true')
+    expect(table.getByRole('button', { name: 'Save edit' })).not.toBeDisabled()
   })
 })

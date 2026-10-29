@@ -12,6 +12,15 @@ Covers the "Add a new word" form (`AddWordForm`):
 - When the RPC fails and the compensating delete also fails, shows the message that names the orphaned storage path for manual cleanup.
 - On success, uploads first, calls `add_word_with_video` with the generated sign id, and shows the success message.
 
+Covers category editing (`EditWordCategoriesRow`), draft/commit behavior:
+
+- Toggling a tag chip updates its pressed state but calls neither `insert` nor `delete` on `word_categories`.
+- **Revert changes** restores the saved selection, makes no database call, and both action buttons are disabled once the draft matches the saved copy again.
+- **Save edit** sends only the categories added/removed since the saved copy (one `delete().eq().in()` call, one `insert()` call), then the draft becomes the new saved copy and **Save edit** is disabled again.
+- When the save fails, the error from the `insert`/`delete` call is shown in an alert and the draft (and enabled **Save edit** button) is left untouched.
+
 ## Notes
 
 Mocks `../lib/supabase` (`from`, `rpc`) and the whole `../lib/signVideoUpload` module, so the upload internals are not exercised here. Those are covered by [signVideoUpload.test.ts](./signVideoUpload.md). The file input is located by its `aria-label="Video file"`.
+
+The category-editing tests scope all queries to the admin table (`within(screen.getByRole('table'))`) because `AddWordForm`'s own `TagPicker` renders a same-named "Tags" group higher on the page — `TagChipList` reuses one static `headingId` across every instance, so an unscoped query matches both.

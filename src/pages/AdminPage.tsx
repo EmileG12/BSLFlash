@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
-import { Pencil, Plus } from 'lucide-react'
+import { Check, Pencil, Plus, RotateCcw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -128,11 +128,23 @@ function AddWordForm() {
   )
 }
 
+function sameIds(a: string[], b: string[]) {
+  if (a.length !== b.length) return false
+  const sortedA = [...a].sort()
+  const sortedB = [...b].sort()
+  return sortedA.every((id, index) => id === sortedB[index])
+}
+
 function EditWordCategoriesRow({ word }: { word: WordOption }) {
   const [expanded, setExpanded] = useState(false)
-  const [categoryIds, setCategoryIds] = useState<string[] | null>(null)
+  const [savedCategoryIds, setSavedCategoryIds] = useState<string[] | null>(null)
+  const [draftCategoryIds, setDraftCategoryIds] = useState<string[] | null>(null)
   const [loadingTags, setLoadingTags] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [tagError, setTagError] = useState<string | null>(null)
+
+  const isDirty =
+    savedCategoryIds !== null && draftCategoryIds !== null && !sameIds(savedCategoryIds, draftCategoryIds)
 
   async function handleExpand() {
     if (expanded) {
@@ -140,7 +152,7 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
       return
     }
     setExpanded(true)
-    if (categoryIds !== null) return
+    if (savedCategoryIds !== null) return
     setLoadingTags(true)
     const { data, error } = await supabase
       .from('word_categories')
@@ -151,35 +163,59 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
       setTagError(error.message)
       return
     }
-    setCategoryIds(data.map((row) => row.category_id))
+    const ids = data.map((row) => row.category_id)
+    setSavedCategoryIds(ids)
+    setDraftCategoryIds(ids)
   }
 
-  async function handleToggle(categoryId: string) {
-    if (categoryIds === null) return
+  function handleToggle(categoryId: string) {
+    setDraftCategoryIds((previous) => {
+      if (previous === null) return previous
+      return previous.includes(categoryId)
+        ? previous.filter((id) => id !== categoryId)
+        : [...previous, categoryId]
+    })
+  }
+
+  function handleRevert() {
     setTagError(null)
-    const alreadySelected = categoryIds.includes(categoryId)
-    if (alreadySelected) {
+    setDraftCategoryIds(savedCategoryIds)
+  }
+
+  async function handleSaveEdit() {
+    if (savedCategoryIds === null || draftCategoryIds === null) return
+    setTagError(null)
+    setSaving(true)
+
+    const toInsert = draftCategoryIds.filter((id) => !savedCategoryIds.includes(id))
+    const toDelete = savedCategoryIds.filter((id) => !draftCategoryIds.includes(id))
+
+    if (toDelete.length > 0) {
       const { error } = await supabase
         .from('word_categories')
         .delete()
         .eq('word_id', word.id)
-        .eq('category_id', categoryId)
+        .in('category_id', toDelete)
       if (error) {
         setTagError(error.message)
+        setSaving(false)
         return
       }
-      setCategoryIds((previous) => (previous ?? []).filter((id) => id !== categoryId))
-    } else {
-      const { error } = await supabase.from('word_categories').insert({
-        word_id: word.id,
-        category_id: categoryId,
-      })
-      if (error) {
-        setTagError(error.message)
-        return
-      }
-      setCategoryIds((previous) => [...(previous ?? []), categoryId])
     }
+
+    if (toInsert.length > 0) {
+      const { error } = await supabase
+        .from('word_categories')
+        .insert(toInsert.map((categoryId) => ({ word_id: word.id, category_id: categoryId })))
+      if (error) {
+        setTagError(error.message)
+        setSaving(false)
+        return
+      }
+    }
+
+    setSaving(false)
+    setSavedCategoryIds(draftCategoryIds)
   }
 
   return (
@@ -197,15 +233,34 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
       {expanded && (
         <TableRow>
           <TableCell colSpan={3} className="bg-muted/30">
-            {loadingTags && <p className="text-sm text-muted-foreground">Loading categories…</p>}
-            {!loadingTags && categoryIds !== null && (
-              <TagPicker selectedIds={categoryIds} onToggle={handleToggle} />
-            )}
-            {tagError && (
-              <p role="alert" className="text-sm text-destructive">
-                {tagError}
-              </p>
-            )}
+            <div className="flex flex-col gap-3">
+              {loadingTags && <p className="text-sm text-muted-foreground">Loading categories…</p>}
+              {!loadingTags && draftCategoryIds !== null && (
+                <>
+                  <TagPicker selectedIds={draftCategoryIds} onToggle={handleToggle} />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-success text-primary-foreground hover:bg-success/80"
+                      onClick={handleSaveEdit}
+                      disabled={!isDirty || saving}
+                    >
+                      <Check aria-hidden="true" className="size-3.5" />
+                      {saving ? 'Saving…' : 'Save edit'}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleRevert} disabled={!isDirty || saving}>
+                      <RotateCcw aria-hidden="true" className="size-3.5" />
+                      Revert changes
+                    </Button>
+                  </div>
+                </>
+              )}
+              {tagError && (
+                <p role="alert" className="text-sm text-destructive">
+                  {tagError}
+                </p>
+              )}
+            </div>
           </TableCell>
         </TableRow>
       )}
