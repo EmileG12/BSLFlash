@@ -1,6 +1,6 @@
-# SignStack Documentation
+# BSLFlash Documentation
 
-This is a hand-maintained wiki describing the **current state** of the SignStack codebase. It is not a changelog — every file here is edited in place to describe what exists *now*; nothing is appended as history.
+This is a hand-maintained wiki describing the **current state** of the BSLFlash codebase. It is not a changelog — every file here is edited in place to describe what exists *now*; nothing is appended as history.
 
 This folder is a plain markdown tree, so it works two ways:
 - Browsed directly on GitHub (folders/links render normally).

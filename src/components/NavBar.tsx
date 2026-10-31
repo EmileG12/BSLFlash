@@ -94,7 +94,7 @@ export function NavBar() {
   return (
     <nav className="navbar">
       <div className="navbar-left">
-        <img src="/bsl-long-logo.svg" alt="SignStack" className="navbar-logo" />
+        <img src="/bsl-long-logo.svg" alt="BSLFlash" className="navbar-logo" />
         <div className="hidden items-center gap-7 lg:flex">
           <NavLink to="/" end className="navbar-brand">
             Home

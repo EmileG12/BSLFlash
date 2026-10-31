@@ -13,7 +13,7 @@ export function HomePage() {
         <CardHeader className="selection-band -mt-(--card-spacing) border-b border-brand pt-(--card-spacing)">
           <CardTitle className="text-2xl">Pick a deck to practise</CardTitle>
           <CardDescription>
-            SignStack teaches British Sign Language through short video flashcards. Pick an
+            BSLFlash teaches British Sign Language through short video flashcards. Pick an
             everyday topic or an exam-linked list below, then test yourself sign by sign.
           </CardDescription>
         </CardHeader>

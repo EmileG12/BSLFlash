@@ -1,4 +1,4 @@
-# SignStack
+# BSLFlash
 
 BSL (British Sign Language) flashcard web app.
 

@@ -1,6 +1,6 @@
 # Deployment
 
-How SignStack is hosted, deployed, and kept running — as opposed to `/docs`'s other domains, which describe the app itself.
+How BSLFlash is hosted, deployed, and kept running — as opposed to `/docs`'s other domains, which describe the app itself.
 
 ## Branches
 
