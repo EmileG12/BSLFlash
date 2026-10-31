@@ -73,6 +73,12 @@
   background-color: var(--brand-muted);
 }
 
+.mobile-nav-row--install:hover,
+.mobile-nav-row--install:focus-visible {
+  color: var(--brand);
+  background-color: var(--brand-muted);
+}
+
 .mobile-nav-divider {
   margin: 8px 20px;
   border-top: 1px solid var(--input);

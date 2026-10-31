@@ -1,0 +1,12 @@
+@reference "../index.css";
+
+.install-instructions-description {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.install-instructions-icon {
+  flex-shrink: 0;
+  margin-top: 2px;
+}

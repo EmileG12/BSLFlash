@@ -79,6 +79,12 @@ Any deck can be published with `is_public` (set when the owner saves the deck, v
 
 Both game modes play a custom deck exactly like a standard category: the URL carries a `deckType` segment (`'standard' | 'custom'`, the `DeckType` type exported from [useRandomFlashcard](./hooks/useRandomFlashcard.md)) alongside `categoryId`, e.g. `/flashcards/custom/:categoryId/practice`. [ModeSelectPage](./components/ModeSelectPage.md), [FlashcardRound](./components/FlashcardRound.md), [ScorePill](./components/ScorePill.md), and [useRoundProgress](./hooks/useRoundProgress.md) are untouched by this — only [useRandomFlashcard](./hooks/useRandomFlashcard.md)/[useTenCardsRound](./hooks/useTenCardsRound.md) and the two RPCs they call ([`get_random_word_for_category`](./rpc-functions/get_random_word_for_category.md)/[`get_random_words_for_category`](./rpc-functions/get_random_words_for_category.md)) branch on `deckType`, via an added `is_custom` parameter that selects whether `category_id` is looked up in `word_categories` or `custom_deck_words`.
 
+## Installability (PWA)
+
+The app is installable as a Progressive Web App. [`vite.config.ts`](../vite.config.ts) registers `vite-plugin-pwa` with `registerType: 'autoUpdate'`, which generates the web app manifest (name and short name "BSL Flash", `standalone` display) and a service worker. App icons are generated from `public/bsl-icon.svg` by `@vite-pwa/assets-generator`, configured in `pwa-assets.config.ts`, and written to `public/`.
+
+In-app install UI is built on [useInstallPrompt](./hooks/useInstallPrompt.md): [InstallBanner](./components/InstallBanner.md) (mobile-only, dismissible, mounted by [AppLayout](./components/AppLayout.md)) and the "Install App" row in [MobileNavSheet](./components/MobileNavSheet.md), which shares [InstallInstructionsDialog](./components/InstallInstructionsDialog.md) for platforms with no one-tap prompt.
+
 ## Testing
 
 Vitest + React Testing Library — see [tests/](./tests/README.md) for what's covered and the mocking conventions used throughout.

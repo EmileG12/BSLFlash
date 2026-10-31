@@ -18,3 +18,19 @@ class ResizeObserverStub {
   disconnect() {}
 }
 globalThis.ResizeObserver ??= ResizeObserverStub as unknown as typeof ResizeObserver
+
+// jsdom doesn't implement matchMedia (it has no real viewport/media-query
+// engine), but useInstallPrompt calls it unconditionally to detect standalone
+// display mode. A stub that always reports "no match" is enough since no test
+// here depends on a real media query evaluating true.
+window.matchMedia ??=
+  (() => ({
+    matches: false,
+    media: '',
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia
