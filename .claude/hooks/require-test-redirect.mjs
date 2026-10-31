@@ -12,8 +12,13 @@
 // by adversarial quoting, but it only needs to catch the ordinary ways this mistake
 // actually happens (self-redirecting to an arbitrary path, then `tail -n 100` or `cat`-ing
 // a short log so the whole thing lands in context anyway).
+//
+// TEST_INVOCATION is matched against a quote/heredoc-stripped copy of each segment (see
+// lib/stripQuoted.mjs), so a commit message or doc edit that merely *mentions* e.g. "npm
+// run test" doesn't false-positive the same way a real invocation would.
 
 import { readFileSync } from 'node:fs'
+import { stripQuoted } from './lib/stripQuoted.mjs'
 
 const TEST_INVOCATION = /\b(npm\s+(run\s+)?test|npx\s+vitest|vitest)\b/
 const REQUIRED_LOG_DIR = '.test-logs/'
@@ -90,7 +95,9 @@ try {
 
 const command = payload?.tool_input?.command ?? ''
 const segments = splitSegments(command)
-const testSegmentIndex = segments.findIndex((segment) => TEST_INVOCATION.test(segment))
+const testSegmentIndex = segments.findIndex((segment) =>
+  TEST_INVOCATION.test(stripQuoted(segment)),
+)
 
 if (testSegmentIndex === -1) {
   allow()

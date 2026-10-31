@@ -14,8 +14,13 @@
 // Deliberately a regex/segment heuristic, not a shell parser — same tradeoff as the
 // other hooks in this file: it only needs to catch the ordinary shape of these commands,
 // not survive adversarial quoting.
+//
+// Each trigger regex is matched against a quote/heredoc-stripped copy of the segment (see
+// lib/stripQuoted.mjs), so a commit message or doc edit that merely *mentions* one of these
+// commands doesn't false-positive the same way a real invocation would.
 
 import { readFileSync } from 'node:fs'
+import { stripQuoted } from './lib/stripQuoted.mjs'
 
 function allow() {
   process.exit(0)
@@ -57,19 +62,21 @@ const command = payload?.tool_input?.command ?? ''
 const segments = splitSegments(command)
 
 for (const segment of segments) {
-  if (GH_PR_MERGE.test(segment)) {
+  const stripped = stripQuoted(segment)
+
+  if (GH_PR_MERGE.test(stripped)) {
     deny(
       `"${segment}" merges a PR. Merging is a human action in this repo — ask the user to run ` +
         `this themselves (in their own terminal or the GitHub UI) instead of running it for them.`,
     )
   }
-  if (GH_API_MERGE.test(segment)) {
+  if (GH_API_MERGE.test(stripped)) {
     deny(
       `"${segment}" hits a PR merge endpoint directly. Same rule as "gh pr merge" — merging is a ` +
         `human action; ask the user to do it themselves instead.`,
     )
   }
-  if (PUSH_TO_PROTECTED_BRANCH.test(segment)) {
+  if (PUSH_TO_PROTECTED_BRANCH.test(stripped)) {
     deny(
       `"${segment}" pushes directly to a protected branch (main/master), which is equivalent to ` +
         `merging without a PR review. Ask the user to do this themselves instead.`,
