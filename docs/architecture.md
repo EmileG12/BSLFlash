@@ -1,6 +1,6 @@
 # Architecture
 
-Current state of the SignStack app, described honestly as of now.
+Current state of the BSLFlash app, described honestly as of now.
 
 ## Stack
 

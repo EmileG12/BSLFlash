@@ -53,7 +53,7 @@ describe('NavBar', () => {
     expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument()
   })
 
-  it('renders the SignStack logo', () => {
+  it('renders the BSLFlash logo', () => {
     mockCategories({ data: [], error: null })
 
     renderWithQueryClient(
@@ -62,7 +62,7 @@ describe('NavBar', () => {
       </MemoryRouter>,
     )
 
-    expect(screen.getByRole('img', { name: /signstack/i })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: /bslflash/i })).toBeInTheDocument()
   })
 
   it('signs the user out and navigates to /login when Sign Out is clicked', async () => {

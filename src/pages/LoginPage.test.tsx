@@ -48,7 +48,7 @@ describe('LoginPage', () => {
       </MemoryRouter>,
     )
 
-    await user.type(screen.getByLabelText(/email/i), 'user@signstack.local')
+    await user.type(screen.getByLabelText(/email/i), 'user@bslflash.local')
     await user.type(screen.getByLabelText(/password/i), 'User123!')
     await user.click(screen.getByRole('button', { name: /log in/i }))
 

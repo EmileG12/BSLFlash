@@ -2,7 +2,7 @@
 
 **Path:** `src/components/NavBar.tsx`
 
-**Purpose:** Top navigation bar rendered on every authenticated page via [AppLayout](./AppLayout.md). Shows the SignStack long-form logo (`/bsl-long-logo.svg`), a "Home" link, the [CategoryMenu](./CategoryMenu.md) dropdowns for Categories and Vocabulary, "Create Decks"/"My Decks"/"Browse Decks" links, and a "Sign Out" button — on screens narrower than the `lg` breakpoint (1024px), these give way to a hamburger trigger opening [MobileNavSheet](./MobileNavSheet.md) instead.
+**Purpose:** Top navigation bar rendered on every authenticated page via [AppLayout](./AppLayout.md). Shows the BSLFlash long-form logo (`/bsl-long-logo.svg`), a "Home" link, the [CategoryMenu](./CategoryMenu.md) dropdowns for Categories and Vocabulary, "Create Decks"/"My Decks"/"Browse Decks" links, and a "Sign Out" button — on screens narrower than the `lg` breakpoint (1024px), these give way to a hamburger trigger opening [MobileNavSheet](./MobileNavSheet.md) instead.
 
 **Props:** None.
 

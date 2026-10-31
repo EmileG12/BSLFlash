@@ -3,8 +3,8 @@
 --
 -- Placeholder credentials, change freely -- nothing depends on these outside
 -- this file:
---   superadmin@signstack.local / SuperAdmin123!
---   user@signstack.local       / User123!
+--   superadmin@bslflash.local / SuperAdmin123!
+--   user@bslflash.local       / User123!
 --
 -- Fixed literal UUIDs are used (rather than gen_random_uuid()) so the
 -- auth.users / profiles / user_roles rows below can reference each other
@@ -54,7 +54,7 @@ values
     '11111111-1111-1111-1111-111111111111',
     'authenticated',
     'authenticated',
-    'superadmin@signstack.local',
+    'superadmin@bslflash.local',
     extensions.crypt('SuperAdmin123!', extensions.gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
@@ -73,7 +73,7 @@ values
     '22222222-2222-2222-2222-222222222222',
     'authenticated',
     'authenticated',
-    'user@signstack.local',
+    'user@bslflash.local',
     extensions.crypt('User123!', extensions.gen_salt('bf')),
     now(),
     '{"provider":"email","providers":["email"]}'::jsonb,
@@ -111,7 +111,7 @@ values
     '11111111-1111-1111-1111-111111111111',
     jsonb_build_object(
       'sub', '11111111-1111-1111-1111-111111111111',
-      'email', 'superadmin@signstack.local',
+      'email', 'superadmin@bslflash.local',
       'email_verified', true,
       'phone_verified', false
     ),
@@ -126,7 +126,7 @@ values
     '22222222-2222-2222-2222-222222222222',
     jsonb_build_object(
       'sub', '22222222-2222-2222-2222-222222222222',
-      'email', 'user@signstack.local',
+      'email', 'user@bslflash.local',
       'email_verified', true,
       'phone_verified', false
     ),
