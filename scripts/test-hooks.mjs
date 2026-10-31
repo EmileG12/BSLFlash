@@ -212,6 +212,37 @@ describe('test-output gate', () => {
   )
 })
 
+describe('PR-merge gate', () => {
+  const gate = (command) =>
+    run('node', ['.claude/hooks/block-pr-merge.mjs'], {
+      input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }),
+    }).out
+
+  check(
+    'denies gh pr merge',
+    gate('gh pr merge 6 --merge').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies gh pr merge --admin',
+    gate('gh pr merge 6 --admin').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies the raw API merge endpoint',
+    gate('gh api --method PUT repos/x/y/pulls/6/merge').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies a direct push to main',
+    gate('git push origin main').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies a direct push to master',
+    gate('git push origin master').includes('"permissionDecision":"deny"'),
+  )
+  check('allows a push to a non-protected branch', gate('git push origin staging').trim() === '')
+  check('allows an unrelated gh command', gate('gh pr view 6').trim() === '')
+  check('allows an unrelated git command', gate('git status').trim() === '')
+})
+
 describe('left the repo as it found it', () => {
   check('HEAD unchanged', run('git', ['rev-parse', 'HEAD']).out.trim() === headBefore)
   check(
