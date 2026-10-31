@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Pencil, Plus } from 'lucide-react'
+import { useQueryClient } from '@tanstack/react-query'
+import { Check, Pencil, Plus, RotateCcw } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,9 +10,10 @@ import { TableCard } from '../components/TableCard'
 import { TagPicker } from '../components/TagPicker'
 import { useWords, type WordOption } from '../hooks/useWords'
 import { supabase } from '../lib/supabase'
-import { uploadSignVideo } from '../lib/signVideoUpload'
+import { deleteSignVideoFile, uploadSignVideoFile } from '../lib/signVideoUpload'
 
 function AddWordForm() {
+  const queryClient = useQueryClient()
   const [word, setWord] = useState('')
   const [definition, setDefinition] = useState('')
   const [videoFile, setVideoFile] = useState<File | null>(null)
@@ -38,37 +40,51 @@ function AddWordForm() {
 
     setSubmitting(true)
     setFormError(null)
+
+    const signId = crypto.randomUUID()
+    let uploaded: Awaited<ReturnType<typeof uploadSignVideoFile>>
     try {
-      const { data: newWord, error: wordError } = await supabase
-        .from('words')
-        .insert({ word: trimmedWord, definition: trimmedDefinition })
-        .select('id')
-        .single()
-      if (wordError) throw wordError
+      uploaded = await uploadSignVideoFile(signId, videoFile)
+    } catch (uploadError) {
+      setFormError(
+        `Video upload failed: ${uploadError instanceof Error ? uploadError.message : 'unknown error'}. No changes were saved.`,
+      )
+      setSubmitting(false)
+      return
+    }
 
-      const { data: newSign, error: signError } = await supabase
-        .from('signs')
-        .insert({ word_id: newWord.id, variant_name: 'Standard', is_primary: true })
-        .select('id')
-        .single()
-      if (signError) throw signError
+    try {
+      const { error } = await supabase.rpc('add_word_with_video', {
+        p_word: trimmedWord,
+        p_definition: trimmedDefinition,
+        p_sign_id: signId,
+        p_storage_path: uploaded.storagePath,
+        p_format: uploaded.format,
+        p_duration_ms: uploaded.metadata.durationMs,
+        p_width: uploaded.metadata.width,
+        p_height: uploaded.metadata.height,
+        p_file_size: videoFile.size,
+        p_category_ids: categoryIds,
+      })
+      if (error) throw error
 
-      await uploadSignVideo(newSign.id, videoFile)
-
-      if (categoryIds.length > 0) {
-        const { error: tagError } = await supabase
-          .from('word_categories')
-          .insert(categoryIds.map((categoryId) => ({ word_id: newWord.id, category_id: categoryId })))
-        if (tagError) throw tagError
-      }
-
+      queryClient.invalidateQueries({ queryKey: ['words'] })
       setSuccessMessage(`Added "${trimmedWord}".`)
       setWord('')
       setDefinition('')
       setVideoFile(null)
       setCategoryIds([])
-    } catch (error) {
-      setFormError(error instanceof Error ? error.message : 'Failed to add word.')
+    } catch (writeError) {
+      const cleanedUp = await deleteSignVideoFile(uploaded.storagePath).then(
+        () => true,
+        () => false,
+      )
+      const message = (writeError as { message?: string } | null)?.message ?? 'unknown error'
+      setFormError(
+        cleanedUp
+          ? `Failed to add word: ${message}. No changes were saved.`
+          : `Failed to add word: ${message}. No changes were saved, but the uploaded video file could not be removed and may need manual cleanup (path: ${uploaded.storagePath}).`,
+      )
     } finally {
       setSubmitting(false)
     }
@@ -88,6 +104,7 @@ function AddWordForm() {
         />
         <Input
           type="file"
+          aria-label="Video file"
           accept="video/mp4,video/webm"
           onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)}
         />
@@ -111,11 +128,23 @@ function AddWordForm() {
   )
 }
 
+function sameIds(a: string[], b: string[]) {
+  if (a.length !== b.length) return false
+  const sortedA = [...a].sort()
+  const sortedB = [...b].sort()
+  return sortedA.every((id, index) => id === sortedB[index])
+}
+
 function EditWordCategoriesRow({ word }: { word: WordOption }) {
   const [expanded, setExpanded] = useState(false)
-  const [categoryIds, setCategoryIds] = useState<string[] | null>(null)
+  const [savedCategoryIds, setSavedCategoryIds] = useState<string[] | null>(null)
+  const [draftCategoryIds, setDraftCategoryIds] = useState<string[] | null>(null)
   const [loadingTags, setLoadingTags] = useState(false)
+  const [saving, setSaving] = useState(false)
   const [tagError, setTagError] = useState<string | null>(null)
+
+  const isDirty =
+    savedCategoryIds !== null && draftCategoryIds !== null && !sameIds(savedCategoryIds, draftCategoryIds)
 
   async function handleExpand() {
     if (expanded) {
@@ -123,7 +152,7 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
       return
     }
     setExpanded(true)
-    if (categoryIds !== null) return
+    if (savedCategoryIds !== null) return
     setLoadingTags(true)
     const { data, error } = await supabase
       .from('word_categories')
@@ -134,35 +163,41 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
       setTagError(error.message)
       return
     }
-    setCategoryIds(data.map((row) => row.category_id))
+    const ids = data.map((row) => row.category_id)
+    setSavedCategoryIds(ids)
+    setDraftCategoryIds(ids)
   }
 
-  async function handleToggle(categoryId: string) {
-    if (categoryIds === null) return
+  function handleToggle(categoryId: string) {
+    setDraftCategoryIds((previous) => {
+      if (previous === null) return previous
+      return previous.includes(categoryId)
+        ? previous.filter((id) => id !== categoryId)
+        : [...previous, categoryId]
+    })
+  }
+
+  function handleRevert() {
     setTagError(null)
-    const alreadySelected = categoryIds.includes(categoryId)
-    if (alreadySelected) {
-      const { error } = await supabase
-        .from('word_categories')
-        .delete()
-        .eq('word_id', word.id)
-        .eq('category_id', categoryId)
-      if (error) {
-        setTagError(error.message)
-        return
-      }
-      setCategoryIds((previous) => (previous ?? []).filter((id) => id !== categoryId))
-    } else {
-      const { error } = await supabase.from('word_categories').insert({
-        word_id: word.id,
-        category_id: categoryId,
-      })
-      if (error) {
-        setTagError(error.message)
-        return
-      }
-      setCategoryIds((previous) => [...(previous ?? []), categoryId])
+    setDraftCategoryIds(savedCategoryIds)
+  }
+
+  async function handleSaveEdit() {
+    if (savedCategoryIds === null || draftCategoryIds === null) return
+    setTagError(null)
+    setSaving(true)
+
+    const { error } = await supabase.rpc('set_word_categories', {
+      p_word_id: word.id,
+      p_category_ids: draftCategoryIds,
+    })
+    setSaving(false)
+    if (error) {
+      setTagError(error.message)
+      return
     }
+
+    setSavedCategoryIds(draftCategoryIds)
   }
 
   return (
@@ -180,15 +215,34 @@ function EditWordCategoriesRow({ word }: { word: WordOption }) {
       {expanded && (
         <TableRow>
           <TableCell colSpan={3} className="bg-muted/30">
-            {loadingTags && <p className="text-sm text-muted-foreground">Loading categories…</p>}
-            {!loadingTags && categoryIds !== null && (
-              <TagPicker selectedIds={categoryIds} onToggle={handleToggle} />
-            )}
-            {tagError && (
-              <p role="alert" className="text-sm text-destructive">
-                {tagError}
-              </p>
-            )}
+            <div className="flex flex-col gap-3">
+              {loadingTags && <p className="text-sm text-muted-foreground">Loading categories…</p>}
+              {!loadingTags && draftCategoryIds !== null && (
+                <>
+                  <TagPicker selectedIds={draftCategoryIds} onToggle={handleToggle} />
+                  <div className="flex gap-2">
+                    <Button
+                      size="sm"
+                      className="bg-success text-primary-foreground hover:bg-success/80"
+                      onClick={handleSaveEdit}
+                      disabled={!isDirty || saving}
+                    >
+                      <Check aria-hidden="true" className="size-3.5" />
+                      {saving ? 'Saving…' : 'Save edit'}
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={handleRevert} disabled={!isDirty || saving}>
+                      <RotateCcw aria-hidden="true" className="size-3.5" />
+                      Revert changes
+                    </Button>
+                  </div>
+                </>
+              )}
+              {tagError && (
+                <p role="alert" className="text-sm text-destructive">
+                  {tagError}
+                </p>
+              )}
+            </div>
           </TableCell>
         </TableRow>
       )}
