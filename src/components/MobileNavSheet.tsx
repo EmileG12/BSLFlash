@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
-import { ChevronDown, LogOut, Menu, Shield } from 'lucide-react'
+import { ChevronDown, Download, LogOut, Menu, Shield } from 'lucide-react'
 import { ADMIN_NAV_ITEMS } from '../lib/adminNav'
 import { useCategories } from '../hooks/useCategories'
 import { useUserRoles } from '../hooks/useUserRoles'
+import { useInstallPrompt } from '../hooks/useInstallPrompt'
 import { Sheet, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from './ui/sheet'
 import { Button } from './ui/button'
+import { InstallInstructionsDialog } from './InstallInstructionsDialog'
 import './MobileNavSheet.css'
 
 interface AdminDisclosureProps {
@@ -53,6 +55,47 @@ function AdminDisclosure({ onNavigate }: AdminDisclosureProps) {
 
 interface MobileNavSheetProps {
   onSignOut: () => void
+}
+
+interface InstallMenuRowProps {
+  onNavigate: () => void
+}
+
+/** Persistent "Install App" row, shown whenever the PWA isn't already installed.
+ * Chromium/Android triggers the native one-tap prompt directly; iOS/other open
+ * the shared manual-instructions dialog instead. Unlike InstallBanner, this row
+ * isn't dismissible -- it's a plain menu item, not a nag. */
+function InstallMenuRow({ onNavigate }: InstallMenuRowProps) {
+  const { canInstall, canPromptNatively, platform, promptInstall } = useInstallPrompt()
+  const [showInstructions, setShowInstructions] = useState(false)
+
+  if (!canInstall) return null
+
+  function handleClick() {
+    if (canPromptNatively) {
+      void promptInstall()
+      onNavigate()
+    } else {
+      setShowInstructions(true)
+    }
+  }
+
+  return (
+    <>
+      <button type="button" className="mobile-nav-row mobile-nav-row--install" onClick={handleClick}>
+        Install App
+        <Download size={18} />
+      </button>
+      <InstallInstructionsDialog
+        open={showInstructions}
+        onOpenChange={(open) => {
+          setShowInstructions(open)
+          if (!open) onNavigate()
+        }}
+        platform={platform}
+      />
+    </>
+  )
 }
 
 interface CategoryDisclosureProps {
@@ -172,6 +215,7 @@ export function MobileNavSheet({ onSignOut }: MobileNavSheetProps) {
               </span>
             </NavLink>
           )}
+          <InstallMenuRow onNavigate={close} />
           <div className="mobile-nav-divider" />
           <button
             type="button"

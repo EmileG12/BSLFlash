@@ -71,6 +71,8 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [AdminPage](./AdminPage.md) | `src/pages/AdminPage.test.tsx` | [AdminPage](../components/AdminPage.md) — add-word upload/error paths, category-edit draft/save/revert |
 | [SuperadminWordEditPage](./SuperadminWordEditPage.md) | `src/pages/SuperadminWordEditPage.test.tsx` | [SuperadminWordEditPage](../components/SuperadminWordEditPage.md) — add video and add variant upload and error paths |
 | [signVideoUpload](./signVideoUpload.md) | `src/lib/signVideoUpload.test.ts` | [signVideoUpload](../utils/signVideoUpload.md) |
+| [useInstallPrompt](./useInstallPrompt.md) | `src/hooks/useInstallPrompt.test.ts` | [useInstallPrompt](../hooks/useInstallPrompt.md) |
+| [InstallBanner](./InstallBanner.md) | `src/components/InstallBanner.test.tsx` | [InstallBanner](../components/InstallBanner.md) |
 
 ## Shared helpers
 

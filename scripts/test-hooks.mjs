@@ -210,6 +210,57 @@ describe('test-output gate', () => {
     'denies cat-ing the log after a valid redirect',
     catted.includes('"permissionDecision":"deny"'),
   )
+
+  check(
+    'allows a commit message that only mentions "npm run test" in prose',
+    gate('git commit -m "docs: explain why npm run test must be redirected"').trim() === '',
+  )
+})
+
+describe('PR-merge gate', () => {
+  const gate = (command) =>
+    run('node', ['.claude/hooks/block-pr-merge.mjs'], {
+      input: JSON.stringify({ tool_name: 'Bash', tool_input: { command } }),
+    }).out
+
+  check(
+    'denies gh pr merge',
+    gate('gh pr merge 6 --merge').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies gh pr merge --admin',
+    gate('gh pr merge 6 --admin').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies the raw API merge endpoint',
+    gate('gh api --method PUT repos/x/y/pulls/6/merge').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies a direct push to main',
+    gate('git push origin main').includes('"permissionDecision":"deny"'),
+  )
+  check(
+    'denies a direct push to master',
+    gate('git push origin master').includes('"permissionDecision":"deny"'),
+  )
+  check('allows a push to a non-protected branch', gate('git push origin staging').trim() === '')
+  check('allows an unrelated gh command', gate('gh pr view 6').trim() === '')
+  check('allows an unrelated git command', gate('git status').trim() === '')
+
+  check(
+    'allows a commit message that only mentions "gh pr merge" in prose',
+    gate('git commit -m "docs: explain why gh pr merge is blocked"').trim() === '',
+  )
+  check(
+    'allows a commit message mentioning a direct push to main in prose',
+    gate('git commit -m "note: a direct git push to main is dangerous"').trim() === '',
+  )
+  check(
+    'allows a heredoc commit message that mentions gh pr merge in its body',
+    gate(
+      "git commit -m \"$(cat <<'EOF'\nAdd a hook that blocks gh pr merge\nEOF\n)\"",
+    ).trim() === '',
+  )
 })
 
 describe('left the repo as it found it', () => {

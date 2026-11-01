@@ -14,6 +14,7 @@ Custom React hooks, one doc file per hook.
 | [useCategories](./useCategories.md) | `src/hooks/useCategories.ts` | Fetches the flashcard categories that have at least one word, filtered by vocabulary kind. |
 | [useCategoryInfo](./useCategoryInfo.md) | `src/hooks/useCategoryInfo.ts` | Looks up one category's or custom deck's display name and whether it's a vocabulary category. |
 | [useHoverDropdownMenu](./useHoverDropdownMenu.md) | `src/hooks/useHoverDropdownMenu.ts` | Open-state and hover/focus mechanics for a nav dropdown that opens on hover, shared by `CategoryMenu` and the Admin nav entry. |
+| [useInstallPrompt](./useInstallPrompt.md) | `src/hooks/useInstallPrompt.ts` | Reports whether the app can be installed as a PWA, captures the browser's one-tap install prompt, detects platform, and holds the install-banner dismissal flag. |
 | [useCustomDeckDetail](./useCustomDeckDetail.md) | `src/hooks/useCustomDeckDetail.ts` | Loads one owned deck's name, publish flag, word ids, and tag ids for the Edit deck modal. |
 | [useCustomDecks](./useCustomDecks.md) | `src/hooks/useCustomDecks.ts` | Fetches the signed-in user's own custom decks for My Decks, with a local setter for a renamed deck. |
 | [usePublicDecks](./usePublicDecks.md) | `src/hooks/usePublicDecks.ts` | Fetches the published-deck directory for a search, tag filter and sort, with an optimistic-update setter. |

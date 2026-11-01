@@ -79,6 +79,14 @@ Any deck can be published with `is_public` (set when the owner saves the deck, v
 
 Both game modes play a custom deck exactly like a standard category: the URL carries a `deckType` segment (`'standard' | 'custom'`, the `DeckType` type exported from [useRandomFlashcard](./hooks/useRandomFlashcard.md)) alongside `categoryId`, e.g. `/flashcards/custom/:categoryId/practice`. [ModeSelectPage](./components/ModeSelectPage.md), [FlashcardRound](./components/FlashcardRound.md), [ScorePill](./components/ScorePill.md), and [useRoundProgress](./hooks/useRoundProgress.md) are untouched by this — only [useRandomFlashcard](./hooks/useRandomFlashcard.md)/[useTenCardsRound](./hooks/useTenCardsRound.md) and the two RPCs they call ([`get_random_word_for_category`](./rpc-functions/get_random_word_for_category.md)/[`get_random_words_for_category`](./rpc-functions/get_random_words_for_category.md)) branch on `deckType`, via an added `is_custom` parameter that selects whether `category_id` is looked up in `word_categories` or `custom_deck_words`.
 
+## Installability (PWA)
+
+The app is installable as a Progressive Web App. [`vite.config.ts`](../vite.config.ts) registers `vite-plugin-pwa` with `registerType: 'autoUpdate'`, which generates the web app manifest (`standalone` display) and a service worker. App icons are generated from `public/bsl-icon.svg` by `@vite-pwa/assets-generator`, configured in `pwa-assets.config.ts`, and written to `public/`.
+
+The manifest's `name`/`short_name` depend on the Vercel build environment: `VERCEL_ENV === 'production'` (the `main`-branch deploy, per [hosting.md](./deployment/hosting.md)) gets "BSL Flash"/"BSL Flash" (name/short_name); every other build — `staging`, any other preview branch, or a local build where `VERCEL_ENV` is unset — gets "BSL Flash Staging"/"BSL Staging" (`short_name` shortened since it's what actually renders under the home-screen icon, and Android truncates long labels). This lets an installed PWA's icon/label show which environment it points at, so a preview install can't be mistaken for the production app.
+
+In-app install UI is built on [useInstallPrompt](./hooks/useInstallPrompt.md): [InstallBanner](./components/InstallBanner.md) (mobile-only, dismissible, mounted by [AppLayout](./components/AppLayout.md)) and the "Install App" row in [MobileNavSheet](./components/MobileNavSheet.md), which shares [InstallInstructionsDialog](./components/InstallInstructionsDialog.md) for platforms with no one-tap prompt.
+
 ## Testing
 
 Vitest + React Testing Library — see [tests/](./tests/README.md) for what's covered and the mocking conventions used throughout.

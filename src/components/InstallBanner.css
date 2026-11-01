@@ -1,0 +1,83 @@
+@reference "../index.css";
+
+.install-banner {
+  width: 100%;
+  background: var(--brand-muted);
+  border-bottom: 1px solid var(--border);
+  border-left: 4px solid var(--brand);
+}
+
+.install-banner-tap {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+  min-width: 0;
+  min-height: 44px;
+  padding: 10px 12px;
+  background: none;
+  border: none;
+  font: inherit;
+  text-align: left;
+  color: var(--foreground);
+  cursor: pointer;
+  outline: none;
+}
+
+.install-banner-tap:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}
+
+.install-banner-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: var(--brand-emphasis);
+  color: var(--brand-contrast);
+}
+
+.install-banner-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.install-banner-title {
+  font-weight: 600;
+  font-size: 0.95em;
+}
+
+.install-banner-subtitle {
+  font-size: 0.85em;
+  color: var(--muted-foreground);
+}
+
+.install-banner-dismiss {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  margin-right: 4px;
+  background: none;
+  border: none;
+  color: var(--muted-foreground);
+  cursor: pointer;
+  outline: none;
+}
+
+.install-banner-dismiss:hover,
+.install-banner-dismiss:focus-visible {
+  color: var(--brand);
+}
+
+.install-banner-dismiss:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: -2px;
+}

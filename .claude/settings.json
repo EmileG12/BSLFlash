@@ -13,6 +13,11 @@
             "type": "command",
             "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-ui-designer-writes.mjs\"",
             "timeout": 10
+          },
+          {
+            "type": "command",
+            "command": "node \"$CLAUDE_PROJECT_DIR/.claude/hooks/block-pr-merge.mjs\"",
+            "timeout": 10
           }
         ]
       },

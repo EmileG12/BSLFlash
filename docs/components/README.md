@@ -28,7 +28,9 @@ React components, one doc file per component.
 | [NavBar](./NavBar.md) | `src/components/NavBar.tsx` | Top nav bar (Home link, Categories/Vocabulary dropdowns, Create Decks/My Decks/Browse Decks links, role-gated Admin entry, Sign Out) shown on all authenticated pages. |
 | [CategoryMenu](./CategoryMenu.md) | `src/components/CategoryMenu.tsx` | Hover-triggered nav dropdown listing flashcard categories; used twice by `NavBar` for Categories and Vocabulary. |
 | [MobileNavSheet](./MobileNavSheet.md) | `src/components/MobileNavSheet.tsx` | Hamburger-triggered slide-in nav menu for narrow screens, rendered by `NavBar` alongside the desktop bar. |
-| [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar`. |
+| [InstallBanner](./InstallBanner.md) | `src/components/InstallBanner.tsx` | Dismissible mobile-only nudge to install the app as a PWA; one-tap install where the browser offers it, manual instructions otherwise. |
+| [InstallInstructionsDialog](./InstallInstructionsDialog.md) | `src/components/InstallInstructionsDialog.tsx` | Shared "Add to Home Screen" instructions dialog (iOS vs other), used by `InstallBanner` and the `MobileNavSheet` install row. |
+| [AppLayout](./AppLayout.md) | `src/components/AppLayout.tsx` | Wraps authenticated pages with `NavBar` and `InstallBanner`. |
 | [ProtectedRoute](./ProtectedRoute.md) | `src/components/ProtectedRoute.tsx` | Redirects to `/login` when signed out. |
 | [GuestRoute](./GuestRoute.md) | `src/components/GuestRoute.tsx` | Redirects to `/` when already signed in. |
 | [AuthCard](./AuthCard.md) | `src/components/AuthCard.tsx` | Shared Card scaffold for `LoginPage`/`SignupPage`. |
