@@ -17,6 +17,7 @@ function AddWordForm() {
   const [word, setWord] = useState('')
   const [definition, setDefinition] = useState('')
   const [videoFile, setVideoFile] = useState<File | null>(null)
+  const [videoInputKey, setVideoInputKey] = useState(0)
   const [categoryIds, setCategoryIds] = useState<string[]>([])
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState<string | null>(null)
@@ -73,6 +74,7 @@ function AddWordForm() {
       setWord('')
       setDefinition('')
       setVideoFile(null)
+      setVideoInputKey((previous) => previous + 1)
       setCategoryIds([])
     } catch (writeError) {
       const cleanedUp = await deleteSignVideoFile(uploaded.storagePath).then(
@@ -103,9 +105,11 @@ function AddWordForm() {
           onChange={(event) => setDefinition(event.target.value)}
         />
         <Input
+          key={videoInputKey}
           type="file"
           aria-label="Video file"
           accept="video/mp4,video/webm"
+          className="cursor-pointer file:cursor-pointer"
           onChange={(event) => setVideoFile(event.target.files?.[0] ?? null)}
         />
         <TagPicker selectedIds={categoryIds} onToggle={toggleCategory} />
