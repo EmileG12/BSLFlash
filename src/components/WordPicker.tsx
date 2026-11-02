@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
-import { Plus, X } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Info, Plus, X } from 'lucide-react'
 import type { WordOption } from '../hooks/useWords'
 
 interface WordPickerProps {
@@ -16,6 +17,34 @@ interface WordPickerProps {
 /** Two-column word catalog / selected-words picker, shared by CreateDeckPage and EditDeckModal so neither duplicates this markup. */
 export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove }: WordPickerProps) {
   const [search, setSearch] = useState('')
+  const [openWordId, setOpenWordId] = useState<string | null>(null)
+
+  function definitionPopover(word: WordOption) {
+    return (
+      <Popover
+        open={openWordId === word.id}
+        onOpenChange={(next) => setOpenWordId(next ? word.id : null)}
+      >
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            className="size-11"
+            aria-label={`Show definition of ${word.word}`}
+          >
+            <Info className="size-4 text-muted-foreground" />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          side="bottom"
+          align="end"
+          className="word-definition-popover max-w-64 whitespace-normal break-words pointer-events-none"
+        >
+          {word.definition}
+        </PopoverContent>
+      </Popover>
+    )
+  }
 
   const wordsById = useMemo(() => new Map(words.map((word) => [word.id, word])), [words])
   const selectedWords = selectedIds
@@ -48,15 +77,17 @@ export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove
             <p className="p-2 text-sm text-muted-foreground">No words match your search.</p>
           ) : (
             availableWords.map((word) => (
-              <Button
-                key={word.id}
-                variant="ghost"
-                className="min-h-11 justify-start"
-                onClick={() => onAdd(word.id)}
-              >
-                <Plus aria-hidden="true" className="size-4 text-muted-foreground" />
-                {word.word}
-              </Button>
+              <div key={word.id} className="flex items-center gap-1">
+                <Button
+                  variant="ghost"
+                  className="min-h-11 flex-1 justify-start"
+                  onClick={() => onAdd(word.id)}
+                >
+                  <Plus aria-hidden="true" className="size-4 text-muted-foreground" />
+                  {word.word}
+                </Button>
+                {definitionPopover(word)}
+              </div>
             ))
           )}
         </div>
@@ -79,15 +110,18 @@ export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove
                 className="flex items-center justify-between rounded-md px-2.5 py-1 text-sm text-foreground"
               >
                 {word.word}
-                <Button
-                  variant="ghost"
-                  size="icon-sm"
-                  className="size-11"
-                  aria-label={`Remove ${word.word}`}
-                  onClick={() => onRemove(word.id)}
-                >
-                  <X />
-                </Button>
+                <div className="flex items-center gap-1">
+                  {definitionPopover(word)}
+                  <Button
+                    variant="ghost"
+                    size="icon-sm"
+                    className="size-11"
+                    aria-label={`Remove ${word.word}`}
+                    onClick={() => onRemove(word.id)}
+                  >
+                    <X />
+                  </Button>
+                </div>
               </div>
             ))
           )}
