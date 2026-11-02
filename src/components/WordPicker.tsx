@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useMemo, useState, type MouseEvent } from 'react'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
@@ -19,6 +19,32 @@ export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove
   const [search, setSearch] = useState('')
   const [openWordId, setOpenWordId] = useState<string | null>(null)
 
+  // A row's open popover can visually cover the trigger of the row directly
+  // below it (the lists are packed tightly). Letting clicks pass through the
+  // whole popover to whatever's underneath would also let them reach that
+  // row's much bigger add/remove button -- so the popover stays click-blocking
+  // by default, and this handler only forwards a click to the one safe case:
+  // another word's own "show definition" trigger, found by momentarily hiding
+  // this popover from hit-testing and checking what's directly underneath.
+  function passClickThroughToCoveredTrigger(event: MouseEvent<HTMLElement>) {
+    const content = event.currentTarget
+    // Radix Popper positions content inside its own wrapper div; elementFromPoint
+    // hits that wrapper first unless it's hidden from hit-testing too, not just
+    // the content node itself.
+    const wrapper = content.closest<HTMLElement>('[data-radix-popper-content-wrapper]')
+    content.style.pointerEvents = 'none'
+    if (wrapper) wrapper.style.pointerEvents = 'none'
+    const covered = document.elementFromPoint(event.clientX, event.clientY)
+    content.style.pointerEvents = ''
+    if (wrapper) wrapper.style.pointerEvents = ''
+    const coveredTrigger = covered?.closest<HTMLElement>('[data-slot="popover-trigger"]')
+    coveredTrigger?.click()
+  }
+
+  function closeIfOpen(id: string) {
+    setOpenWordId((current) => (current === id ? null : current))
+  }
+
   function definitionPopover(word: WordOption) {
     return (
       <Popover
@@ -38,7 +64,8 @@ export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove
         <PopoverContent
           side="bottom"
           align="end"
-          className="word-definition-popover max-w-64 whitespace-normal break-words pointer-events-none"
+          className="max-w-64 whitespace-normal break-words"
+          onClick={passClickThroughToCoveredTrigger}
         >
           {word.definition}
         </PopoverContent>
@@ -81,7 +108,10 @@ export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove
                 <Button
                   variant="ghost"
                   className="min-h-11 flex-1 justify-start"
-                  onClick={() => onAdd(word.id)}
+                  onClick={() => {
+                    closeIfOpen(word.id)
+                    onAdd(word.id)
+                  }}
                 >
                   <Plus aria-hidden="true" className="size-4 text-muted-foreground" />
                   {word.word}
@@ -117,7 +147,10 @@ export function WordPicker({ words, loading, error, selectedIds, onAdd, onRemove
                     size="icon-sm"
                     className="size-11"
                     aria-label={`Remove ${word.word}`}
-                    onClick={() => onRemove(word.id)}
+                    onClick={() => {
+                      closeIfOpen(word.id)
+                      onRemove(word.id)
+                    }}
                   >
                     <X />
                   </Button>

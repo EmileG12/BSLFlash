@@ -278,15 +278,3 @@ code {
     min-height: 100svh;}
   html {
     @apply font-sans;}}
-
-/*
- * Lets clicks pass through the word-definition popover to whatever's underneath
- * (e.g. a sibling row's trigger directly below it in WordPicker's tightly packed
- * lists) instead of the popover's own hit-test area intercepting them. Scoped via
- * :has() to this popover's own content class so other Radix Popper consumers
- * (DropdownMenu, Select, Combobox) sharing the same wrapper attribute stay
- * unaffected.
- */
-[data-radix-popper-content-wrapper]:has(> .word-definition-popover) {
-  pointer-events: none;
-}
