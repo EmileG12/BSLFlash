@@ -10,6 +10,7 @@ This folder is a plain markdown tree, so it works two ways:
 
 - [architecture.md](./architecture.md) — how the pieces fit together, current state of the app.
 - [documentation-standards.md](./documentation-standards.md) — how anything in this wiki is written: voice, structure, the current-state rule. Read before writing a doc.
+- [local-development.md](./local-development.md) — running the app locally: prerequisites, setup, seed accounts, scripts.
 - [workflow-automation.md](./workflow-automation.md) — why the workflow is enforced by hooks, the three subagents, and which designs were rejected.
 - [components/](./components/README.md) — React components.
 - [hooks/](./hooks/README.md) — custom React hooks.

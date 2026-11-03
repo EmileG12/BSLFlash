@@ -73,6 +73,8 @@ Running the browser suite requires Chromium: `npx playwright install chromium`.
 | [signVideoUpload](./signVideoUpload.md) | `src/lib/signVideoUpload.test.ts` | [signVideoUpload](../utils/signVideoUpload.md) |
 | [useInstallPrompt](./useInstallPrompt.md) | `src/hooks/useInstallPrompt.test.ts` | [useInstallPrompt](../hooks/useInstallPrompt.md) |
 | [InstallBanner](./InstallBanner.md) | `src/components/InstallBanner.test.tsx` | [InstallBanner](../components/InstallBanner.md) |
+| [WordPicker](./WordPicker.md) | `src/components/WordPicker.test.tsx` | [WordPicker](../components/WordPicker.md) |
+| [WordPicker.browser](./WordPicker.browser.md) | `src/components/WordPicker.browser.test.tsx` | [WordPicker](../components/WordPicker.md) — real-browser popover-switch behavior |
 
 ## Shared helpers
 
